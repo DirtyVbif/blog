@@ -1,5 +1,7 @@
 # Dependency files
 package-lock.json
+composer.lock
 
 # Dependency directories
 node_modules/
+vendor/

@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'Blog' => BLOGDIR
+    'Blog' => COREDIR
 ];

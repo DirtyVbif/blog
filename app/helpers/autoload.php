@@ -1,8 +1,11 @@
 <?php
 
-$helpers = [];
+$helpers = [
+    'app.php',
+    'debug.php'
+];
 
-foreach ([] as $helper_file) {
+foreach ($helpers as $helper_file) {
     require_once HELPERS . $helper_file;
 }
 

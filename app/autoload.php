@@ -3,7 +3,7 @@
 /** @var string relative path to the php application scripts folder. Includes trailing slash */
 define('APPDIR', ROOTDIR . 'app/');
 /** @var string relative path to the php application scripts folder. Includes trailing slash */
-define('BLOGDIR', APPDIR . 'Blog/');
+define('COREDIR', APPDIR . 'core/');
 /** @var string relative path to the helper functions folder. Includes trailing slash */
 define('HELPERS', APPDIR . 'helpers/');
 /** @var string absolute path to the project folder on server. Includes trailing slash */
