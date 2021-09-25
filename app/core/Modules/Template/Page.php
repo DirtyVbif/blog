@@ -6,6 +6,8 @@ use Blog\Modules\TemplateFacade\Title;
 
 class Page extends BaseTemplate
 {
+    use Components\TemplateAttributesMethods;
+
     protected Title $title;
 
     public function __construct(
@@ -28,6 +30,7 @@ class Page extends BaseTemplate
     public function render()
     {
         $this->data['langcode'] = app()->getLangcode();
+        $this->data['attributes'] = $this->attributes();
         if ($title = $this->getTitle()) {
             $this->data['page']['title'] = $title;
         }
@@ -46,5 +49,11 @@ class Page extends BaseTemplate
     public function getTitle(): ?Title
     {
         return $this->title ?? null;
+    }
+
+    public function setHeader(PageHeader $header): self
+    {
+        $this->data['page']['header'] = $header;
+        return $this;
     }
 }

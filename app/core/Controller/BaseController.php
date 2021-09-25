@@ -2,14 +2,14 @@
 
 namespace Blog\Controller;
 
-use Blog\Modules\Template\Page;
-
 abstract class BaseController
 {
     public function prepare(): void
     {
         app()->builder()->preparePage();
         app()->response()->set(app()->page());
+        app()->page()->setAttr('class', 'page');
+        app()->page()->getTitle()->setAttr('class', 'page__title');
         return;
     }
 

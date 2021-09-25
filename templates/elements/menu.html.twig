@@ -1,0 +1,8 @@
+{{ wrapper.open() }}
+    {% for item in items %}
+        <li class="{{ item.class }}">
+            {% set link_class = item.current ? item.link_class ~ ' active' : item.link_class %}
+            <a href="{{ item.url }}" class="{{ link_class }}">{{- item.label -}}</a>
+        </li>
+    {% endfor %}
+{{ wrapper.close() }}
