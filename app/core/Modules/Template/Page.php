@@ -2,10 +2,16 @@
 
 namespace Blog\Modules\Template;
 
+use Blog\Modules\TemplateFacade\Title;
+
 class Page extends BaseTemplate
 {
-    public function __construct(protected string $template_name = 'page')
-    {
+    protected Title $title;
+
+    public function __construct(
+        protected string $template_name = 'page'
+    ) {
+        $this->data['page'] = [];
         parent::__construct($this->template_name);
     }
 
@@ -22,6 +28,23 @@ class Page extends BaseTemplate
     public function render()
     {
         $this->data['langcode'] = app()->getLangcode();
+        if ($title = $this->getTitle()) {
+            $this->data['page']['title'] = $title;
+        }
         return parent::render();
+    }
+
+    public function setTitle(string $title_content): self
+    {
+        if (!isset($this->title)) {
+            $this->title = new Title;
+        }
+        $this->title->set($title_content);
+        return $this;
+    }
+
+    public function getTitle(): ?Title
+    {
+        return $this->title ?? null;
     }
 }

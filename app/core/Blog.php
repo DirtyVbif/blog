@@ -3,6 +3,7 @@
 namespace Blog;
 
 use Blog\Controller\BaseController;
+use Blog\Modules\Builder\Builder;
 use Blog\Modules\Response\Response;
 use Blog\Modules\Router\Router;
 use Blog\Modules\Template\Page;
@@ -17,10 +18,11 @@ class Blog
     private Response $response;
     private BaseController $controller;
     private Page $page;
+    private Builder $builder;
 
     public function __toString()
     {
-        return (string)$this->response->render();
+        return (string)$this->response()->render();
     }
 
     public function run(): void
@@ -47,7 +49,7 @@ class Blog
     public function controller(): BaseController
     {
         if (!isset($this->controller)) {
-            $prefix = '\Blog\Modules\Controller\\';
+            $prefix = '\Blog\Controller\\';
             $name = $prefix . $this->router()->get('controller');
             $this->controller = class_exists($name) ? new $name : new \Blog\Controller\ErrorController;
         }
@@ -60,6 +62,14 @@ class Blog
             $this->page = new Page;
         }
         return $this->page;
+    }
+
+    public function builder(): Builder
+    {
+        if (!isset($this->builder)) {
+            $this->builder = new Builder;
+        }
+        return $this->builder;
     }
 
     public function getLangcode(): string

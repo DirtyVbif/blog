@@ -1,6 +1,8 @@
 <?php
 
-namespace Blog\Modules\Template;
+namespace Blog\Modules\TemplateFacade;
+
+use Blog\Modules\Template\BaseTemplate;
 
 abstract class TemplateFacade
 {
@@ -15,6 +17,6 @@ abstract class TemplateFacade
 
     public function render()
     {
-        return $this->tpl();
+        return $this->tpl()->render();
     }
 }

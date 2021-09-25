@@ -17,12 +17,13 @@ $__config['langcode'] = 'ru';
 // set twig settings
 $__config['twig'] = [
     'safe_classes' => [
-        // 'DMPF\Modules\Template\Page' => ['html', 'js', 'all']
-        // 'DMPF\Modules\Template\Wrapper' => ['html']
+        // 'Path\To\Class' => ['html', 'js', 'all']
+        'Blog\Modules\Template\TemplateWrapper' => ['html'],
+        'Blog\Modules\TemplateFacade\Title' => ['html']
     ],
     'config' => [
-        'cache' => 'cache/templates',
-        // 'cache' => false,
+        // 'cache' => 'cache/templates',
+        'cache' => false,
         'debug' => true,
         'auto_reload' => false
         // 'autoescape' => false

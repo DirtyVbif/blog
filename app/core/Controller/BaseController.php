@@ -8,7 +8,10 @@ abstract class BaseController
 {
     public function prepare(): void
     {
-        $page = new Page;
-        app()->response()->set($page);
+        app()->builder()->preparePage();
+        app()->response()->set(app()->page());
+        return;
     }
+
+    abstract public function getTitle(): string;
 }

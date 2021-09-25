@@ -2,7 +2,10 @@
 
 namespace Blog\Controller;
 
-class ErrorController extends BaseController
+class FrontController extends BaseController
 {
-
+    public function getTitle(): string
+    {
+        return 'Blog page';
+    }
 }
