@@ -10,7 +10,7 @@ class Title extends TemplateFacade
     /**
      * @return Element $tpl
      */
-    public function tpl(): BaseTemplate
+    public function tpl()
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element('h1');
@@ -21,6 +21,12 @@ class Title extends TemplateFacade
     public function set(string $title_content): self
     {
         $this->tpl()->content()->set($title_content);
+        return $this;
+    }
+
+    public function setAttr(string $name, ?string $value = null): self
+    {
+        $this->tpl()->setAttr($name, $value);
         return $this;
     }
 }

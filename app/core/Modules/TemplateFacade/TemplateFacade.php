@@ -8,7 +8,7 @@ abstract class TemplateFacade
 {
     protected BaseTemplate $tpl;
 
-    abstract public function tpl(): BaseTemplate;
+    abstract public function tpl();
 
     public function __toString()
     {
