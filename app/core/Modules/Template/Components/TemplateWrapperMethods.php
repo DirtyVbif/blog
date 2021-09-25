@@ -24,4 +24,10 @@ trait TemplateWrapperMethods
         $this->wrapper()->set($tag_name);
         return $this;
     }
+
+    public function setAttr(string $name, ?string $value = null): self
+    {
+        $this->wrapper()->setAttr($name, $value);
+        return $this;
+    }
 }

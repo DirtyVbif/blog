@@ -14,6 +14,12 @@ class Element extends BaseTemplate
         $this->tag($tag);
     }
 
+    public function setName(string $template_name): self
+    {
+        $this->template_name = $template_name;
+        return $this;
+    }
+
     public function render()
     {
         $this->set('wrapper', $this->wrapper());
