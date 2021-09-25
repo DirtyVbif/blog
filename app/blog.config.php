@@ -18,7 +18,9 @@ $__config['langcode'] = 'ru';
 $__config['twig'] = [
     'safe_classes' => [
         // 'Path\To\Class' => ['html', 'js', 'all']
+        'Blog\Modules\Template\BaseTemplate' => ['html'],
         'Blog\Modules\Template\TemplateWrapper' => ['html'],
+        'Blog\Modules\Template\TemplateAttributes' => ['html'],
         'Blog\Modules\TemplateFacade\Title' => ['html']
     ],
     'config' => [
