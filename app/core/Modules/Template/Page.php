@@ -9,6 +9,10 @@ class Page extends BaseTemplate
     use Components\TemplateAttributesMethods;
 
     protected Title $title;
+    protected array $css = [
+        'style.min'
+    ];
+    protected array $js = [];
 
     public function __construct(
         protected string $template_name = 'page'
@@ -24,6 +28,10 @@ class Page extends BaseTemplate
 
     public function useCss(string $name): self
     {
+        $name = preg_replace('/\.css$/', '', $name);
+        if (!in_array($name, $this->css)) {
+            array_push($this->css, $name);
+        }
         return $this;
     }
 
@@ -31,6 +39,7 @@ class Page extends BaseTemplate
     {
         $this->data['langcode'] = app()->getLangcode();
         $this->data['attributes'] = $this->attributes();
+        $this->data['css'] = $this->css;
         if ($title = $this->getTitle()) {
             $this->data['page']['title'] = $title;
         }
