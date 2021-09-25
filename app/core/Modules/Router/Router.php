@@ -4,6 +4,8 @@ namespace Blog\Modules\Router;
 
 class Router
 {
+    use Components\RouterRedirects;
+
     protected array $data = [];
     protected int $status = 200;
     protected string $default_langcode = 'en';
@@ -22,8 +24,15 @@ class Router
         $this->data['url'] = urldecode($_SERVER['REDIRECT_URL'] ?? '/');
         $this->data['params'] = $_GET ?? [];
         $this->parseUrlArguments();
-        $c_name = strtolower($this->arg(1) ?? 'front');
-        $this->data['controller'] = ucfirst($c_name) . 'Controller';
+        if ($this->isPostRequest()) {
+            pre($_POST);
+            die;
+        } else if ($this->isGetRequest()) {
+            $c_name = strtolower($this->arg(1) ?? 'front');
+            $this->data['controller'] = ucfirst($c_name) . 'Controller';
+        } else {
+            die('unknown request method.');
+        }
         return;
     }
 
@@ -74,5 +83,38 @@ class Router
     public function getLangcode(): string
     {
         return $this->get('langcode');
+    }
+
+    public function isGetRequest(): bool
+    {
+        return $this->get('method') === 'GET';
+    }
+
+    public function isPostRequest(): bool
+    {
+        return $this->get('method') === 'POST';
+    }
+
+    public function isHome(): bool
+    {
+        return $this->get('url') === '/';
+    }
+
+    /**
+     * Get current relative offset of specified deep level
+     * 
+     * @param int $level min 1
+     */
+    public function level(int $level): string
+    {
+        $level = $level < 1 ? 1 : $level;
+        $url = '';
+        for ($i = 1; $i <= $level; $i++) {
+            if (!$arg = $this->arg($i)) {
+                break;
+            }
+            $url .= '/' . $arg;
+        }
+        return $url ? $url : '/';
     }
 }
