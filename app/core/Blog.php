@@ -3,23 +3,16 @@
 namespace Blog;
 
 use Blog\Controller\BaseController;
-use Blog\Modules\Builder\Builder;
-use Blog\Modules\Response\Response;
-use Blog\Modules\Router\Router;
-use Blog\Modules\Template\Page;
 
 class Blog
 {
     use Components\Singletone,
         Components\BlogConfig,
         Components\TwigLoader,
-        Components\Translator;
+        Components\Translator,
+        Components\BlogModules;
 
-    private Router $router;
-    private Response $response;
     private BaseController $controller;
-    private Page $page;
-    private Builder $builder;
 
     public function __toString()
     {
@@ -31,22 +24,6 @@ class Blog
         $this->controller()->prepare();
     }
 
-    public function response(): Response
-    {
-        if (!isset($this->response)) {
-            $this->response = new Response;
-        }
-        return $this->response;
-    }
-
-    public function router(): Router
-    {
-        if (!isset($this->router)) {
-            $this->router = new Router;
-        }
-        return $this->router;
-    }
-
     public function controller(): BaseController
     {
         if (!isset($this->controller)) {
@@ -55,22 +32,6 @@ class Blog
             $this->controller = class_exists($name) ? new $name : new \Blog\Controller\ErrorController;
         }
         return $this->controller;
-    }
-
-    public function page(): Page
-    {
-        if (!isset($this->page)) {
-            $this->page = new Page;
-        }
-        return $this->page;
-    }
-
-    public function builder(): Builder
-    {
-        if (!isset($this->builder)) {
-            $this->builder = new Builder;
-        }
-        return $this->builder;
     }
 
     public function getLangcode(): string

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Application global charset
+ * Default application charset
  */
 const CHARSET = 'UTF-8';
 
@@ -11,10 +11,14 @@ const CHARSET = 'UTF-8';
  */
 $__config = [];
 
-// set default application parameters
+/**
+ * Default application langcode
+ */
 $__config['langcode'] = 'ru';
 
-// set twig settings
+/**
+ * Twig settings
+ */
 $__config['twig'] = [
     'safe_classes' => [
         // 'Path\To\Class' => ['html', 'js', 'all']
@@ -30,6 +34,26 @@ $__config['twig'] = [
         // 'autoescape' => false
     ],
     'templates' => 'templates'
+];
+
+/**
+ * Database connection settings
+ */
+$__config['database'] = [
+    'HOST' => 'localhost',
+    'NAME' => 'mublog',
+    'USER' => 'root',
+    'PASS' => 'root',
+    'DRIVER' => 'mysql'
+];
+
+/**
+* PDO connection parameters.
+* This parameters will be used if 'PDO' database strategy selected
+*/
+$__config['pdo'] = [
+   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,     // return assoc array
+   PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION           // return exeption if error
 ];
 
 return $__config;
