@@ -1,0 +1,8 @@
+{{ wrapper.open() }}
+    {{ label }}
+    <ul>
+        {% for item in items %}
+            <li><h3>{{ item.label }}</h3></li>
+        {% endfor %}
+    </ul>
+{{ wrapper.close() }}

@@ -1,0 +1,27 @@
+php: {
+  icon: '/images/icon-php.png',
+  label: 'PHP 5, 7, 8',
+  desc: '',
+  class: ''
+}
+
+javascript: {
+  icon: '/images/icon-js.png',
+  label: 'JavaScript',
+  desc: '',
+  class: ''
+}
+
+html: {
+  icon: '/images/icon-html.png',
+  label: 'HTML 5 / CSS 3',
+  desc: '',
+  class: ''
+}
+
+sql: {
+  icon: '/images/icon-sql.png',
+  label: 'SQL Databases',
+  desc: '',
+  class: ''
+}

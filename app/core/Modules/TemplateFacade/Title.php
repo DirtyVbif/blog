@@ -11,7 +11,7 @@ class Title extends TemplateFacade
     public function __construct(
         protected int $size = 1
     ) {
-        $this->size = $this->size > 6 ? 6 : ($this->size < 1 ? 1 : $this->size);
+        $this->size($this->size);
     }
     /**
      * @return Element $tpl
@@ -29,6 +29,8 @@ class Title extends TemplateFacade
     {
         if (!isset($this->content) || !$this->content) {
             $this->renderable = false;
+        } else {
+            $this->tpl()->setContent($this->content);
         }
         return parent::render();
     }
@@ -42,6 +44,21 @@ class Title extends TemplateFacade
     public function setAttr(string $name, ?string $value = null): self
     {
         $this->tpl()->setAttr($name, $value);
+        return $this;
+    }
+
+    public function size(int $size): self
+    {
+        switch (true) {
+            case ($size > 6):
+                $this->size = 6;
+                break;
+            case ($size < 1):
+                $this->size = 1;
+                break;
+            default:
+                $this->size = $size;
+        }
         return $this;
     }
 }

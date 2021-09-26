@@ -30,4 +30,10 @@ trait TemplateWrapperMethods
         $this->wrapper()->setAttr($name, $value);
         return $this;
     }
+
+    public function addClass(string $class): self
+    {
+        $this->wrapper()->addClass($class);
+        return $this;
+    }
 }

@@ -12,7 +12,7 @@ trait Translator
     public function translate(string $text): string
     {
         $this->checkTranslations();
-        return $this->translations[$text] ?? $text;
+        return isset($this->translations[$text]) ? $this->translations[$text] : $text;
     }
 
     public function langcode(): string

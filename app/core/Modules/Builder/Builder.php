@@ -5,6 +5,7 @@ namespace Blog\Modules\Builder;
 use Blog\Modules\Template\Element;
 use Blog\Modules\Template\PageFooter;
 use Blog\Modules\Template\PageHeader;
+use Blog\Modules\TemplateFacade\Title;
 use Symfony\Component\Yaml\Yaml;
 
 class Builder
@@ -35,7 +36,7 @@ class Builder
     public function getMenuLinks(string $menu_name): array
     {
         if (!isset($this->menu_links)) {
-            $this->menu_links = Yaml::parseFile(__DIR__ . '/src/menu-links.yml');
+            $this->menu_links = $this->getSrc('menu-links');
         }
         $links = $this->menu_links[$menu_name] ?? [];
         foreach ($links as &$link) {
@@ -45,6 +46,13 @@ class Builder
             }
         }
         return $links;
+    }
+
+    protected function getSrc(string $name): array
+    {
+        $name = strSuffix($name, '.yml');
+        $filename = COREDIR . "Modules/Builder/src/{$name}";
+        return file_exists($filename) ? Yaml::parseFile($filename) : [];
     }
 
     public function header(): PageHeader
@@ -82,7 +90,20 @@ class Builder
     {
         $slider = new Element('section');
         $slider->setName('elements/slider');
-        $slider->setAttr('class', 'slider');
+        $slider->addClass('slider');
         return $slider;
+    }
+
+    public function getSkills(): Element
+    {
+        $skills = new Element('section');
+        $skills->setName('elements/skills');
+        $skills->addClass('skills');
+        $items = $this->getSrc('skills');
+        $skills->set('items', $items);
+        $label = new Title(2);
+        $label->set(t('My skills'));
+        $skills->set('label', $label);
+        return $skills;
     }
 }

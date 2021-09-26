@@ -27,4 +27,10 @@ trait TemplateAttributesMethods
         $this->setAttr($name, $value);
         return $this;
     }
+
+    public function addClass(string $class): self
+    {
+        $this->attributes()->addClass($class);
+        return $this;
+    }
 }
