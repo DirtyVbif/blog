@@ -15,4 +15,10 @@ trait TemplateContentMethods
         }
         return $this->content;
     }
+
+    public function setContent($content): self
+    {
+        $this->content()->set($content);
+        return $this;
+    }
 }

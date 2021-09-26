@@ -7,6 +7,7 @@ use Blog\Modules\Template\BaseTemplate;
 abstract class TemplateFacade
 {
     protected BaseTemplate $tpl;
+    protected bool $renderable = true;
 
     abstract public function tpl();
 
@@ -17,6 +18,6 @@ abstract class TemplateFacade
 
     public function render()
     {
-        return $this->tpl()->render();
+        return $this->renderable ? $this->tpl()->render() : '';
     }
 }

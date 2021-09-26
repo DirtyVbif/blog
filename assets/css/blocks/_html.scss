@@ -6,8 +6,19 @@ html, body {
     margin: 0;
     padding: 0;
     color: $txt;
+    font: $font;
+    @include vwMax(767) {
+        font-size: 18px;
+    }
+    @include vwMax(480) {
+        font-size: 16px;
+    }
 }
 
 a {
     text-decoration: none;
+}
+
+h1 {
+    font-size: 2em;
 }

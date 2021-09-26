@@ -13,6 +13,7 @@ class Page extends BaseTemplate
         'style.min'
     ];
     protected array $js = [];
+    protected array $content = [];
 
     public function __construct(
         protected string $template_name = 'page'
@@ -43,6 +44,12 @@ class Page extends BaseTemplate
         if ($title = $this->getTitle()) {
             $this->data['page']['title'] = $title;
         }
+        if (!empty($this->content)) {
+            $content = new Element('main');
+            $content->setAttr('class', 'container container_main');
+            $content->setContent(implode($this->content));
+            $this->data['page']['content'] = $content;
+        }
         return parent::render();
     }
 
@@ -69,6 +76,12 @@ class Page extends BaseTemplate
     public function setFooter(PageFooter $footer): self
     {
         $this->data['page']['footer'] = $footer;
+        return $this;
+    }
+
+    public function addContent($content): self
+    {
+        $this->content[] = $content;
         return $this;
     }
 }

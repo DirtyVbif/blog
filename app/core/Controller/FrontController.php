@@ -12,12 +12,15 @@ class FrontController extends BaseController
         app()->builder()->header()->set('menu', $main_menu);
         $foo_nav = app()->builder()->getMenu('footer');
         app()->builder()->footer()->set('menu', $foo_nav);
+        $slider = app()->builder()->getSlider();
+        app()->page()->addContent($slider);
+        app()->page()->useCss('front.min');
 
         return;
     }
 
     public function getTitle(): string
     {
-        return 'Blog page';
+        return '';
     }
 }

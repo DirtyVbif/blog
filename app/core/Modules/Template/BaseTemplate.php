@@ -7,6 +7,7 @@ class BaseTemplate
     protected array $data = [];
     protected string $namespace;
     protected string $template_extension = '.html.twig';
+    protected bool $is_safe = false;
 
     public function __construct(
         protected string $template_name

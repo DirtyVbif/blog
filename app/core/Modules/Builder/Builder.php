@@ -77,4 +77,12 @@ class Builder
             ->setAttr('title', t('Go home page'));
         return $logo;
     }
+
+    public function getSlider(): Element
+    {
+        $slider = new Element('section');
+        $slider->setName('elements/slider');
+        $slider->setAttr('class', 'slider');
+        return $slider;
+    }
 }

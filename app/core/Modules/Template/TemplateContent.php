@@ -2,6 +2,8 @@
 
 namespace Blog\Modules\Template;
 
+use Twig\Markup;
+
 class TemplateContent extends BaseTemplateElement
 {
     protected array $content = [];

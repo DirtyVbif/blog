@@ -1,0 +1,34 @@
+@mixin vwMin($_min) {
+    @media (min-width: $_min + 'px') {
+        @content;
+    }
+}
+
+@mixin vwMax($_max) {
+    @media (max-width: $_max + 'px') {
+        @content;
+    }
+}
+
+@mixin wrapper()
+{
+    width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    @include vwMax(1200) {
+        width: 720px;
+    }
+    @include vwMax(767) {
+        width: calc(100% - 60px);
+    }
+    @include vwMax(480) {
+        width: calc(100% - 30px);
+    }
+}
+
+@mixin noul()
+{
+    margin: 0;
+    padding-left: 0;
+    list-style-type: none;
+}

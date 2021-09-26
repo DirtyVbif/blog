@@ -1,0 +1,15 @@
+.container {
+    @include wrapper();
+
+    &_main {
+        background: $bkgd;
+        overflow: hidden;
+        border-radius: 5px;
+        box-shadow: 0 0 10px -3px #898d90;
+
+        @include vwMax(767) {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    }
+}
