@@ -24,7 +24,7 @@ $__config['twig'] = [
         'Blog\Modules\TemplateFacade\Title' => ['html']
     ],
     'config' => [
-        // 'cache' => 'cache/templates',
+        // 'cache' => ROOTDIR . 'cache/templates',
         'cache' => false,
         'debug' => true,
         'auto_reload' => false

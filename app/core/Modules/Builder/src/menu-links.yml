@@ -1,11 +1,53 @@
 main: [
-  {url: '/', label: 'home', class: 'menu__item menu_main__item', link_class: 'menu__link menu_main__link'}
-  {url: '/blog', label: 'blog', class: 'menu__item menu_main__item', link_class: 'menu__link menu_main__link'}
-  {url: '#about', label: 'about', class: 'menu__item menu_main__item', link_class: 'js-anchor-link menu__link menu_main__link'}
-  {url: '#contacts', label: 'contacts', class: 'menu__item menu_main__item', link_class: 'js-anchor-link menu__link menu_main__link'}
+  {
+    url: '/',
+    label: 'home',
+    class: 'menu__item menu_main__item',
+    link_class: 'menu__link menu_main__link'
+  }
+  {
+    url: '/blog',
+    label: 'blog',
+    class: 'menu__item menu_main__item',
+    link_class: 'menu__link menu_main__link'
+  }
+  {
+    url: '#about',
+    label: 'about',
+    class: 'menu__item menu_main__item',
+    link_class: 'js-anchor-link menu__link menu_main__link'
+  }
+  {
+    url: '#contacts',
+    label: 'contacts',
+    class: 'menu__item menu_main__item',
+    link_class: 'js-anchor-link menu__link menu_main__link'
+  }
 ]
 
 footer: [
-  {url: '/', label: 'home'}
-  {url: '/blog', label: 'blog'}
+  {
+    url: '/',
+    label: 'home',
+    class: 'menu__item menu_footer__item',
+    link_class: 'menu__link menu_footer__link'
+  }
+  {
+    url: '/blog',
+    label: 'blog',
+    class: 'menu__item menu_footer__item',
+    link_class: 'menu__link menu_footer__link'
+  }
+  {
+    url: '#about',
+    label: 'about',
+    class: 'menu__item menu_footer__item',
+    link_class: 'js-anchor-link menu__link menu_footer__link'
+  }
+  {
+    url: '#contacts',
+    label: 'contacts',
+    class: 'menu__item menu_footer__item',
+    link_class: 'js-anchor-link menu__link menu_footer__link'
+  }
 ]

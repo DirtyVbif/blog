@@ -3,19 +3,21 @@
 namespace Blog\Modules\Builder;
 
 use Blog\Modules\Template\Element;
+use Blog\Modules\Template\PageFooter;
 use Blog\Modules\Template\PageHeader;
 use Symfony\Component\Yaml\Yaml;
 
 class Builder
 {
     protected PageHeader $page_header;
-    protected Element $logo;
+    protected PageFooter $page_footer;
     protected array $menu_links;
 
     public function preparePage(): void
     {
         app()->page()->setTitle(app()->controller()->getTitle());
         app()->page()->setHeader($this->header());
+        app()->page()->setFooter($this->footer());
         return;
     }
 
@@ -49,19 +51,30 @@ class Builder
     {
         if (!isset($this->page_header)) {
             $this->page_header = new PageHeader;
-            $this->page_header->set('logo', $this->getLogo());
+            $logo = $this->getLogo();
+            $logo->setAttr('class', 'logo logo_header');
+            $this->page_header->set('logo', $logo);
         }
         return $this->page_header;
     }
 
+    public function footer(): PageFooter
+    {
+        if (!isset($this->page_footer)) {
+            $this->page_footer = new PageFooter;
+            $logo = $this->getLogo();
+            $logo->setAttr('class', 'logo logo_footer');
+            $this->page_footer->set('logo', $logo);
+        }
+        return $this->page_footer;
+    }
+
     public function getLogo(): Element
     {
-        if (!isset($this->logo)) {
-            $this->logo = new Element('a');
-            $this->logo->setName('elements/logo');
-            $this->logo->setAttr('href', '/')
-                ->setAttr('title', 'Go home page');
-        }
-        return $this->logo;
+        $logo = new Element('a');
+        $logo->setName('elements/logo');
+        $logo->setAttr('href', '/')
+            ->setAttr('title', 'Go home page');
+        return $logo;
     }
 }

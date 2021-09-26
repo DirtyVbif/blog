@@ -21,7 +21,7 @@ class Page extends BaseTemplate
         parent::__construct($this->template_name);
     }
 
-    public function useJs(string $name): self
+    public function useJs(string $name, bool $async = true): self
     {
         return $this;
     }
@@ -63,6 +63,12 @@ class Page extends BaseTemplate
     public function setHeader(PageHeader $header): self
     {
         $this->data['page']['header'] = $header;
+        return $this;
+    }
+
+    public function setFooter(PageFooter $footer): self
+    {
+        $this->data['page']['footer'] = $footer;
         return $this;
     }
 }
