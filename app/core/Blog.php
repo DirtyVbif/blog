@@ -12,7 +12,8 @@ class Blog
 {
     use Components\Singletone,
         Components\BlogConfig,
-        Components\TwigLoader;
+        Components\TwigLoader,
+        Components\Translator;
 
     private Router $router;
     private Response $response;

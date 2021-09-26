@@ -5,7 +5,12 @@ function app(): \Blog\Blog
     return \Blog\Blog::instance();
 }
 
-function page(): \Blog\Modules\Templates\Page
+function page(): \Blog\Modules\Template\Page
 {
-    app()->page();
+    return app()->page();
+}
+
+function t(string $text): string
+{
+    return app()->translate($text);
 }

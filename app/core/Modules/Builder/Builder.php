@@ -74,7 +74,7 @@ class Builder
         $logo = new Element('a');
         $logo->setName('elements/logo');
         $logo->setAttr('href', '/')
-            ->setAttr('title', 'Go home page');
+            ->setAttr('title', t('Go home page'));
         return $logo;
     }
 }

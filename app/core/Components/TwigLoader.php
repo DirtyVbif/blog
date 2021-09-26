@@ -52,6 +52,10 @@ trait TwigLoader
             if (!isset($extensions['Twig\Extension\EscaperExtension'])) {
                 $this->twig->addExtension(new TwigEscaper('html'));
             }
+            $twig_functions = new ExtendedTwigFunctions;
+            foreach ($twig_functions->list() as $fn) {
+                $this->twig->addFunction($fn);
+            }
             $this->twig_set_base_safe_classes();
         }
 
