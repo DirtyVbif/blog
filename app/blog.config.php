@@ -56,4 +56,15 @@ $__config['pdo'] = [
    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION           // return exeption if error
 ];
 
+/**
+ * Application cache configurations
+ */
+$__config['cache'] = [
+    'sql' => [
+        'status' => true,
+        'lifetime' => 60 * 60 * 24,
+        'minimized' => false
+    ]
+];
+
 return $__config;

@@ -7,6 +7,8 @@ use PDOStatement;
 
 class Bridge
 {
+    use Components\BridgeCacheSystem;
+
     /**
      * @var string[] database connection config
      */
@@ -47,15 +49,6 @@ class Bridge
      */
     public function query(string $request, array $data = []): PDOStatement
     {
-        // $cache_request = $this->bindVariables($request, $data);
-        // if (preg_match('/\bselect\s.*\sfrom\s/i', $request)) {
-        //     $query = $this->getCacheQuery($cache_request);
-        //     return empty($query) ?
-        //         $this->setCacheQuery(
-        //             $cache_request,
-        //             $this->connect()->query($request, $data)
-        //         ) : $query;
-        // }
         $this->statement = $this->connect()->prepare($request);
         $this->statement->execute($data);
         $this->statementErrors();
@@ -80,19 +73,17 @@ class Bridge
      */
     public function selectFirst(string $request, array $data = []): array
     {
-        // $cache_request = $this->bindVariables($request, $data);
-        // $query = $this->getCacheQuery($cache_request, false);
-        // if (empty($query)) {
-        //     $row = $this->query($request, $data)->fetch();
-        //     $query = $this->setCacheQuery(
-        //         $cache_request,
-        //         [0 => $row ? $row : []]
-        //     );
-        //     $query =  $query[0];
-        // }
-        // return $query;
-        $row = $this->query($request, $data)->fetch();
-        return $row ? $row : [];
+        $cache_request = $this->bindVariables($request, $data);
+        $query = $this->getCacheQuery($cache_request, false);
+        if (empty($query)) {
+            $row = $this->query($request, $data)->fetch();
+            $query = $this->setCacheQuery(
+                $cache_request,
+                [0 => $row ? $row : []]
+            );
+            $query =  $query[0];
+        }
+        return $query;
     }
 
     /**
@@ -100,14 +91,13 @@ class Bridge
      */
     public function select(string $request, array $data = []): array
     {
-        // $cache_request = $this->bindVariables($request, $data);
-        // $query = $this->getCacheQuery($cache_request);
-        // return empty($query) ?
-        //     $this->setCacheQuery(
-        //         $cache_request,
-        //         $this->query($request, $data)->fetchAll()
-        //     ) : $query;
-        return $this->query($request, $data)->fetchAll();
+        $cache_request = $this->bindVariables($request, $data);
+        $query = $this->getCacheQuery($cache_request);
+        return empty($query) ?
+            $this->setCacheQuery(
+                $cache_request,
+                $this->query($request, $data)->fetchAll()
+            ) : $query;
     }
 
     /**
@@ -115,8 +105,8 @@ class Bridge
      */
     public function change(string $request, array $data = []): int
     {
-        // $cache_request = $this->bindVariables($request, $data);
-        // $this->markupCacheToUpdate($cache_request);
+        $cache_request = $this->bindVariables($request, $data);
+        $this->markupCacheToUpdate($cache_request);
         return $this->query($request, $data)->rowCount();
     }
 
@@ -127,8 +117,8 @@ class Bridge
      */
     public function insert(string $request, array $data = []): string
     {
-        // $cache_request = $this->bindVariables($request, $data);
-        // $this->markupCacheToUpdate($cache_request);
+        $cache_request = $this->bindVariables($request, $data);
+        $this->markupCacheToUpdate($cache_request);
         $this->query($request, $data);
         return $this->connect()->lastInsertId();
     }

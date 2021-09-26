@@ -73,6 +73,35 @@ function strRegexQuote(string $string, array $chars = ['/']): string
     return $string;
 }
 
+/**
+ * Replace White Spaces in string (str rws) with single white space symbol
+ */
+function strrws(string $string): string
+{
+    return preg_replace('/[\s]+/', ' ', $string);
+}
+
+/**
+ * Format File (or directory) String (ffstr). Removes leading slash `/`
+ * 
+ * Recieves one or more string arguments as references and removes leading slash `/` for each argument
+ */
+function ffstr(string &...$args): void
+{
+    foreach ($args as &$arg) {
+        $arg = str_replace('\\', '/', $arg);
+        $arg = preg_replace(
+            ['/^\/\b/', '/^\/?\.\/\b/', '/^\/{1}/'],
+            ['', '', ''],
+            $arg
+        );
+    }
+    return;
+}
+
+/**
+ * Convert input string into PascalCaseString
+ */
 function strPascalCase(string $string): string
 {
     $pascal_string = '';

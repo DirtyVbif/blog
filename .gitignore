@@ -5,3 +5,6 @@ composer.lock
 # Dependency directories
 node_modules/
 vendor/
+
+# cache
+cache/
