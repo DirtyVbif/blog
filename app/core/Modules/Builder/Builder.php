@@ -13,6 +13,7 @@ class Builder
     protected PageHeader $page_header;
     protected PageFooter $page_footer;
     protected array $menu_links;
+    protected array $links;
 
     public function preparePage(): void
     {
@@ -38,14 +39,35 @@ class Builder
         if (!isset($this->menu_links)) {
             $this->menu_links = $this->getSrc('menu-links');
         }
-        $links = $this->menu_links[$menu_name] ?? [];
-        foreach ($links as &$link) {
+        $menu_items = $this->menu_links[$menu_name] ?? [];
+        $links = [];
+        foreach ($menu_items['items'] as $name) {
+            $link = $this->getLink($name);
             $link['current'] = $link['url'] === app()->router()->get('url');
-            if (preg_match('/^\#/', $link['url']) && !app()->router()->isHome()) {
-                $link['url'] = '/' . $link['url'];
+            $item_classes = $link_classes = [];
+            if (preg_match('/^\#/', $link['url'])) {
+                $link_classes[] = 'js-anchor-link';
+                if (!app()->router()->isHome()) {
+                    $link['url'] = '/' . $link['url'];
+                }
             }
+            foreach (preg_split('/\s+/', $menu_items['class']) as $class_string) {
+                $item_classes[] = $class_string . '__item';
+                $link_classes[] = $class_string . '__link';
+            }
+            $link['class'] = implode(' ', $item_classes);
+            $link['link_class'] = implode(' ', $link_classes);
+            $links[$name] = $link;
         }
         return $links;
+    }
+
+    public function getLink(string $name): array
+    {
+        if (!isset($this->links)) {
+            $this->links = $this->getSrc('links');
+        }
+        return $this->links[$name];
     }
 
     protected function getSrc(string $name): array

@@ -1,0 +1,20 @@
+front: {
+  url: '/',
+  label: 'home'
+}
+blog: {
+  url: '/blog',
+  label: 'blog'
+}
+about: {
+  url: '#about',
+  label: 'about'
+}
+contacts: {
+  url: '#contacts',
+  label: 'contacts'
+}
+cookie_agreement: {
+  url: '/agreement-cookie',
+  label: 'Использование файлов cookie'
+}
