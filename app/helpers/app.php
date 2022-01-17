@@ -37,3 +37,8 @@ function cookies(): \Blog\Client\CookiesFacade
 {
     return CookiesFacade::instance();
 }
+
+function tpllink(string $name): \Blog\Modules\TemplateFacade\Link
+{
+    return new \Blog\Modules\TemplateFacade\Link($name);
+}

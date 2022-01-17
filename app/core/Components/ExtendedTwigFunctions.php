@@ -6,14 +6,14 @@ use Twig\TwigFunction;
 
 class ExtendedTwigFunctions
 {
-    protected array $functions;
+    protected array $functions = [];
+    protected array $function_names = [
+        't', 'link'
+    ];
 
     public function __construct()
     {
-        $this->functions = [];
-        $this->prepareExtendedFunctions([
-            't'
-        ]);
+        $this->prepareExtendedFunctions($this->function_names);
     }
 
     public function list(): array
@@ -33,5 +33,10 @@ class ExtendedTwigFunctions
     protected function initFunctionT(): TwigFunction
     {
         return new TwigFunction('t', 't');
+    }
+
+    protected function initFunctionLink(): TwigFunction
+    {
+        return new TwigFunction('link', 'tpllink');
     }
 }

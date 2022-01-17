@@ -13,6 +13,7 @@ class Title extends TemplateFacade
     ) {
         $this->size($this->size);
     }
+    
     /**
      * @return Element $tpl
      */
