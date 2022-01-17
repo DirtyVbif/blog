@@ -2,6 +2,8 @@
 
 namespace Blog\Modules\Template;
 
+use Twig\Markup;
+
 class BaseTemplate
 {
     protected array $data = [];
@@ -28,7 +30,11 @@ class BaseTemplate
         if ($this->useGlobals()) {
             $this->setGlobals();
         }
-        return app()->twig()->render($this->twigTplName(), $this->data());
+        $output = app()->twig()->render($this->twigTplName(), $this->data());
+        if ($this->safety()) {
+            $output = new Markup($output, CHARSET);
+        }
+        return $output;
     }
 
     public function twigTplName(): string
@@ -66,5 +72,15 @@ class BaseTemplate
     protected function setGlobals()
     {
         $this->set('langcode', app()->getLangcode());
+    }
+
+    public function safety(?bool $is_safe = null): bool|self
+    {
+        if (is_null($is_safe)) {
+            return $this->is_safe;
+        } else {
+            $this->is_safe = $is_safe;
+            return $this;
+        }
     }
 }
