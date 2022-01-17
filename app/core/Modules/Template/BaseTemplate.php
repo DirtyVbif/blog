@@ -8,6 +8,8 @@ class BaseTemplate
     protected string $namespace;
     protected string $template_extension = '.html.twig';
     protected bool $is_safe = false;
+    protected bool $use_globals = false;
+    protected array $globals;
 
     public function __construct(
         protected string $template_name
@@ -23,6 +25,9 @@ class BaseTemplate
 
     public function render()
     {
+        if ($this->useGlobals()) {
+            $this->setGlobals();
+        }
         return app()->twig()->render($this->twigTplName(), $this->data());
     }
 
@@ -41,5 +46,25 @@ class BaseTemplate
     {
         $this->data[$data_key] = $value;
         return;
+    }
+
+    /**
+     * Get or set current statement of usage of global variables in the template
+     */
+    public function useGlobals(?bool $usage = null)
+    {
+        if (is_null($usage)) {
+            /** @return bool */
+            return $this->use_globals;
+        } else {
+            /** @return void */
+            $this->use_globals = $usage;
+            return;
+        }
+    }
+
+    protected function setGlobals()
+    {
+        $this->set('langcode', app()->getLangcode());
     }
 }

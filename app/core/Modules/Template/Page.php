@@ -18,6 +18,7 @@ class Page extends BaseTemplate
     public function __construct(
         protected string $template_name = 'page'
     ) {
+        $this->useGlobals(true);
         $this->data['page'] = [];
         parent::__construct($this->template_name);
     }
@@ -38,9 +39,9 @@ class Page extends BaseTemplate
 
     public function render()
     {
-        $this->data['langcode'] = app()->getLangcode();
         $this->data['attributes'] = $this->attributes();
         $this->data['css'] = $this->css;
+        $this->data['cookies_accepted'] = cookies()->isCookiesAccepted();
         if ($title = $this->getTitle()) {
             $this->data['page']['title'] = $title;
         }
