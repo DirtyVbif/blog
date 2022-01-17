@@ -15,14 +15,13 @@ class FrontController extends BaseController
         app()->builder()->footer()->set('menu', $foo_nav);
         // use front page styles
         app()->page()->useCss('front.min');
-        // set front page slider
-        app()->page()->addContent(
-            app()->builder()->getSlider()
-        );
-        // set front page skill box
-        app()->page()->addContent(
+        // add page content
+        app()->page()->addContent([
+            // set front page slider
+            app()->builder()->getSlider(),
+            // set front page skill box
             app()->builder()->getSkills()
-        );
+        ]);
         return;
     }
 

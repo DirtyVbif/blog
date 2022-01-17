@@ -81,7 +81,16 @@ class Page extends BaseTemplate
 
     public function addContent($content): self
     {
-        $this->content[] = $content;
+        if (is_array($content)) {
+            foreach ($content as $part) {
+                $this->addContent($part);
+            }
+        } else if (
+            is_string($content)
+            || (is_object($content) && method_exists($content, '__toString'))
+        ) {
+            $this->content[] = $content;
+        }
         return $this;
     }
 }

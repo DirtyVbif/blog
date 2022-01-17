@@ -1,0 +1,7 @@
+{% set date = '2021' %}
+{% if current_year != date %}
+{% set date = date ~ '—' ~ current_year %}
+{% endif %}
+{{ wrapper.open() }}
+    <p>All rights reserved © <a href="https://vk.com/uspmm">Michael Uspensky</a>, {{ date }}</p>
+{{ wrapper.close() }}

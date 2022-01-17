@@ -71,8 +71,9 @@ class Builder
         if (!isset($this->page_footer)) {
             $this->page_footer = new PageFooter;
             $logo = $this->getLogo();
-            $logo->setAttr('class', 'logo logo_footer');
+            $logo->addClass('logo_footer');
             $this->page_footer->set('logo', $logo);
+            $this->page_footer->set('copyrights', $this->getCopyrights());
         }
         return $this->page_footer;
     }
@@ -82,8 +83,18 @@ class Builder
         $logo = new Element('a');
         $logo->setName('elements/logo');
         $logo->setAttr('href', '/')
-            ->setAttr('title', t('Go home page'));
+            ->setAttr('title', t('Go home page'))
+            ->setAttr('class', 'logo');
         return $logo;
+    }
+
+    public function getCopyrights(): Element
+    {
+        $cp = new Element;
+        $cp->setName('elements/copyrights');
+        $cp->setAttr('class', 'copyrights');
+        $cp->set('current_year', date('Y'));
+        return $cp;
     }
 
     public function getSlider(): Element
