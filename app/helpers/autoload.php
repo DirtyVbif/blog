@@ -4,7 +4,8 @@ $helpers = [
     'app.php',
     'debug.php',
     'string.php',
-    'sql.php'
+    'sql.php',
+    'array.php'
 ];
 
 foreach ($helpers as $helper_file) {

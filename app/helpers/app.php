@@ -1,5 +1,8 @@
 <?php
 
+use Blog\Client\CookiesFacade;
+use Blog\Client\SessionFacade;
+
 function app(): \Blog\Blog
 {
     return \Blog\Blog::instance();
@@ -23,4 +26,14 @@ function f(string $name, string $directory, ?string $extension = null, int $perm
     $file = new \Blog\Modules\FileSystem\File($name, $extension, $directory);
     $file->permissions($permission);
     return $file;
+}
+
+function session(): \Blog\Client\SessionFacade
+{
+    return SessionFacade::instance();
+}
+
+function cookies(): \Blog\Client\CookiesFacade
+{
+    return CookiesFacade::instance();
 }
