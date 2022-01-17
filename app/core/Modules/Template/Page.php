@@ -3,6 +3,7 @@
 namespace Blog\Modules\Template;
 
 use Blog\Modules\TemplateFacade\Title;
+use Twig\Markup;
 
 class Page extends BaseTemplate
 {
@@ -14,13 +15,23 @@ class Page extends BaseTemplate
     ];
     protected array $js = [];
     protected array $content = [];
+    protected array $modal = [];
 
     public function __construct(
         protected string $template_name = 'page'
     ) {
         $this->useGlobals(true);
         $this->data['page'] = [];
+        if (!cookies()->isCookiesAccepted()) {
+            $this->addModal(app()->builder()->getCookieModal());
+        }
         parent::__construct($this->template_name);
+    }
+
+    public function addModal($content): self
+    {
+        $this->modal[] = $content;
+        return $this;
     }
 
     public function useJs(string $name, bool $async = true): self
@@ -41,10 +52,8 @@ class Page extends BaseTemplate
     {
         $this->data['attributes'] = $this->attributes();
         $this->data['css'] = $this->css;
-        $this->data['cookies_accepted'] = cookies()->isCookiesAccepted();
-        if ($title = $this->getTitle()) {
-            $this->data['page']['title'] = $title;
-        }
+        $this->data['page']['title'] = $this->getTitle();
+        $this->data['page']['modal'] = $this->getModal();
         if (!empty($this->content)) {
             $content = new Element('main');
             $content->setAttr('class', 'container container_main');
@@ -66,6 +75,19 @@ class Page extends BaseTemplate
     public function getTitle(): ?Title
     {
         return $this->title ?? null;
+    }
+
+    public function getModal(): ?Element
+    {
+        $modal = null;
+        if (!empty($this->modal)) {
+            $modal = new Element('aside');
+            $modal->addClass('container container_modal');
+            $modal->setAttr('role', 'alert');
+            $content = implode($this->modal);
+            $modal->setContent($content);
+        }
+        return $modal;
     }
 
     public function setHeader(PageHeader $header): self

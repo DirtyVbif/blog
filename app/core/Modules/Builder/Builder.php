@@ -139,4 +139,11 @@ class Builder
         $skills->set('label', $label);
         return $skills;
     }
+
+    public function getCookieModal(): Element
+    {
+        $chunk = new Element;
+        $chunk->setName('elements/accept-cookies');
+        return $chunk;
+    }
 }

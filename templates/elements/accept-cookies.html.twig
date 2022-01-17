@@ -1,0 +1,8 @@
+{{ wrapper.open() }}
+    <form action="?cookies=agreement" method="GET">
+        <p>Мой сайт использует файлы cookie. Вам необходимо принять {{ link('cookie_agreement').render('соглашение об использовании файлов cookie') }} моим сайтом, либо прекратить использование сайта.</p>
+        <input type="checkbox" required id="agreement-cookies" name="agreement" value="accept">
+        <label for="agreement-cookies">Я прочёл {{ link('cookie_agreement').render('соглашение') }}</label>
+        <input type="submit" disabled value="Принять">
+    </form>
+{{ wrapper.close() }}
