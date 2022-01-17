@@ -8,6 +8,8 @@ class CookiesFacade
 {
     use Singletone;
 
+    protected const COOKIESACCEPTED = 'cookies-accepted';
+
     /**
      * Get cookie by name
      */
@@ -43,5 +45,16 @@ class CookiesFacade
     public function isset(string $name): bool
     {
         return !is_null($this->get($name));
+    }
+
+    public function setCookiesAccepted(): self
+    {
+        session()->set(self::COOKIESACCEPTED, true);
+        return $this;
+    }
+
+    public function isCookiesAccepted(): bool
+    {
+        return session()->get(self::COOKIESACCEPTED) ?? false;
     }
 }

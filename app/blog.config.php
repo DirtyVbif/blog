@@ -24,7 +24,7 @@ $__config['twig'] = [
         // 'Path\To\Class' => ['html', 'js', 'all']
         'Blog\Modules\Template\BaseTemplate' => ['html'],
         'Blog\Modules\Template\BaseTemplateElement' => ['html'],
-        'Blog\Modules\TemplateFacade\Title' => ['html']
+        'Blog\Modules\TemplateFacade\TemplateFacade' => ['html']
     ],
     'config' => [
         // 'cache' => ROOTDIR . 'cache/templates',

@@ -10,8 +10,6 @@ class SessionFacade
     use Singletone,
         SetterAndGetter;
 
-    protected const COOKIESACCEPTED = 'cookies-accepted';
-
     /**
      * Start new session or initialize existing one
      */
@@ -90,16 +88,5 @@ class SessionFacade
             $_SESSION[$name] = setamdv($k, $_SESSION[$name], unset: true);
         }
         return $this;
-    }
-
-    public function setCookiesAccepted(): self
-    {
-        $this->set(self::COOKIESACCEPTED, true);
-        return $this;
-    }
-
-    public function isCookiesAccepted(): bool
-    {
-        return $this->get(self::COOKIESACCEPTED) ?? false;
     }
 }

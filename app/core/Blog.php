@@ -21,6 +21,7 @@ class Blog
 
     public function run(): void
     {
+        session()->start();
         $this->controller()->prepare();
     }
 
