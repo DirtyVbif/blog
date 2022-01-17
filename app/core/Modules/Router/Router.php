@@ -24,15 +24,22 @@ class Router
         $this->data['url'] = urldecode($_SERVER['REDIRECT_URL'] ?? '/');
         $this->data['params'] = $_GET ?? [];
         $this->parseUrlArguments();
-        if ($this->isPostRequest()) {
+        if ($this->isPostRequest() && !$this->isAjaxRequest()) {
             pre($_POST);
             die;
         } else if ($this->isGetRequest()) {
-            $c_name = strtolower($this->arg(1) ?? 'front');
-            $this->data['controller'] = ucfirst($c_name) . 'Controller';
+            $this->setControllerName($this->arg(1) ?? 'front');
         } else {
             die('unknown request method.');
         }
+        return;
+    }
+
+    protected function setControllerName(string $controller_name): void
+    {
+        $controller_name = urldecode($controller_name);
+        $controller_name = strtolower($controller_name);
+        $this->data['controller'] = ucfirst($controller_name) . 'Controller';
         return;
     }
 
@@ -83,6 +90,11 @@ class Router
     public function getLangcode(): string
     {
         return $this->get('langcode');
+    }
+
+    public function isAjaxRequest(): bool
+    {
+        return $this->arg(1) === 'ajax';
     }
 
     public function isGetRequest(): bool
