@@ -17,6 +17,13 @@ $__config = [];
 $__config['langcode'] = 'ru';
 
 /**
+ * Application development settings
+ */
+$__config['development'] = [
+    'js' => true
+];
+
+/**
  * Twig settings
  */
 $__config['twig'] = [

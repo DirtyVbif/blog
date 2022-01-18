@@ -8,7 +8,7 @@ class ExtendedTwigFunctions
 {
     protected array $functions = [];
     protected array $function_names = [
-        't', 'link'
+        't', 'link', 'url'
     ];
 
     public function __construct()
@@ -38,5 +38,10 @@ class ExtendedTwigFunctions
     protected function initFunctionLink(): TwigFunction
     {
         return new TwigFunction('link', 'tpllink');
+    }
+
+    protected function initFunctionUrl(): TwigFunction
+    {
+        return new TwigFunction('url', 'url');
     }
 }
