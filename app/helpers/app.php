@@ -42,3 +42,14 @@ function tpllink(string $name): \Blog\Modules\TemplateFacade\Link
 {
     return new \Blog\Modules\TemplateFacade\Link($name);
 }
+
+/**
+ * Generate url offset with given @param string $path and @param array $parameters [optional].
+ * 
+ * @param string $path can be named path constant or relative offset
+ */
+function url(string $path, array $parameters = []): string
+{
+    $url = app()->router()->getUrl($path, $parameters);
+    return $url;
+}

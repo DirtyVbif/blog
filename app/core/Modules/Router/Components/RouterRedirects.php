@@ -9,6 +9,7 @@ trait RouterRedirects
         '<home>' => 'getHomeUrl',
         '<current_url>' => 'getCurrentUrl',
         '<current>' => 'getCurrentUrl',
+        '<current_offset>' => 'getCurrentOffset',
         '<previous>' => 'getPreviousUrl'
     ];
 
@@ -27,25 +28,54 @@ trait RouterRedirects
     {
         if (is_numeric($location)) {
             $location = app()->router()->level($location);
-        } else if (isset($this->REDIRECTS[$location])) {
-            $location = $this->getPathByConstant($location);
+        } else {
+            $location = $this->getUrl($location);
         }
         header("Location: $location", true, $status);
         exit;
     }
 
-    public function getHomeUrl(): string
+    public function getUrl(string $path, array $parameters = []): string
     {
-        return '/';
+        if ($method = $this->REDIRECTS[$path] ?? false) {
+            $url = $this->$method($parameters);
+        } else {
+            $url = $path !== '/' ? strSuffix($path, '/', true) : $path;
+            $url .= $this->implodeGetParameters($parameters);
+        }
+        return $url;
     }
 
-    public function getCurrentUrl(): string
+    public function getHomeUrl(array $parameters = []): string
     {
-        return app()->router()->get('url');
+        return '/' . $this->implodeGetParameters($parameters);
     }
 
-    public function getPreviousUrl(): string
+    public function getCurrentUrl(array $parameters = []): string
+    {
+        $url = app()->router()->get('url');
+        $parameters += app()->router()->get('params');
+        $url .= $this->implodeGetParameters($parameters);
+        return $url;
+    }
+
+    public function getPreviousUrl(array $parameters = []): string
     {
         return urldecode($_SERVER['HTTP_REFERER']);
+    }
+
+    public function getCurrentOffset(array $parameters = []): string
+    {
+        $url = app()->router()->get('url');
+        return $url;
+    }
+
+    protected function implodeGetParameters(array $parameters): string
+    {        
+        $pairs = [];
+        foreach ($parameters as $name => $value) {
+            $pairs[] = $name . '=' . $value;
+        }
+        return empty($pairs) ? '' : '?' . implode('&', $pairs);
     }
 }
