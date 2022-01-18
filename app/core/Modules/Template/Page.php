@@ -3,7 +3,6 @@
 namespace Blog\Modules\Template;
 
 use Blog\Modules\TemplateFacade\Title;
-use Twig\Markup;
 
 class Page extends BaseTemplate
 {
@@ -34,14 +33,20 @@ class Page extends BaseTemplate
         return $this;
     }
 
-    public function useJs(string $name, bool $async = true): self
+    public function useJs(string $name, ?string $load_type = 'async', ?string $content = null): self
     {
+        $name = strPrefix(strSuffix($name, '.js'), '/');
+        $this->js[$name] = [
+            'src' => $name,
+            'type' => $load_type,
+            'content' => $content
+        ];
         return $this;
     }
 
     public function useCss(string $name): self
     {
-        $name = preg_replace('/\.css$/', '', $name);
+        $name = strSuffix($name, '.css', true);
         if (!in_array($name, $this->css)) {
             array_push($this->css, $name);
         }
@@ -52,6 +57,7 @@ class Page extends BaseTemplate
     {
         $this->data['attributes'] = $this->attributes();
         $this->data['css'] = $this->css;
+        $this->data['js'] = $this->getJsSrc();
         $this->data['page']['title'] = $this->getTitle();
         $this->data['page']['modal'] = $this->getModal();
         if (!empty($this->content)) {
@@ -61,6 +67,16 @@ class Page extends BaseTemplate
             $this->data['page']['content'] = $content;
         }
         return parent::render();
+    }
+
+    protected function getJsSrc(): array
+    {
+        if (app()->config('development')->js) {
+            foreach ($this->js as &$js) {
+                $js['src'] .= '?t=' . time();
+            }
+        }
+        return $this->js;
     }
 
     public function setTitle(string $title_content): self

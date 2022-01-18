@@ -14,12 +14,16 @@ class Builder
     protected PageFooter $page_footer;
     protected array $menu_links;
     protected array $links;
+    protected array $used_tpl_id = [];
 
     public function preparePage(): void
     {
         app()->page()->setTitle(app()->controller()->getTitle());
         app()->page()->setHeader($this->header());
         app()->page()->setFooter($this->footer());
+        app()->page()->useJs('js/default.min');
+        app()->page()->useJs('js/classes.min');
+        app()->page()->useJs('js/script.min');
         return;
     }
 
@@ -144,6 +148,17 @@ class Builder
     {
         $chunk = new Element;
         $chunk->setName('elements/accept-cookies');
+        $chunk->addClass('cookie-agreement hidden');
+        $chunk->setId('cookie-agreement');
         return $chunk;
+    }
+
+    public function useId(string $id)
+    {
+        if (in_array($id, $this->used_tpl_id)) {
+            // TODO: notify user about html id attribute duplicate
+        } else {
+            array_push($this->used_tpl_id, $id);
+        }
     }
 }
