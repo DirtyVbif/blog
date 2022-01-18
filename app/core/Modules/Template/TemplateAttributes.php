@@ -25,6 +25,8 @@ class TemplateAttributes extends BaseTemplateElement
     {
         if ($name === 'class' && $value) {
             return $this->addClass($value);
+        } else if ($name === 'id' && $value) {
+            return $this->setId($value);
         }
         $this->attributes[$name] = $value;
         return $this;
@@ -59,5 +61,12 @@ class TemplateAttributes extends BaseTemplateElement
             return '';
         }
         return ' class="' . $this->classList(true) . '"';
+    }
+
+    public function setId(string $id): self
+    {
+        $this->attributes['id'] = $id;
+        app()->builder()->useId($id);
+        return $this;
     }
 }

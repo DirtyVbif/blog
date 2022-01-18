@@ -33,4 +33,10 @@ trait TemplateAttributesMethods
         $this->attributes()->addClass($class);
         return $this;
     }
+
+    public function setId(string $id): self
+    {
+        $this->attributes()->setId($id);
+        return $this;
+    }
 }

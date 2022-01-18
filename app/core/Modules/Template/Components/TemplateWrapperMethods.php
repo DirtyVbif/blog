@@ -36,4 +36,10 @@ trait TemplateWrapperMethods
         $this->wrapper()->addClass($class);
         return $this;
     }
+
+    public function setId(string $id): self
+    {
+        $this->wrapper()->setId($id);
+        return $this;
+    }
 }
