@@ -17,6 +17,11 @@ html, body {
 
 a {
     text-decoration: none;
+    color: $link;
+    transition: $transition;
+    &:hover {
+        color: $link_hover;
+    }
 }
 
 h1 {

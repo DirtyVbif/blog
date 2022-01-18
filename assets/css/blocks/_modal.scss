@@ -1,0 +1,42 @@
+.cookie-agreement {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    background-color: #ffffff;
+    box-shadow: $shadow_default;
+    transition: .2s transform ease-out;
+    transform: translateY(0);
+
+    &.hidden {
+        display: block;
+        transform: translateY(100%);
+    }
+
+    &__form {
+        @include wrapper();
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+
+        @include vwMax($vwbp_s) {
+            flex-direction: column;
+        }
+
+        @include vwMax($vwbp_xs) {
+            font-size: 15px;
+        }
+    }
+
+    &__submit {
+        margin-left: 1em;
+        border: none;
+        outline: none;
+        font: inherit;
+        @include vwMax($vwbp_s) {
+            margin-left: 0;
+            margin-bottom: 1em;
+        }
+    }
+}

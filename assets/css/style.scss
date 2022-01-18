@@ -6,7 +6,13 @@
 @import 'blocks/mixins';
 // <----------------------------------------------
 
+// DEFAULT STYLES ------------------------------->
 @import 'blocks/html';
+@import 'blocks/defaults';
+// <----------------------------------------------
+
 @import 'blocks/page';
 @import 'blocks/container';
 @import 'blocks/logo';
+@import 'blocks/modal';
+@import 'blocks/button';

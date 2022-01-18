@@ -1,3 +1,13 @@
+// VIEWPORT WIDTH BREAKPOINTS ------------------->
+$vwbp_min: 320px;
+$vwbp_xs: 480px;
+$vwbp_s: 600px;
+$vwbp_m: 768px;
+$vwbp_l: 992px;
+$vwbp_xl: 1200px;
+$vwbp_max: 1920px;
+// <----------------------------------------------
+
 // FONT ----------------------------------------->
 @import 'font-montserrat';
 $font: 400 20px/1.4 'Montserrat', sans-serif;
@@ -6,4 +16,16 @@ $font: 400 20px/1.4 'Montserrat', sans-serif;
 // COLORS --------------------------------------->
 $txt: #171717;
 $bkgd: #f7f7f7;
+$btn_blue: #6666c7;
+$btn_blue_hover: #4b4bd8;
+$link: #a87704;
+$link_hover: #ca8f06;
+$link_visited: #6b5319;
+$grey_light: #c2ccd3;
+$grey: #898d90;
+// <----------------------------------------------
+
+// STYLES --------------------------------------->
+$shadow_default: 0 0 10px -3px $grey;
+$transition: .2s all ease-in-out;
 // <----------------------------------------------
