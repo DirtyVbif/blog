@@ -2,13 +2,14 @@
 
 namespace Blog\Client;
 
+use Blog\Components\AjaxModule;
 use Blog\Components\Singletone;
 
-class CookiesFacade
+class CookiesFacade implements AjaxModule
 {
     use Singletone;
 
-    protected const COOKIESACCEPTED = 'cookies-accepted';
+    public const COOKIESACCEPTED = 'cookies-accepted';
 
     /**
      * Get cookie by name
@@ -19,9 +20,8 @@ class CookiesFacade
     }
 
     /**
-     * Send a cookie. Same as setcookie() function. @see setcookie() documentation
-     * 
-     * @link https://php.net/manual/en/function.setcookie.php
+     * Send a cookie. Same as setcookie() function.
+     * @see setcookie() documentation at @link https://php.net/manual/en/function.setcookie.php
      */
     public function set(string $name, $value, $expires_or_options = 0, $path = '/', $domain = '', $secure = false, $httponly = false)
     {        
@@ -56,5 +56,22 @@ class CookiesFacade
     public function isCookiesAccepted(): bool
     {
         return session()->get(self::COOKIESACCEPTED) ?? false;
+    }
+
+    public function ajaxRequest(): array
+    {
+        $response = [
+            'status' => 200,
+            'output' => null
+        ];
+        if (($_POST['cookie-agreement'] ?? false) == 1) {
+            // TODO: add csrf-token verification
+            $this->setCookiesAccepted();
+            $response['output'] = 'cookies accepted successfully';
+        } else {
+            $response['status'] = 400;
+            $response['output'] = 'Error 400. Bad request.';
+        }
+        return $response;
     }
 }

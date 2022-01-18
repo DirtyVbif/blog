@@ -2,6 +2,8 @@
 
 namespace Blog\Components;
 
+use Blog\Client\CookiesFacade;
+use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
 use Blog\Modules\Builder\Builder;
 use Blog\Modules\Response\Response;
@@ -54,5 +56,15 @@ trait BlogModules
             $this->sql = new Bridge;
         }
         return $this->sql;
+    }
+
+    public function cookie(): CookiesFacade
+    {
+        return CookiesFacade::instance();
+    }
+
+    public function session(): SessionFacade
+    {
+        return SessionFacade::instance();
     }
 }

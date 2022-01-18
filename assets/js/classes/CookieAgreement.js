@@ -6,7 +6,7 @@ class CookieAgreement
         this.s = {
             trigger: '#cookie-agreement',
             hidden_class: 'hidden',
-            get_status_path: '/ajax/cookie?is-accepted',
+            ajax_path: '/ajax/cookie',
             show_times: 3
         };
 
@@ -14,13 +14,15 @@ class CookieAgreement
         this.modal;
         this.window_resize_event;
         this.submit;
+        this.form;
     }
 
     initialize()
     {
-        localStorage.setItem('cookie-agreement-show-times', 0);
         this.modal = document.querySelector(this.s.trigger);
-        if (this.modal.length < 1) {
+        this.form = document.querySelector(this.s.trigger + ' form');
+        this.submit = document.querySelector(this.s.trigger + ' form input[type="submit"]');
+        if (!this.modal || !this.form || !this.submit) {
             return;
         }
         if (!isCookieAccepted()) {
@@ -41,10 +43,8 @@ class CookieAgreement
         }
         this.modal.classList.remove(this.s.hidden_class);
         this._setBottomOffset();
-        this.submit = this.modal.querySelector('input[type="submit"]');
         this.submit.addEventListener('click', event => {
-            event.preventDefault();
-            this._acceptCookies();
+            this._acceptCookies(event);
         });
     }
 
@@ -57,28 +57,41 @@ class CookieAgreement
         });
     }
 
-    _setDocumentBottomOffset()
+    _setDocumentBottomOffset(unset = false)
     {
-        document.body.style.marginBottom = parseFloat(this.modal.offsetHeight) + 'px';
+        let margin = null;
+        if (!unset) {
+            margin = parseFloat(this.modal.offsetHeight) + 'px';
+        }
+        document.body.style.marginBottom = margin;
     }
 
     _removeBottomOffset()
     {
-        this._setDocumentBottomOffset();
         if (this.window_resize_event) {
             window.removeEventListener('resize', this.window_resize_event);
         }
-        document.body.style.marginBottom = null;
+        this._setDocumentBottomOffset(true);
     }
 
-    _acceptCookies()
+    _acceptCookies(event)
     {
+        event.preventDefault();
         this._removeBottomOffset();
+        this._setAsAccepted();
     }
 
     _setAsAccepted()
     {
+        localStorage.setItem('cookie-agreement-accepted', 1);
         this.modal.remove();
         // TODO: send cookie accept status on server;
+        let formData = new FormData(this.form);
+        fetch(this.s.ajax_path, {
+            method: 'post',
+            body: formData
+        }).then(response => response.json())
+            .then(response => console.log(response))
+            .catch(error => console.warn(error));
     }
 }
