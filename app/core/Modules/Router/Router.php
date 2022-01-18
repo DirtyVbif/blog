@@ -27,7 +27,7 @@ class Router
         if ($this->isPostRequest() && !$this->isAjaxRequest()) {
             pre($_POST);
             die;
-        } else if ($this->isGetRequest()) {
+        } else if ($this->isGetRequest() || $this->isAjaxRequest()) {
             $this->setControllerName($this->arg(1) ?? 'front');
         } else {
             die('unknown request method.');
