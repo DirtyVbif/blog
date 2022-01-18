@@ -85,7 +85,6 @@ class CookieAgreement
     {
         localStorage.setItem('cookie-agreement-accepted', 1);
         this.modal.remove();
-        // TODO: send cookie accept status on server;
         let formData = new FormData(this.form);
         fetch(this.s.ajax_path, {
             method: 'post',

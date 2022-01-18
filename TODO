@@ -1,1 +1,2 @@
 [] Add Messenger::module for outputting status messages;
+[] Add CSRF-token module and verification methods;

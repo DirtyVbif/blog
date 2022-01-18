@@ -55,6 +55,10 @@ class CookiesFacade implements AjaxModule
 
     public function isCookiesAccepted(): bool
     {
+        if (($_GET['cookie-agreement'] ?? false) == 1) {
+            // TODO: add csrf-token verification
+            $this->setCookiesAccepted();
+        }
         return session()->get(self::COOKIESACCEPTED) ?? false;
     }
 
