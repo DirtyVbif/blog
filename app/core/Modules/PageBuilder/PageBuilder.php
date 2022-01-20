@@ -1,14 +1,14 @@
 <?php
 
-namespace Blog\Modules\Builder;
+namespace Blog\Modules\PageBuilder;
 
 use Blog\Modules\Messenger\Messenger;
 use Blog\Modules\Template\Element;
 use Symfony\Component\Yaml\Yaml;
 
-class Builder
+class PageBuilder
 {
-    use Components\BuilderElements;
+    use Components\PageBuilderElements;
 
     protected array $menu_links;
     protected array $links;
@@ -39,7 +39,7 @@ class Builder
     public function getMenuLinks(string $menu_name): array
     {
         if (!isset($this->menu_links)) {
-            $this->menu_links = $this->getSrc('menu-links');
+            $this->menu_links = $this->getContent('menu-links');
         }
         $menu_items = $this->menu_links[$menu_name] ?? [];
         $links = [];
@@ -67,15 +67,15 @@ class Builder
     public function getLink(string $name): array
     {
         if (!isset($this->links)) {
-            $this->links = $this->getSrc('links');
+            $this->links = $this->getContent('routes');
         }
         return $this->links[$name];
     }
 
-    protected function getSrc(string $name): array
+    protected function getContent(string $name): array
     {
         $name = strSuffix($name, '.yml');
-        $filename = COREDIR . "Modules/Builder/src/{$name}";
+        $filename = ROOTDIR . "content/{$name}";
         return file_exists($filename) ? Yaml::parseFile($filename) : [];
     }
 

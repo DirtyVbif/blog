@@ -1,13 +1,13 @@
 <?php
 
-namespace Blog\Modules\Builder\Components;
+namespace Blog\Modules\PageBuilder\Components;
 
 use Blog\Modules\Template\Element;
 use Blog\Modules\Template\PageFooter;
 use Blog\Modules\Template\PageHeader;
 use Blog\Modules\TemplateFacade\Title;
 
-trait BuilderElements
+trait PageBuilderElements
 {
     protected PageHeader $page_header;
     protected PageFooter $page_footer;
@@ -67,7 +67,7 @@ trait BuilderElements
         $skills = new Element('section');
         $skills->setName('elements/skills');
         $skills->addClass('skills');
-        $items = $this->getSrc('skills');
+        $items = $this->getContent('skills');
         $skills->set('items', $items);
         $label = new Title(2);
         $label->set(t('My skills'));

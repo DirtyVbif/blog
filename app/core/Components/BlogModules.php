@@ -5,7 +5,7 @@ namespace Blog\Components;
 use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
-use Blog\Modules\Builder\Builder;
+use Blog\Modules\PageBuilder\PageBuilder;
 use Blog\Modules\Messenger\Messenger;
 use Blog\Modules\Response\Response;
 use Blog\Modules\Router\Router;
@@ -14,7 +14,7 @@ use Blog\Modules\Template\Page;
 trait BlogModules
 {
     private Page $page;
-    private Builder $builder;
+    private PageBuilder $builder;
     private Router $router;
     private Response $response;
     private Bridge $sql;
@@ -44,10 +44,10 @@ trait BlogModules
         return $this->page;
     }
 
-    public function builder(): Builder
+    public function builder(): PageBuilder
     {
         if (!isset($this->builder)) {
-            $this->builder = new Builder;
+            $this->builder = new PageBuilder;
         }
         return $this->builder;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\Modules\Builder;
+namespace Blog\Modules\PageBuilder;
 
 class IDList
 {
