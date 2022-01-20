@@ -2,6 +2,7 @@
 
 namespace Blog\Components;
 
+use Twig\Markup;
 use Twig\TwigFunction;
 
 class ExtendedTwigFunctions
@@ -52,10 +53,9 @@ class ExtendedTwigFunctions
             $output = $id;
             app()->builder()->useId($id);
             if ($render_as_attr) {
-                $output = "id={$id}";
+                $output = "id=\"{$id}\"";
             }
-            /** @return string $output */
-            return $output;
+            return new Markup($output, CHARSET);
         });
     }
 }
