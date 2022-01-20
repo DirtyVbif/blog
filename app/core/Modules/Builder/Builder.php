@@ -2,16 +2,14 @@
 
 namespace Blog\Modules\Builder;
 
+use Blog\Modules\Messenger\Messenger;
 use Blog\Modules\Template\Element;
-use Blog\Modules\Template\PageFooter;
-use Blog\Modules\Template\PageHeader;
-use Blog\Modules\TemplateFacade\Title;
 use Symfony\Component\Yaml\Yaml;
 
 class Builder
 {
-    protected PageHeader $page_header;
-    protected PageFooter $page_footer;
+    use Components\BuilderElements;
+
     protected array $menu_links;
     protected array $links;
     protected array $used_tpl_id = [];
@@ -81,84 +79,12 @@ class Builder
         return file_exists($filename) ? Yaml::parseFile($filename) : [];
     }
 
-    public function header(): PageHeader
+    public function useId(string $id): bool
     {
-        if (!isset($this->page_header)) {
-            $this->page_header = new PageHeader;
-            $logo = $this->getLogo();
-            $logo->setAttr('class', 'logo logo_header');
-            $this->page_header->set('logo', $logo);
+        if (!IDList::instance()->use($id)) {
+            msgr()->warning("На странице имеется повторяющийся #id: {$id}", Messenger::ACCESS_LEVEL_ADMIN);
+            return false;
         }
-        return $this->page_header;
-    }
-
-    public function footer(): PageFooter
-    {
-        if (!isset($this->page_footer)) {
-            $this->page_footer = new PageFooter;
-            $logo = $this->getLogo();
-            $logo->addClass('logo_footer');
-            $this->page_footer->set('logo', $logo);
-            $this->page_footer->set('copyrights', $this->getCopyrights());
-        }
-        return $this->page_footer;
-    }
-
-    public function getLogo(): Element
-    {
-        $logo = new Element('a');
-        $logo->setName('elements/logo');
-        $logo->setAttr('href', '/')
-            ->setAttr('title', t('Go home page'))
-            ->setAttr('class', 'logo');
-        return $logo;
-    }
-
-    public function getCopyrights(): Element
-    {
-        $cp = new Element;
-        $cp->setName('elements/copyrights');
-        $cp->setAttr('class', 'copyrights');
-        $cp->set('current_year', date('Y'));
-        return $cp;
-    }
-
-    public function getSlider(): Element
-    {
-        $slider = new Element('section');
-        $slider->setName('elements/slider');
-        $slider->addClass('slider');
-        return $slider;
-    }
-
-    public function getSkills(): Element
-    {
-        $skills = new Element('section');
-        $skills->setName('elements/skills');
-        $skills->addClass('skills');
-        $items = $this->getSrc('skills');
-        $skills->set('items', $items);
-        $label = new Title(2);
-        $label->set(t('My skills'));
-        $skills->set('label', $label);
-        return $skills;
-    }
-
-    public function getCookieModal(): Element
-    {
-        $chunk = new Element;
-        $chunk->setName('elements/accept-cookies');
-        $chunk->addClass('cookie-agreement hidden');
-        $chunk->setId('cookie-agreement');
-        return $chunk;
-    }
-
-    public function useId(string $id)
-    {
-        if (in_array($id, $this->used_tpl_id)) {
-            // TODO: notify user about html id attribute duplicate
-        } else {
-            array_push($this->used_tpl_id, $id);
-        }
+        return true;
     }
 }
