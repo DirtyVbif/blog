@@ -37,18 +37,19 @@ addHeader = require('gulp-header');                     // add first line into f
 
 // =====================================================================
 //clean target directories
-function clean(callback) {
-    delFiles([
+function clean() {
+    return delFiles([
         src.dest + 'css/',
         src.dest + 'js/'
-    ]);
-    callback();
+    ], {
+        force: true
+    });
 }
 
 // =====================================================================
 // compile SASS/SCSS files into target css public directory
-function css(callback) {
-    gulp.src(src.assets.css, opt.src)
+function css() {
+    return gulp.src(src.assets.css, opt.src)
         .pipe(
             sass(opt.css)
                 .on('error', sass.logError)
@@ -58,49 +59,43 @@ function css(callback) {
             suffix: '.min'
         }))
         .pipe(gulp.dest(src.dest));
-    callback();
 }
 
 // =====================================================================
 // watch css changes
-function watch_css(callback) {
-    gulp.watch(src.assets.css, css);
-    callback();
+function watch_css() {
+    return gulp.watch(src.assets.css, css);
 }
 
 // =====================================================================
 // minifine and put main.js scripts into target directories
-function js(callback) {
-    gulp.src(src.assets.js, opt.src)
+function js() {
+    return gulp.src(src.assets.js, opt.src)
         .pipe(addHeader('"use strict";'))
         .pipe(minifyJS())
         .pipe(
             rename({ suffix: '.min' })
-        ).pipe(gulp.dest(src.dest));
-    callback();
+        ).pipe(gulp.dest(src.dest + '/'));
 }
 
-function jsc(callback) {
-    gulp.src(src.assets.jsc)
+function jsc() {
+    return gulp.src(src.assets.jsc)
         .pipe(concat('classes.js'))
         .pipe(addHeader('"use strict";'))
         .pipe(minifyJS())
         .pipe(
             rename({ suffix: '.min' })
         ).pipe(gulp.dest(src.dest + 'js/'));
-    callback();
 }
 
 // =====================================================================
 // watch js changes
-function watch_js(callback) {
-    gulp.watch(src.assets.js, js);
-    callback();
+function watch_js() {
+    return gulp.watch(src.assets.js, js);
 }
 
-function watch_jsc(callback) {
-    gulp.watch(src.assets.jsc, jsc);
-    callback();
+function watch_jsc() {
+    return gulp.watch(src.assets.jsc, jsc);
 }
 
 // =====================================================================
@@ -115,7 +110,7 @@ function watch_jsc(callback) {
 exports.default = gulp.series(
     clean,
     gulp.parallel(
-        css, js, jsc
+        css, js, jsc,
     ),
     gulp.parallel(
         watch_css, watch_js, watch_jsc

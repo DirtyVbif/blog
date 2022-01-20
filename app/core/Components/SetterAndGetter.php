@@ -78,20 +78,20 @@ trait SetterAndGetter
     protected function getByVarName(string $var_name, bool $use_this = true, ?string $key = null)
     {
         if ($use_this) {
-            $result = $this->$var_name;
+            $result = $this->$var_name ?? null;
         } else {
-            $result = $GLOBALS[$var_name];
+            $result = $GLOBALS[$var_name] ?? null;
         }
-        if (!is_null($key)) {
+        if (!is_null($key) && !is_null($result)) {
             $k = $this->parseKey($key);
             $i = array_shift($k);
             $result = $result[$i] ?? null;
-            if (!is_null($result)) {
+            if (is_array($result)) {
                 for ($i = 0; $i < count($k); $i++) {
-                    $result = $result[$k[$i]] ?? null;
-                    if (is_null($result)) {
+                    if (!is_array($result)) {
                         break;
                     }
+                    $result = $result[$k[$i]] ?? null;
                 }
             }
         }

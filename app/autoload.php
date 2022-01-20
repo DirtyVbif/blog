@@ -7,7 +7,7 @@ define('COREDIR', APPDIR . 'core/');
 /** @var string relative path to the helper functions folder. Includes trailing slash */
 define('HELPERS', APPDIR . 'helpers/');
 /** @var string absolute path to the project folder on server. Includes trailing slash */
-define('SERVERDIR', preg_replace('/core$/i', '', __DIR__));
+define('SERVERDIR', preg_replace('/(\\\|\/)app$/i', '', __DIR__));
 
 $namespaces = require_once APPDIR . 'namespaces.php';
 $includes = require_once APPDIR . 'includes.php';

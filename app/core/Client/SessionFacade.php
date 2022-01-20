@@ -35,7 +35,7 @@ class SessionFacade
         return $this->setByVarName('_SESSION', $value, false, $name, $rewrite);
     }
 
-    public function push(string $name, $value): self
+    public function append(string $name, $value): self
     {
         if (!$this->get($name) || !is_array($this->get($name))) {
             $this->set($name, []);
