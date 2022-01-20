@@ -111,3 +111,11 @@ function strPascalCase(string $string): string
     }
     return $pascal_string;
 }
+
+/**
+ * Converts absolute server path to relative app path
+ */
+function strTrimServDir(string $directory): String
+{
+    return str_replace(SERVERDIR, '', $directory);
+}
