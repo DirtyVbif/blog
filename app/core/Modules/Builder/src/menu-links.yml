@@ -1,9 +1,9 @@
 main: {
-  items: ['front', 'blog', 'about', 'contacts'],
+  items: ['front', 'about', 'blog', 'contacts'],
   class: 'menu menu_main'
 }
 
 footer: {
-  items: ['front', 'blog', 'about', 'contacts'],
+  items: ['front', 'about', 'blog', 'contacts'],
   class: 'menu menu_footer'
 }
