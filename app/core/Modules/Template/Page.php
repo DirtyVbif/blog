@@ -66,6 +66,7 @@ class Page extends BaseTemplate
             $content->setContent(implode($this->content));
             $this->data['page']['content'] = $content;
         }
+        $this->data['page']['messenger'] = msgr();
         return parent::render();
     }
 

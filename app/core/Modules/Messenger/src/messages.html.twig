@@ -1,0 +1,16 @@
+{{ wrapper.open() }}
+    <ul class="status-container__list">
+        {% for item in items %}
+            <li class="status-message status-message_{{ item.type }}">
+                {% if item.prefix %}
+                    <p class="status-message__prefix status-message_{{ item.type }}__prefix">
+                        {{- item.prefix -}}
+                    </p>
+                {% endif %}
+                <p class="status-message__output status-message_{{ item.type }}__output">
+                    {{- item.text -}}
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+{{ wrapper.close() }}

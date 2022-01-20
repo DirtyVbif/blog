@@ -11,6 +11,9 @@ $vwbp_max: 1920px;
 // FONT ----------------------------------------->
 @import 'font-montserrat';
 $font: 400 20px/1.4 'Montserrat', sans-serif;
+
+@import 'font-source-sans-pro';
+$font_code: 200 18px/1.35 'Source Sans Pro', sans-serif;
 // <----------------------------------------------
 
 // COLORS --------------------------------------->
@@ -22,6 +25,7 @@ $link: #a87704;
 $link_hover: #ca8f06;
 $link_visited: #6b5319;
 $grey_light: #c2ccd3;
+$grey_bright: #d1dae0;
 $grey: #898d90;
 // <----------------------------------------------
 

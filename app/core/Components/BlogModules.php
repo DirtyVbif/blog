@@ -6,6 +6,7 @@ use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
 use Blog\Modules\Builder\Builder;
+use Blog\Modules\Messenger\Messenger;
 use Blog\Modules\Response\Response;
 use Blog\Modules\Router\Router;
 use Blog\Modules\Template\Page;
@@ -17,6 +18,7 @@ trait BlogModules
     private Router $router;
     private Response $response;
     private Bridge $sql;
+    private Messenger $messenger;
 
     public function response(): Response
     {
@@ -66,5 +68,13 @@ trait BlogModules
     public function session(): SessionFacade
     {
         return SessionFacade::instance();
+    }
+
+    public function messenger(): Messenger
+    {
+        if (!isset($this->messenger)) {
+            $this->messenger = new Messenger;
+        }
+        return $this->messenger;
     }
 }

@@ -53,3 +53,8 @@ function url(string $path, array $parameters = []): string
     $url = app()->router()->getUrl($path, $parameters);
     return $url;
 }
+
+function msgr(): \Blog\Modules\Messenger\Messenger
+{
+    return app()->messenger();
+}

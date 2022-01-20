@@ -1,0 +1,49 @@
+.status-container {
+    &__list {
+        @include wrapper();
+        padding-left: 0;
+        list-style-type: none;
+    }
+}
+
+.status-message {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 15px;
+    border-left: 4px solid $grey;
+    background-color: $grey_bright;
+    border-radius: 4px;
+
+    & p {
+        margin: 0;
+    }
+
+    &:not(:first-child) {
+        margin-top: 10px;
+    }
+
+    &_debug {
+        font: $font_code;
+        &__prefix {
+            font-style: italic;
+        }
+    }
+
+    &_notice {
+        color: #1a4e04;
+        border-color: #358713;
+        background-color: #bdd4b3;
+    }
+
+    &_warning {
+        color: #836700;
+        border-color: #b89100;
+        background-color: #e9e5b3;
+    }
+
+    &_error {
+        color: #933c12;
+        border-color: #e02727;
+        background-color: #f5cdcd;
+    }
+}
