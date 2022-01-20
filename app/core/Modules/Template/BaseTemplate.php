@@ -37,9 +37,15 @@ class BaseTemplate
         return $output;
     }
 
+    public function setNamespace(string $name): void
+    {
+        $this->namespace = $name;
+        return;
+    }
+
     public function twigTplName(): string
     {
-        $namespace = isset($this->namespace) ? $this->namespace . '@' : '';
+        $namespace = isset($this->namespace) ? '@' . $this->namespace . '/' : '';
         return $namespace . $this->template_name . $this->template_extension;
     }
 

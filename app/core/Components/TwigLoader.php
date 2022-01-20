@@ -68,9 +68,9 @@ trait TwigLoader
     //     return;
     // }
 
-    // public function twig_add_path(string $directory, string $name): void
-    // {
-    //     $this->twig_loader = $this->twig()->getLoader();
-    //     $this->twig_loader->addPath($directory, $name);
-    // }
+    public function twig_add_namespace(string $directory, string $name): void
+    {
+        $this->twig_loader()->addPath($directory, $name);
+        return;
+    }
 }
