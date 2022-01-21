@@ -5,6 +5,8 @@ namespace Blog\Modules\PageBuilder\Components;
 use Blog\Modules\Template\Element;
 use Blog\Modules\Template\PageFooter;
 use Blog\Modules\Template\PageHeader;
+use Blog\Modules\TemplateFacade\BodyText;
+use Blog\Modules\TemplateFacade\Image;
 use Blog\Modules\TemplateFacade\Title;
 
 trait PageBuilderElements
@@ -58,7 +60,7 @@ trait PageBuilderElements
     {
         $slider = new Element('section');
         $slider->setName('elements/slider');
-        $slider->addClass('slider');
+        $slider->addClass('section section_slider');
         return $slider;
     }
 
@@ -66,11 +68,18 @@ trait PageBuilderElements
     {
         $skills = new Element('section');
         $skills->setName('elements/skills');
-        $skills->addClass('skills');
+        $skills->addClass('section section_skills')
+            ->setId('about');
         $items = $this->getContent('skills');
+        foreach ($items as &$item) {
+            $item['icon'] = new Image($item['icon']);
+            $item['icon']->width(120);
+            $item['desc'] = new BodyText($item['desc']);
+        }
         $skills->set('items', $items);
         $label = new Title(2);
         $label->set(t('My skills'));
+        $label->addClass('section__header section_skills__header');
         $skills->set('label', $label);
         return $skills;
     }
