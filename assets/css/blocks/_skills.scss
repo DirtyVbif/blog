@@ -1,0 +1,58 @@
+$skill_card_width: 500px;
+$skill_icon_width: 140px;
+
+.skill {
+    background: $grey_very_light;
+    box-shadow: $shadow;
+    border-radius: 12px;
+
+    &:hover {
+        background-color: $bkgd;
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: $skill_icon_width;
+        height: $skill_icon_width;
+        padding: 10px;
+        float: left;
+    }
+
+    &__title {
+        font-size: 1.2em;
+        margin-right: 12px;
+        margin-top: 12px;
+        margin-bottom: 10px;
+        font-weight: 400;
+    }
+
+    &__desc {
+        margin-right: 12px;
+        font-size: 15px;
+        & p {
+            margin-top: 0;
+            margin-bottom: 6px;
+        }
+    }
+
+    .js-slider__item & {
+        &__title,
+        &__desc {
+            display: none;
+        }
+    }
+    
+    .js-slider__item_middle & {
+        &__title,
+        &__desc {
+            display: block;
+        }
+    }
+}
+
+.js-slider__item_middle.skill {
+    background-color: $bkgd;
+    width: $skill_card_width;
+}

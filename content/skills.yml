@@ -1,27 +1,55 @@
 php: {
-  icon: '/images/icon-php.png',
-  label: 'PHP 5, 7, 8',
+  icon: '/images/logo-php.svg',
+  label: 'PHP',
   desc: '',
   class: ''
 }
 
 javascript: {
-  icon: '/images/icon-js.png',
+  icon: '/images/logo-js.svg',
   label: 'JavaScript',
-  desc: '',
+  desc: "Понимание принципов ООП.\nЗнание ECMA Script 6",
   class: ''
 }
 
 html: {
-  icon: '/images/icon-html.png',
+  icon: '/images/logo-html-css.svg',
   label: 'HTML 5 / CSS 3',
   desc: '',
   class: ''
 }
 
 sql: {
-  icon: '/images/icon-sql.png',
+  icon: '/images/logo-sql.png',
   label: 'SQL Databases',
+  desc: '',
+  class: ''
+}
+
+terminal: {
+  icon: '/images/logo-terminal.svg',
+  label: 'Command Line',
+  desc: '',
+  class: ''
+}
+
+turbo: {
+  icon: '/images/logo-amp-turbo.svg',
+  label: 'AMP & Turbo pages',
+  desc: '',
+  class: ''
+}
+
+laravel: {
+  icon: '/images/logo-laravel.svg',
+  label: 'Laravel Framework',
+  desc: '',
+  class: ''
+}
+
+drupal: {
+  icon: '/images/logo-drupal.svg',
+  label: 'Drupal',
   desc: '',
   class: ''
 }

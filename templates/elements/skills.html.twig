@@ -1,8 +1,24 @@
 {{ wrapper.open() }}
     {{ label }}
-    <ul>
-        {% for item in items %}
-            <li><h3>{{ item.label }}</h3></li>
+    <ul class="js-slider" {{ id('skills', true) }}>
+        <li class="js-slider__control js-slider__control_prev"></li>
+        {% set i = 0 %}
+        {% for key, item in items %}
+            {% if i == 0 %}
+                <li class="js-slider__item js-slider__item_left skill skill_{{ key }}">
+            {% elseif i == 1 %}
+                <li class="js-slider__item js-slider__item_middle skill skill_{{ key }}">
+            {% elseif i == 2 %}
+                <li class="js-slider__item js-slider__item_right skill skill_{{ key }}">
+            {% else %}
+                <li class="js-slider__item hidden skill skill_{{ key }}">
+            {% endif %}
+                <div class="skill__icon">{{ item.icon }}</div>
+                <h3 class="skill__title">{{- item.label -}}</h3>
+                <div class="skill__desc">{{- item.desc|raw -}}</div>
+            </li>
+            {% set i = i + 1 %}
         {% endfor %}
+        <li class="js-slider__control js-slider__control_next"></li>
     </ul>
 {{ wrapper.close() }}

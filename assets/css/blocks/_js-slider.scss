@@ -1,0 +1,61 @@
+.js-slider {
+    @include noul();
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+
+    &__item {
+        transition: $transition;
+        &_left,
+        &_right {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            opacity: .6;
+            cursor: pointer;
+        }
+        &_left {
+            transform: translate(calc(-50% - 360px), -50%) scale(.6);
+            &:hover {
+                transform: translate(calc(-50% - 360px), -50%) scale(.7);
+                opacity: .9;
+            }
+        }
+        &_right {
+            transform: translate(calc(-50% + 360px), -50%) scale(.6);
+            &:hover {
+                transform: translate(calc(-50% + 360px), -50%) scale(.7);
+                opacity: .9;
+            }
+        }
+    }
+
+    &__control {
+        background: url('/images/icons/arrow.svg') no-repeat;
+        background-position: center center;
+        background-size: 40px 40px;
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        border-radius: 30px;
+        transition: $transition;
+        opacity: 0.7;
+
+        &:hover {
+            background-color: $bkgd;
+            box-shadow: $shadow;
+            opacity: 0.9;
+        }
+
+        &:active {
+            background-color: $grey_bright;
+            box-shadow: none;
+        }
+
+        &_next {
+            transform: rotate(180deg);
+        }
+    }
+}
