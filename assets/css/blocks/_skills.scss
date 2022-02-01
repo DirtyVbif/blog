@@ -37,22 +37,15 @@ $skill_icon_width: 140px;
         }
     }
 
-    .js-slider__item & {
-        &__title,
-        &__desc {
-            display: none;
-        }
+    &.left &__title,
+    &.left &__desc,
+    &.right &__title,
+    &.right &__desc {
+        display: none;
     }
-    
-    .js-slider__item_middle & {
-        &__title,
-        &__desc {
-            display: block;
-        }
-    }
-}
 
-.js-slider__item_middle.skill {
-    background-color: $bkgd;
-    width: $skill_card_width;
+    &.middle {
+        background-color: $bkgd;
+        width: $skill_card_width;
+    }
 }

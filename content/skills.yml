@@ -1,55 +1,55 @@
+drupal: {
+  icon: '/images/logo-drupal.svg',
+  label: 'Drupal',
+  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  class: ''
+}
+
 php: {
   icon: '/images/logo-php.svg',
   label: 'PHP',
-  desc: '',
+  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
   class: ''
 }
 
 javascript: {
   icon: '/images/logo-js.svg',
   label: 'JavaScript',
-  desc: "Понимание принципов ООП.\nЗнание ECMA Script 6",
+  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
   class: ''
 }
 
 html: {
   icon: '/images/logo-html-css.svg',
   label: 'HTML 5 / CSS 3',
-  desc: '',
+  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
   class: ''
 }
 
 sql: {
   icon: '/images/logo-sql.png',
   label: 'SQL Databases',
-  desc: '',
+  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
   class: ''
 }
 
 terminal: {
   icon: '/images/logo-terminal.svg',
   label: 'Command Line',
-  desc: '',
+  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
   class: ''
 }
 
 turbo: {
   icon: '/images/logo-amp-turbo.svg',
   label: 'AMP & Turbo pages',
-  desc: '',
+  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
   class: ''
 }
 
 laravel: {
   icon: '/images/logo-laravel.svg',
   label: 'Laravel Framework',
-  desc: '',
-  class: ''
-}
-
-drupal: {
-  icon: '/images/logo-drupal.svg',
-  label: 'Drupal',
-  desc: '',
+  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
   class: ''
 }

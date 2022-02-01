@@ -8,22 +8,22 @@
 
     &__item {
         transition: $transition;
-        &_left,
-        &_right {
+        &.left,
+        &.right {
             position: absolute;
             top: 50%;
             left: 50%;
             opacity: .6;
             cursor: pointer;
         }
-        &_left {
+        &.left {
             transform: translate(calc(-50% - 360px), -50%) scale(.6);
             &:hover {
                 transform: translate(calc(-50% - 360px), -50%) scale(.7);
                 opacity: .9;
             }
         }
-        &_right {
+        &.right {
             transform: translate(calc(-50% + 360px), -50%) scale(.6);
             &:hover {
                 transform: translate(calc(-50% + 360px), -50%) scale(.7);
@@ -54,7 +54,7 @@
             box-shadow: none;
         }
 
-        &_next {
+        &.next {
             transform: rotate(180deg);
         }
     }
