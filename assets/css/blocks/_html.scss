@@ -7,10 +7,10 @@ html, body {
     padding: 0;
     color: $txt;
     font: $font;
-    @include vwMax(767) {
+    @include vwMax($vwbp_m) {
         font-size: 18px;
     }
-    @include vwMax(480) {
+    @include vwMax($vwbp_s) {
         font-size: 16px;
     }
 }

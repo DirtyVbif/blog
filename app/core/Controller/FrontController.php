@@ -17,10 +17,12 @@ class FrontController extends BaseController
         app()->page()->useCss('front.min');
         // add page content
         app()->page()->addContent([
-            // set front page slider
-            app()->builder()->getSlider(),
+            // set front page banner
+            app()->builder()->getBanner(),
             // set front page skill box
-            app()->builder()->getSkills()
+            app()->builder()->getSkills(),
+            // set front page summary block
+            app()->builder()->getSummary()
         ]);
         return;
     }

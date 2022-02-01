@@ -56,11 +56,11 @@ trait PageBuilderElements
         return $cp;
     }
 
-    public function getSlider(): Element
+    public function getBanner(): Element
     {
         $slider = new Element('section');
-        $slider->setName('elements/slider');
-        $slider->addClass('section section_slider');
+        $slider->setName('elements/banner');
+        $slider->addClass('section section_banner');
         return $slider;
     }
 
@@ -82,6 +82,24 @@ trait PageBuilderElements
         $label->addClass('section__header section_skills__header');
         $skills->set('label', $label);
         return $skills;
+    }
+
+    public function getSummary(): Element
+    {
+        $summary = new Element('section');
+        $summary->setName('elements/summary');
+        $summary->addClass('section section_summary')
+            ->setId('summary');
+        $label = new Title(2);
+        $label->set(t('Web-developer summary'));
+        $label->addClass('section__header section_summary__header');
+        $diff = date_diff(
+            date_create('26-08-1989'),
+            date_create(date("Y-m-d"))
+        );
+        $summary->set('label', $label)
+            ->set('my_age', $diff->format('%y'));
+        return $summary;
     }
 
     public function getCookieModal(): Element
