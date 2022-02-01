@@ -9,7 +9,7 @@ class ExtendedTwigFunctions
 {
     protected array $functions = [];
     protected array $function_names = [
-        't', 'link', 'url', 'html id'
+        't', 'link', 'url', 'html id', 'img'
     ];
 
     public function __construct()
@@ -57,5 +57,10 @@ class ExtendedTwigFunctions
             }
             return new Markup($output, CHARSET);
         });
+    }
+
+    protected function initFunctionImg(): TwigFunction
+    {
+        return new TwigFunction('img', 'img');
     }
 }

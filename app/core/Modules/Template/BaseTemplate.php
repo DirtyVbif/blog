@@ -54,10 +54,10 @@ class BaseTemplate
         return $this->data;
     }
 
-    public function set(string $data_key, $value): void
+    public function set(string $data_key, $value): self
     {
         $this->data[$data_key] = $value;
-        return;
+        return $this;
     }
 
     /**

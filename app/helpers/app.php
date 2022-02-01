@@ -58,3 +58,9 @@ function msgr(): \Blog\Modules\Messenger\Messenger
 {
     return app()->messenger();
 }
+
+function img(string $src): \Blog\Modules\TemplateFacade\Image
+{
+    $img = new \Blog\Modules\TemplateFacade\Image($src);
+    return $img;
+}
