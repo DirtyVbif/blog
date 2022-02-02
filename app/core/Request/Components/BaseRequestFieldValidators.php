@@ -60,8 +60,25 @@ trait BaseRequestFieldValidators
         return preg_match($pattern, $value);
     }
 
-    protected function validateFieldPlainText(string $field_name, array $rule)
+    protected function validateFieldPlainText(string $field_name, array $rule): array
     {
-        
+        $value = $this->data[$field_name] ?? null;
+        $errors = [];
+        foreach ($rule as $rule_name => $valid) {
+            switch ($rule_name) {
+                case 'required':
+                    if (!$this->validateRequiredValue($value, $valid)) {
+                        $errors[] = t(
+                            'Field `@field_name` is required.',
+                            ['field_name' => $this->getFieldName($field_name)]
+                        );
+                    }
+                    break;
+            }
+        }
+        if (isset($this->data[$field_name])) {
+            $this->data[$field_name] = htmlspecialchars(strip_tags($this->data[$field_name]));
+        }
+        return $errors;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Blog\Controller;
 
+use Blog\Request\FeedbackRequest;
+
 class PostController extends BaseController
 {
     public function prepare(): void
@@ -23,6 +25,7 @@ class PostController extends BaseController
 
     public function feedbackRequest()
     {
-        pre($_POST);
+        $data = new FeedbackRequest($_POST);
+        pre($data->name, $data->email, $data->subject);
     }
 }

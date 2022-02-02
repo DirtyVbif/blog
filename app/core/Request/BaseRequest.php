@@ -4,6 +4,8 @@ namespace Blog\Request;
 
 abstract class BaseRequest
 {
+    use Components\BaseRequestFieldValidators;
+
     protected bool $is_valid;
     protected array $errors = [];
 
