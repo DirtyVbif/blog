@@ -5,6 +5,7 @@ namespace Blog\Components;
 use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
+use Blog\Modules\Mailer\Mailer;
 use Blog\Modules\PageBuilder\PageBuilder;
 use Blog\Modules\Messenger\Messenger;
 use Blog\Modules\Response\Response;
@@ -19,6 +20,7 @@ trait BlogModules
     private Response $response;
     private Bridge $sql;
     private Messenger $messenger;
+    private Mailer $mailer;
 
     public function response(): Response
     {
@@ -76,5 +78,13 @@ trait BlogModules
             $this->messenger = new Messenger;
         }
         return $this->messenger;
+    }
+
+    public function mailer(): Mailer
+    {
+        if (!isset($this->mailer)) {
+            $this->mailer = new Mailer;
+        }
+        return $this->mailer;
     }
 }

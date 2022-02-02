@@ -41,4 +41,21 @@ class FeedbackRequest extends BaseRequest
     {
         return t(self::FIELD_NAMES[$name] ?? $name);
     }
+
+    public function sendAsMail(): void
+    {
+        $timestamp = time();
+        $to = app()->config('webmaster')->mail;
+        $subject = 'Сообщение с сайта от пользователя ' . date('m.d H:i', $timestamp);
+        $message = 'Сообщение от: ' . $this->name . ' (' . $this->email . ")\r\n";
+        $message .= 'Отправлено в: ' . date('Y-m-d H:i:s', $timestamp) . "\r\n";
+        $message .= "Текст сообщения:\r\n" . $this->subject;
+        $headers = [
+            'From' => $this->email,
+            'Reply-To' => $this->email,
+            'Date' => date('D, d M Y H:i:s O', $timestamp)
+        ];
+        app()->mailer()->send($to, $subject, $message, $headers);
+        return;
+    }
 }

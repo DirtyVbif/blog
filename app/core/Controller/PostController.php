@@ -14,7 +14,6 @@ class PostController extends BaseController
         } else {
             msgr()->warning('POST request is not valid.');
         }
-        die;
         app()->router()->redirect('<current>');
     }
 
@@ -26,6 +25,10 @@ class PostController extends BaseController
     public function feedbackRequest()
     {
         $data = new FeedbackRequest($_POST);
-        pre($data->name, $data->email, $data->subject);
+        if ($data->isValid()) {
+            $data->sendAsMail();
+            msgr()->notice('Ваше сообщение успешно отправлено и будет обработано в ближайшее время.');
+        }
+        return;
     }
 }
