@@ -17,4 +17,20 @@
         background-color: $btn_blue;
         color: $grey_light;
     }
+
+    &_transparent {
+        color: $btn_blue;
+        border: 1px solid $btn_blue;
+        background-color: transparent;
+        &:hover {
+            color: $btn_blue_hover;
+            border-color: $btn_blue_hover;
+            background-color: transparent;
+        }
+        &:active {
+            color: $btn_blue_hover;
+            border-color: $btn_blue_hover;
+            background-color: transparent;
+        }
+    }
 }

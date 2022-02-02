@@ -1,7 +1,10 @@
 .section {
+    padding-top: 15px;
+    padding-bottom: 15px;
 
     &__header {
         text-align: center;
+        text-transform: capitalize;
     }
 
     &_banner {
@@ -19,6 +22,21 @@
 
         & h1 {
             font-size: 60px;
+        }
+    }
+
+    &_summary,
+    &_contacts {
+        padding-left: 30px;
+        padding-right: 30px;
+
+        @include vwMax($vwbp_xl) {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        @include vwMax($vwbp_m) {
+            padding-left: 15px;
+            padding-right: 15px;
         }
     }
 }

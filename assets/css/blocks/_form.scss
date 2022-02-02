@@ -1,0 +1,64 @@
+.form {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+
+    &__field {
+        display: flex;
+        flex-wrap: wrap;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        align-items: center;
+    }
+
+    &__field-label {
+        width: 140px;
+
+        @include vwMax($vwbp_s) {
+            width: 110px;
+        }
+    }
+
+    &__field-anno {
+        width: 100%;
+        font-size: 0.7em;
+        color: $grey_strong;
+    }
+
+    &__textarea,
+    &__input {
+        padding: 5px 12px;
+        outline: none;
+        border-radius: 4px;
+        border: 1px solid $grey_light;
+        font: inherit;
+
+        &:focus {
+            border-color: $link_hover;
+        }
+    }
+
+    &__input {
+        width: calc(100% - 140px);
+
+        @include vwMax($vwbp_s) {
+            width: calc(100% - 110px);
+        }
+        @include vwMax($vwbp_xs) {
+            width: 100%;
+        }
+    }
+
+    &__textarea {
+        width: 100%;
+        resize: vertical;
+    }
+
+    &__submit {
+        outline: none;
+        font: inherit;
+        &:focus {
+            border-color: $link_hover;
+        }
+    }
+}

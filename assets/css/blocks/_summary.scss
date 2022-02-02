@@ -1,6 +1,4 @@
 .section_summary {
-    padding: 0 30px;
-
     & article {
         & h3 {
             margin-bottom: 0;
@@ -14,12 +12,6 @@
         & p {
             text-align: justify;
         }
-    }
-    @include vwMax($vwbp_xl) {
-        padding: 0 20px;
-    }
-    @include vwMax($vwbp_m) {
-        padding: 0 15px;
     }
 }
 
