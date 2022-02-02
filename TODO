@@ -2,10 +2,10 @@
 [v] Add contacts block;
 [v] Add mailer module;
 [v] Complete send mail from contacts block;
+[v] Add enviroment config file for DB connecting and toher local config files;
+[v] Convert Database connection to env file;
 
 [ ] Add CSRF-token module and verification methods;
 [ ] Add EN/RU switcher and translations;
-[ ] Test contact form mail sending on hosting
-[ ] Add user authentification module and form
-[ ] Add enviroment config file for DB connecting and toher local config files
-[ ] Convert Database connection to env file
+[ ] Test contact form mail sending on hosting;
+[ ] Add user authentification module and form;
