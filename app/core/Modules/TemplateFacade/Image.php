@@ -50,9 +50,14 @@ class Image extends TemplateFacade
                 file_get_contents($this->source_path)
             );
             $attr = $xmlget->attributes();
-            $image_size = preg_split('/\s+/', (string)$attr['viewBox']);
-            $this->width = $image_size[2];
-            $this->height = $image_size[3];
+            if (isset($attr['viewBox'])) {
+                $image_size = preg_split('/\s+/', (string)$attr['viewBox']);
+                $this->width = $image_size[2];
+                $this->height = $image_size[3];
+            } else if (isset($attr['width'], $attr['height'])) {
+                $this->width = (float)$attr['width'];
+                $this->height = (float)$attr['height'];
+            }
         } else {
             $image_size = getimagesize($this->source_path);
             $this->width = $image_size[0];
