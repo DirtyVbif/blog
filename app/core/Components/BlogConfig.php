@@ -2,10 +2,14 @@
 
 namespace Blog\Components;
 
+use Symfony\Component\Yaml\Yaml;
+
 trait BlogConfig
 {
     private array $config;
     private bool $config_loaded = false;
+    private bool $env_loaded = false;
+    private array $env;
 
     private function loadConfig(): void
     {
@@ -25,5 +29,14 @@ trait BlogConfig
             return (object)$this->config;
         }
         return isset($this->config[$config_name]) ? (object)$this->config[$config_name] : null;
+    }
+
+    public function env(): \stdClass
+    {
+        if (!$this->env_loaded) {
+            $this->env = Yaml::parseFile(ROOTDIR . 'env');
+            $this->env_loaded = true;
+        }
+        return (object)$this->env;
     }
 }

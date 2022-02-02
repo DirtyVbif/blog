@@ -8,10 +8,7 @@ use PDOStatement;
 class Bridge
 {
     use Components\BridgeCacheSystem;
-
-    /**
-     * @var string[] database connection config
-     */
+    
     private object $config;
 
     private PDO $connection;
@@ -19,7 +16,7 @@ class Bridge
 
     public function __construct()
     {
-        $this->config = app()->config('database');
+        $this->config = (object)app()->env()->DB;
         return $this;
     }
 

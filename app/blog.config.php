@@ -17,6 +17,13 @@ $__config = [];
 $__config['langcode'] = 'ru';
 
 /**
+ * Webmaster contacts
+ */
+$__config['webmaster'] = [
+    'mail' => 'info@mublog.site'
+];
+
+/**
  * Application development settings
  */
 $__config['development'] = [
@@ -41,17 +48,6 @@ $__config['twig'] = [
         // 'autoescape' => false
     ],
     'templates' => 'templates'
-];
-
-/**
- * Database connection settings
- */
-$__config['database'] = [
-    'HOST' => 'localhost',
-    'NAME' => 'mublog',
-    'USER' => 'root',
-    'PASS' => 'root',
-    'DRIVER' => 'mysql'
 ];
 
 /**

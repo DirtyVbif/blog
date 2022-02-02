@@ -9,6 +9,9 @@ vendor/
 # cache
 cache/
 
-#Development files
+# Development files
 commands
 .vscode/
+
+# local configuration files
+env
