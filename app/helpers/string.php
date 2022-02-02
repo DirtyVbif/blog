@@ -105,7 +105,7 @@ function ffstr(string &...$args): void
 function strPascalCase(string $string): string
 {
     $pascal_string = '';
-    $parts = preg_split('/[\W]+/', $string);
+    $parts = preg_split('/[\W_]+/', $string);
     foreach ($parts as $p) {
         $pascal_string .= ucfirst(strtolower($p));
     }
