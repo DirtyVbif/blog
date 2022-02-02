@@ -16,8 +16,9 @@ function sql(): Bridge
  * @param array|null $columns if is set than used for @method Blog\Database\SQLSelect::columns()
  * @param string|array|null $from if is set than used for @method Blog\Database\SQLSelect::from()
  */
-function db_select(?array $columns = null, string|array|null $from = null): SQLSelect
+function sql_select(?array $columns = null, string|array|null $from = null): SQLSelect
 {
+    // TODO: complete documentation for SQLSelect
     $statement = new SQLSelect;
     if (!is_null($columns)) {
         $statement->columns($columns);
@@ -28,8 +29,9 @@ function db_select(?array $columns = null, string|array|null $from = null): SQLS
     return $statement;
 }
 
-function db_update(?array $set = null, ?string $table = null): SQLUpdate
+function sql_update(?array $set = null, ?string $table = null): SQLUpdate
 {
+    // TODO: complete documentation for SQLUpdate
     $statement = new SQLUpdate;
     if (!is_null($set)) {
         $statement->set($set);
@@ -40,13 +42,14 @@ function db_update(?array $set = null, ?string $table = null): SQLUpdate
     return $statement;
 }
 
-function db_delete(?string $from = null): SQLUpdate
+function sql_delete(?string $from = null): SQLUpdate
 {
-    return db_update(table: $from)->setDel();
+    return sql_update(table: $from)->setDel();
 }
 
-function db_insert(?string $table = null): SQLInsert
+function sql_insert(?string $table = null): SQLInsert
 {
+    // TODO: complete documentation for SQLInsert
     $statement = new SQLInsert;
     if (!is_null($table)) {
         $statement->into($table);

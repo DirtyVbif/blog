@@ -24,7 +24,7 @@ class SQLInsert extends SQLAbstractStatement
      * 
      * @param array $values array of `[value_1, value_2, ...]` values to insert.
      * * Count of values must be equal to count of specified columns
-     * * Can also contains arrays with `[value_1, value_2, ...]` values for multiple rows insert e.g.:
+     * * Can also contains array of arrays with values for multiple rows insert e.g.:
      * ```
      * [
      *  [value_1, value_2, ...],
@@ -46,7 +46,6 @@ class SQLInsert extends SQLAbstractStatement
             if (is_array($value)) {
                 $this->setValues($value);
                 $values_flat_array = false;
-                continue;
             }
         }
         if ($values_flat_array) {
