@@ -25,8 +25,7 @@ class Router
         $this->data['params'] = $_GET ?? [];
         $this->parseUrlArguments();
         if ($this->isPostRequest() && !$this->isAjaxRequest()) {
-            pre($_POST);
-            die;
+            $this->setControllerName('post');
         } else if ($this->isGetRequest() || $this->isAjaxRequest()) {
             $this->setControllerName($this->arg(1) ?? 'front');
         } else {
