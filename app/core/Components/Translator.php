@@ -9,10 +9,14 @@ trait Translator
     protected array $translations;
     protected bool $translations_checked = false;
 
-    public function translate(string $text): string
+    public function translate(string $text, array $variables = []): string
     {
         $this->checkTranslations();
-        return isset($this->translations[$text]) ? $this->translations[$text] : $text;
+        $translation = $this->translations[$text] ?? $text;
+        foreach ($variables as $name => $value) {
+            $translation = str_replace("@{$name}", $value, $translation);
+        }
+        return $translation;
     }
 
     public function langcode(): string

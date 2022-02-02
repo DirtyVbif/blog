@@ -13,18 +13,18 @@ function page(): \Blog\Modules\Template\Page
     return app()->page();
 }
 
-function t(string $text): string
+function t(string $text, array $variables = []): string
 {
-    return app()->translate($text);
+    return app()->translate($text, $variables);
 }
 
 /**
  * Get an object of `\Blog\Modules\FileSystem\File::class`
  */
-function f(string $name, string $directory, ?string $extension = null, int $permission = 644): \Blog\Modules\FileSystem\File
+function f(string $name, string $directory, ?string $extension = null, int $permissions = 644): \Blog\Modules\FileSystem\File
 {
     $file = new \Blog\Modules\FileSystem\File($name, $extension, $directory);
-    $file->permissions($permission);
+    $file->permissions($permissions);
     return $file;
 }
 

@@ -4,3 +4,8 @@
 'contacts': 'контакты'
 'about': 'обо мне'
 'Web-developer summary': 'Резюме веб-разработчика'
+'last posts in blog': 'последние записи в блоге'
+
+'Field `@field_name` is required.': 'Поле `@field_name` обязательно для заполнения.'
+'Field `@field_name` length must be lesser than @n symbols.': 'Содержимое поля `@field_name` должно быть не более @n символов.'
+'Field `@field_name` contains invalid value.': 'Поле `@field_name` содержит недопустимое значение.'
