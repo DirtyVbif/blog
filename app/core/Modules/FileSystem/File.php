@@ -16,7 +16,7 @@ class File
      */
     protected $handle;
 
-    public function __construct(string $name, ?string $extension = null, string $directory)
+    public function __construct(string $name, string $directory, ?string $extension = null)
     {
         $this
             ->name($name)

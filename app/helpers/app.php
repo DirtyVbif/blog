@@ -23,7 +23,7 @@ function t(string $text, array $variables = []): string
  */
 function f(string $name, string $directory, ?string $extension = null, int $permissions = 644): \Blog\Modules\FileSystem\File
 {
-    $file = new \Blog\Modules\FileSystem\File($name, $extension, $directory);
+    $file = new \Blog\Modules\FileSystem\File($name, $directory, $extension);
     $file->permissions($permissions);
     return $file;
 }
