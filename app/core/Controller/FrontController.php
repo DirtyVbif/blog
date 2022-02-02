@@ -18,11 +18,15 @@ class FrontController extends BaseController
         // add page content
         app()->page()->addContent([
             // set front page banner
-            app()->builder()->getBanner(),
+            app()->builder()->getBannerBlock(),
             // set front page skill box
-            app()->builder()->getSkills(),
+            app()->builder()->getSkillsBlock(),
             // set front page summary block
-            app()->builder()->getSummary()
+            app()->builder()->getSummaryBlock(),
+            // set front page blog preview block
+            app()->builder()->getBlogPreview(),
+            // set front page contacts block
+            app()->builder()->getContactsBlock()
         ]);
         return;
     }
