@@ -1,2 +1,6 @@
 [v] Add Messenger::module for outputting status messages;
+[v] Add contacts block;
+[ ] Add mailer module;
+[ ] Complete send mail from contacts block;
 [ ] Add CSRF-token module and verification methods;
+[ ] Add EN/RU switcher and translations;
