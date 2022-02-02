@@ -25,6 +25,15 @@ class Link extends TemplateFacade
         $name = $synonyms[$name] ?? $name;
         return $this->$name;
     }
+
+    public function label(?string $label = null): self|string|null
+    {
+        if (is_null($label)) {
+            return $this->label ?? null;
+        }
+        $this->label = $label;
+        return $this;
+    }
     
     /**
      * @return Element $tpl
