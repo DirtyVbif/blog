@@ -1,0 +1,15 @@
+{{ wrapper.open() }}
+    {{ label }}
+    {% if items is iterable %}
+        <ul>
+            {% for item in items %}
+                <li>
+                    {{ item.preview }}
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.summary }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {{ link('blog').addClass('section__more-link').label('Ещё в блоге') }}
+{{ wrapper.close() }}

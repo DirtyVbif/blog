@@ -56,19 +56,19 @@ trait PageBuilderElements
         return $cp;
     }
 
-    public function getBanner(): Element
+    public function getBannerBlock(): Element
     {
-        $slider = new Element('section');
-        $slider->setName('elements/banner');
-        $slider->addClass('section section_banner');
-        return $slider;
+        $block = new Element('section');
+        $block->setName('blocks/banner');
+        $block->addClass('section section_banner');
+        return $block;
     }
 
-    public function getSkills(): Element
+    public function getSkillsBlock(): Element
     {
-        $skills = new Element('section');
-        $skills->setName('elements/skills');
-        $skills->addClass('section section_skills')
+        $block = new Element('section');
+        $block->setName('blocks/skills');
+        $block->addClass('section section_skills')
             ->setId('about');
         $items = $this->getContent('skills');
         foreach ($items as &$item) {
@@ -76,19 +76,19 @@ trait PageBuilderElements
             $item['icon']->width(120);
             $item['desc'] = new BodyText($item['desc']);
         }
-        $skills->set('items', $items);
+        $block->set('items', $items);
         $label = new Title(2);
         $label->set(t('My skills'));
         $label->addClass('section__header section_skills__header');
-        $skills->set('label', $label);
-        return $skills;
+        $block->set('label', $label);
+        return $block;
     }
 
-    public function getSummary(): Element
+    public function getSummaryBlock(): Element
     {
-        $summary = new Element('section');
-        $summary->setName('elements/summary');
-        $summary->addClass('section section_summary')
+        $block = new Element('section');
+        $block->setName('blocks/summary');
+        $block->addClass('section section_summary')
             ->setId('summary');
         $label = new Title(2);
         $label->set(t('Web-developer summary'));
@@ -97,9 +97,35 @@ trait PageBuilderElements
             date_create('26-08-1989'),
             date_create(date("Y-m-d"))
         );
-        $summary->set('label', $label)
+        $block->set('label', $label)
             ->set('my_age', $diff->format('%y'));
-        return $summary;
+        return $block;
+    }
+
+    public function getContactsBlock(): Element
+    {
+        $block = new Element('section');
+        $block->setName('blocks/contacts');
+        $block->addClass('section section_contacts')
+            ->setId('contacts');
+        $label = new Title(2);
+        $label->set(t('contacts'));
+        $label->addClass('section__header section_contacts__header');
+        $block->set('label', $label);
+        return $block;
+    }
+
+    public function getBlogPreview(): Element
+    {
+        $block = new Element('section');
+        $block->setName('blocks/blog--preview');
+        $block->addClass('section section_blog')
+            ->setId('blog');
+        $label = new Title(2);
+        $label->set(t('last posts in blog'));
+        $label->addClass('section__header section_blog__header');
+        $block->set('label', $label);
+        return $block;
     }
 
     public function getCookieModal(): Element
