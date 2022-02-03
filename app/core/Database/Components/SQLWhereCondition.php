@@ -46,7 +46,12 @@ trait SQLWhereCondition
         ?array $equal_columns = null,
         bool $not = false
     ): self {
-        $this->whereAdd($condition, $operator, 'AND', $equal_columns, $not);
+        $this->whereAdd(
+            condition: $condition,
+            operator: $operator,
+            equal_columns: $equal_columns,
+            not: $not,
+            type: 'AND');
         return $this;
     }
 
@@ -65,16 +70,21 @@ trait SQLWhereCondition
         ?array $equal_columns = null,
         bool $not = false
     ): self {
-        $this->whereAdd($condition, $operator, 'OR', $equal_columns, $not);
+        $this->whereAdd(
+            condition: $condition,
+            operator: $operator,
+            equal_columns: $equal_columns,
+            not: $not,
+            type: 'OR');
         return $this;
     }
 
     protected function whereAdd(
         ?array $condition,
         string $operator,
-        ?string $type = null,
         ?array $equal_columns,
-        bool $not
+        bool $not,
+        ?string $type = null
     ): self {
         if ($condition) {
             $condition = $this->parseWhereCondition($condition);
