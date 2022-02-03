@@ -25,7 +25,7 @@ class ExtendedTwigFunctions
     protected function prepareExtendedFunctions(array $list): self
     {
         foreach ($list as $name) {
-            $fn = 'initFunction' . strPascalCase($name);
+            $fn = 'initFunction' . pascalCase($name);
             $this->functions[$name] = $this->$fn();
         }
         return $this;

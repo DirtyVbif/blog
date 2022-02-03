@@ -51,7 +51,7 @@ abstract class BaseRequest
      */
     protected function validateField(string $field_name, array $rule)
     {
-        $validator = 'validateField' . strPascalCase($rule['type']);
+        $validator = 'validateField' . pascalCase($rule['type']);
         unset($rule['type']);
         return $this->$validator($field_name, $rule);
     }

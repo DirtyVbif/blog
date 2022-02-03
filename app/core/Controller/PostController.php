@@ -9,7 +9,7 @@ class PostController extends BaseController
     public function prepare(): void
     {
         $type = $_POST['type'] ?? null;
-        if ($type && method_exists($this, $method = lcfirst(strPascalCase($type)) . 'Request')) {
+        if ($type && method_exists($this, $method = lcfirst(pascalCase($type)) . 'Request')) {
             $this->$method();
         } else {
             msgr()->warning('POST request is not valid.');
