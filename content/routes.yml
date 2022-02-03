@@ -1,6 +1,6 @@
 front: {
   url: '/',
-  label: 'home'
+  label: 'main page'
 }
 blog: {
   url: '/blog',

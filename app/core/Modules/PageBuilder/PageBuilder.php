@@ -43,7 +43,10 @@ class PageBuilder
         }
         $menu_items = $this->menu_links[$menu_name] ?? [];
         $links = [];
-        foreach ($menu_items['items'] as $name) {
+        foreach ($menu_items['items'] as $name) {            
+            if ($menu_name === 'main' && $name === 'front' && app()->router()->isHome()) {
+                continue;
+            }
             $link = $this->getLink($name);
             $link['current'] = $link['url'] === app()->router()->get('url');
             $item_classes = $link_classes = [];
@@ -56,6 +59,10 @@ class PageBuilder
             foreach (preg_split('/\s+/', $menu_items['class']) as $class_string) {
                 $item_classes[] = $class_string . '__item';
                 $link_classes[] = $class_string . '__link';
+                if ($menu_name === 'main' && $name === 'front') {
+                    $link['label'] = '';
+                    $link_classes[] = $class_string . '__link_home';
+                }
             }
             $link['class'] = implode(' ', $item_classes);
             $link['link_class'] = implode(' ', $link_classes);
