@@ -19,8 +19,12 @@ trait PageBuilderElements
         if (!isset($this->page_header)) {
             $this->page_header = new PageHeader;
             $logo = $this->getLogo();
-            $logo->setAttr('class', 'logo logo_header');
+            $logo->setAttr('class', 'logo_header');
             $this->page_header->set('logo', $logo);
+            $this->page_header->set(
+                'menu',
+                app()->builder()->getMenu('main')
+            );
         }
         return $this->page_header;
     }
@@ -31,6 +35,10 @@ trait PageBuilderElements
             $this->page_footer = new PageFooter;
             $logo = $this->getLogo();
             $logo->addClass('logo_footer');
+            $this->page_footer->set(
+                'menu',
+                app()->builder()->getMenu('footer')
+            );
             $this->page_footer->set('logo', $logo);
             $this->page_footer->set('copyrights', $this->getCopyrights());
         }

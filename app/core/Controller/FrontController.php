@@ -9,10 +9,6 @@ class FrontController extends BaseController
         parent::prepare();
         // add main page elements
         app()->page()->setAttr('class', 'page_front');
-        $main_menu = app()->builder()->getMenu('main');
-        app()->builder()->header()->set('menu', $main_menu);
-        $foo_nav = app()->builder()->getMenu('footer');
-        app()->builder()->footer()->set('menu', $foo_nav);
         // use front page styles
         app()->page()->useCss('front.min');
         // add page content
