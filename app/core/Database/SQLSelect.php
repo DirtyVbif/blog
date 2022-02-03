@@ -12,6 +12,8 @@ class SQLSelect extends SQLAbstractStatement
     protected array $order;
     protected array $join = [];
     protected array $first_table_columns;
+    protected int $limit;
+    protected int $limit_offset;
     protected $result;
 
     /**
@@ -198,7 +200,8 @@ class SQLSelect extends SQLAbstractStatement
         $where_condition = $this->currentSqlStringWhereCondition();
         $join = $this->currentSqlStringJoin();
         $order = $this->currentSqlStringOrder();
-        $sql_string .= $join . $where_condition . $order . ';';
+        $limit = $this->currentSqlStringLimit();
+        $sql_string .= $join . $where_condition . $order . $limit . ';';
         return $sql_string;
     }
 
@@ -263,5 +266,33 @@ class SQLSelect extends SQLAbstractStatement
             $order_string .= implode(', ', $columns);
         }
         return $order_string;
+    }
+
+    protected function currentSqlStringLimit(): string
+    {
+        $limit = '';
+        if ($this->limit()) {
+            $limit .= "\nLIMIT " . $this->limit();
+            $limit .= $this->limitOffset() ? ' OFFSET ' . $this->limitOffset() : '';
+        }
+        return $limit;
+    }
+
+    public function limit(?int $limit = null): int|self|null
+    {
+        if (is_null($limit)) {
+            return $this->limit ?? 0;
+        }
+        $this->limit = max($limit, 0);
+        return $this;
+    }
+
+    public function limitOffset(?int $offset = null): int|self|null
+    {
+        if (is_null($offset)) {
+            return $this->limit_offset ?? 0;
+        }
+        $this->limit_offset = max($offset, 0);
+        return $this;
     }
 }
