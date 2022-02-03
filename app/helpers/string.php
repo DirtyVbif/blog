@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\Yaml\Yaml;
+
 /**
  * Format input with prefix. Formats each value for arrays.
  * 
@@ -102,7 +104,7 @@ function ffstr(string &...$args): void
 /**
  * Convert input string into PascalCaseString
  */
-function strPascalCase(string $string): string
+function pascalCase(string $string): string
 {
     $pascal_string = '';
     $parts = preg_split('/[\W_]+/', $string);
@@ -113,9 +115,31 @@ function strPascalCase(string $string): string
 }
 
 /**
+ * Formats any string to `kebab-case-style-string`
+ */
+function kebabCase(string $string, bool $transliterate = false, string $langcode = 'ru'): string
+{
+    $string = strtolower(
+        ($transliterate ? transliterate($string, $langcode) : $string)
+    );
+    $regex = '/[\W_]+/';
+    $output = preg_replace('/(^\-*)|(\-*$)/', '', preg_replace($regex, '-', $string));
+    return $output;
+}
+
+/**
  * Converts absolute server path to relative app path
  */
-function strTrimServDir(string $directory): String
+function strTrimServDir(string $directory): string
 {
     return str_replace(SERVERDIR, '', $directory);
+}
+
+function transliterate(string $input, string $langcode = 'ru'): string
+{
+    $source = APPDIR . 'translations/' . $langcode . '/transliteration.yml';
+    ffstr($source);
+    $t = Yaml::parseFile($source);
+    $output = str_replace($t[$langcode], $t['en'], $input);
+    return $output;
 }
