@@ -26,10 +26,18 @@ class Blog
         $this->controller()->prepare();
     }
 
-    public function controller(): BaseController
+    public function controller(?string $controller_name = null): BaseController
     {
+        $prefix = '\Blog\Controller\\';
+        if ($controller_name) {
+            $controller_name = $prefix . pascalCase($controller_name) . 'Controller';
+            if (class_exists($controller_name)) {
+                return new $controller_name;
+            } else {
+                return null;
+            }
+        }
         if (!isset($this->controller)) {
-            $prefix = '\Blog\Controller\\';
             $name = $prefix . $this->router()->get('controller');
             $this->controller = class_exists($name) ? new $name : new \Blog\Controller\ErrorController;
         }
