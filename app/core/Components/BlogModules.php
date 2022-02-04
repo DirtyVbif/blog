@@ -11,6 +11,7 @@ use Blog\Modules\Messenger\Messenger;
 use Blog\Modules\Response\Response;
 use Blog\Modules\Router\Router;
 use Blog\Modules\Template\Page;
+use Blog\Modules\User\User;
 
 trait BlogModules
 {
@@ -21,6 +22,7 @@ trait BlogModules
     private Bridge $sql;
     private Messenger $messenger;
     private Mailer $mailer;
+    private User $user;
 
     public function response(): Response
     {
@@ -86,5 +88,13 @@ trait BlogModules
             $this->mailer = new Mailer;
         }
         return $this->mailer;
+    }
+
+    public function user(): User
+    {
+        if (!isset($this->user)) {
+            $this->user = new User;
+        }
+        return $this->user;
     }
 }

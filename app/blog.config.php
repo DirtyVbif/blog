@@ -70,4 +70,12 @@ $__config['cache'] = [
     ]
 ];
 
+/**
+ * User authentification configurations
+ */
+$__config['user'] = [
+    'utoken_lifetime' => 3600 * 24 * 7,
+    'utoken_timeout' => 60 * 5
+];
+
 return $__config;
