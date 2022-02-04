@@ -44,3 +44,20 @@ function setamdv(array $k, $container, $value = null, bool $rewrite = true, bool
     // return modified container
     return $container;
 }
+
+function arraySearchFirstKeyByColumn(array $array, $search, string $column)
+{
+    $result = arraySearchKeyByColumn($array, $search, $column);
+    return $result[0] ?? null;
+}
+
+function arraySearchKeyByColumn(array $array, $search, string $column): array
+{
+    $found_array_keys = [];
+    foreach ($array as $key => $row) {
+        if (isset($row[$column]) && $row[$column] === $search) {
+            $found_array_keys[] = $key;
+        }
+    }
+    return $found_array_keys;
+}

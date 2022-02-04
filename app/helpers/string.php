@@ -76,6 +76,38 @@ function strRegexQuote(string $string, array $chars = ['/']): string
 }
 
 /**
+ * Generates String of (str rand) Random symbols of specified length. Uses `[a-zA-Z0-9]` and `[@#$%_-*&?]` as additional symbols
+ * 
+ * @param int $length length of random string in symbols.
+ * @param boolean $clear means if string will be clear of additional symbols `[@#$%_-*&?]` or not. String contains additional symbols by default.
+ */
+function strRand(int $length = 16, bool $clear = false): string
+{
+    $result = '';
+    $i = 0;
+    $chars = [
+        'lc' => str_split('abcdefghijklmnopqrstuvwxyz'),
+        'uc' => str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+        'str' => str_split('aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ'),
+        'num' => str_split('0123456789-_'),
+        'signs' => str_split('0@1#2$3%4_5-6*7&8?9')
+    ];
+
+    if ($clear) {
+        unset($chars['signs'], $chars['str']);
+    }
+
+    do {
+        $x = array_rand($chars);
+        $y = array_rand($chars[$x]);
+        $result .= $chars[$x][$y];
+        $i++;
+    } while ($i < $length);
+
+    return $result;
+}
+
+/**
  * Replace White Spaces in string (str rws) with single white space symbol
  */
 function strrws(string $string): string
