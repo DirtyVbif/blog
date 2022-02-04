@@ -32,7 +32,7 @@ class FeedbackRequest extends BaseRequest
 
     public function __get($name)
     {
-        if (in_array($name, ['name', 'email', 'subject']) && $this->isValid()) {
+        if (isset(self::FIELD_NAMES[$name]) && $this->isValid()) {
             return $this->data[$name];
         }
     }
