@@ -2,9 +2,11 @@
 
 namespace Blog\Modules\PageBuilder\Components;
 
+use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Modules\Template\PageFooter;
 use Blog\Modules\Template\PageHeader;
+use Blog\Modules\TemplateFacade\BlogArticle;
 use Blog\Modules\TemplateFacade\BodyText;
 use Blog\Modules\TemplateFacade\Image;
 use Blog\Modules\TemplateFacade\Title;
@@ -133,6 +135,15 @@ trait PageBuilderElements
         $label->set(t('last posts in blog'));
         $label->addClass('section__header section_blog__header');
         $block->set('label', $label);
+        /** @var \Blog\Controller\BlogController */
+        $blog_controller = app()->controller('blog');
+        $items = [];
+        foreach ($blog_controller->getArticles(3, true) as $article_data) {
+            $article_data['url'] = '/blog/' . ($article_data['alias'] ?? $article_data['id']);
+            $article_data['date'] = new DateFormat($article_data['created']);
+            $items[] = new BlogArticle($article_data, 'preview');
+        }
+        $block->set('items', $items);
         return $block;
     }
 

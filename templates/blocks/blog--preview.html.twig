@@ -1,13 +1,9 @@
 {{ wrapper.open() }}
     {{ label }}
     {% if items is iterable %}
-        <ul>
+        <ul class="articles articles_preview">
             {% for item in items %}
-                <li>
-                    {{ item.preview }}
-                    <h4>{{ item.title }}</h4>
-                    <p>{{ item.summary }}</p>
-                </li>
+                <li class="articles__item articles_preview__item">{{ item }}</li>
             {% endfor %}
         </ul>
     {% endif %}
