@@ -34,7 +34,7 @@ class Blog
             if (class_exists($controller_name)) {
                 return new $controller_name;
             } else {
-                return null;
+                $this->controller = $this->controller('error');
             }
         }
         if (!isset($this->controller)) {

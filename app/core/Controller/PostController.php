@@ -9,17 +9,27 @@ class PostController extends BaseController
     public function prepare(): void
     {
         $type = $_POST['type'] ?? null;
-        if ($type && method_exists($this, $method = lcfirst(pascalCase($type)) . 'Request')) {
+        $controller = app()->router()->arg(1);
+        if (!$controller && $type && method_exists($this, $method = lcfirst(pascalCase($type)) . 'Request')) {
             $this->$method();
+        } else if ($controller) {
+            app()->controller($controller)->postRequest();
+            return;
         } else {
             msgr()->warning('POST request is not valid.');
         }
         app()->router()->redirect('<current>');
     }
 
+    public function postRequest(): void
+    {
+        $this->prepare();
+        return;
+    }
+
     public function getTitle(): string
     {
-        return t('Error 404. Page not found.');
+        return '';
     }
 
     public function feedbackRequest()

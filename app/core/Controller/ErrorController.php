@@ -14,4 +14,10 @@ class ErrorController extends BaseController
     {
         return t('Error 404. Page not found.');
     }
+
+    public function postRequest(): void
+    {
+        pre($_POST);
+        exit;
+    }
 }

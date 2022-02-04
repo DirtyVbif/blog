@@ -41,4 +41,10 @@ class BlogController extends BaseController
         $sql->where(condition: ['id' => $id]);
         return $sql->first();
     }
+
+    public function postRequest(): void
+    {
+        pre($_POST);
+        exit;
+    }
 }

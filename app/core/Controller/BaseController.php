@@ -14,4 +14,6 @@ abstract class BaseController
     }
 
     abstract public function getTitle(): string;
+
+    abstract public function postRequest(): void;
 }

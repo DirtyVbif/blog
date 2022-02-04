@@ -31,4 +31,10 @@ class FrontController extends BaseController
     {
         return '';
     }
+
+    public function postRequest(): void
+    {
+        pre($_POST);
+        exit;
+    }
 }

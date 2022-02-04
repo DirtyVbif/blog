@@ -47,4 +47,10 @@ class AjaxController extends BaseController
             }
         }
     }
+
+    public function postRequest(): void
+    {
+        $this->prepare();
+        return;
+    }
 }
