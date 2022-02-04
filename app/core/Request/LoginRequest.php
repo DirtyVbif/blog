@@ -20,7 +20,7 @@ class LoginRequest extends BaseRequest
             ],
             'password' => [
                 'type' => 'string',
-                'pattern' => "/[\w\@\%\#\!\?\&\$\-]{8,}/",
+                'pattern' => "/[\w\@\%\#\!\?\&\$\-]{8,40}/",
                 'required' => true
             ],
             'remember_me' => [

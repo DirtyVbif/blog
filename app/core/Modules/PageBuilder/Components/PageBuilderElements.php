@@ -155,4 +155,11 @@ trait PageBuilderElements
         $chunk->setId('cookie-agreement');
         return $chunk;
     }
+
+    public function getLoginForm(): Element
+    {
+        $form = new Element;
+        $form->setName('forms/login');
+        return $form;
+    }
 }

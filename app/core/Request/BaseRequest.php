@@ -29,7 +29,7 @@ abstract class BaseRequest
     {
         $this->is_valid = true;
         foreach ($this->rules() as $name => $rule) {
-            if (!isset($this->data[$name])) {
+            if (!isset($this->data[$name]) && ($rule['required'] ?? false)) {
                 $this->is_valid = false;
                 $this->errors[$name] = [
                     t(

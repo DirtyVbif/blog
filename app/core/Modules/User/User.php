@@ -87,8 +87,10 @@ class User
 
     public function initialize(): self
     {
-        $this->setUserStatus();
-        $this->initialized = true;
+        if (!$this->initialized) {
+            $this->setUserStatus();
+            $this->initialized = true;
+        }
         return $this;
     }
 
@@ -155,19 +157,19 @@ class User
 
     public function getUserStatusId(): int
     {
+        $this->initialize();
         return (int)$this->getUserStatus()->id;
     }
 
     public function getUserStatus(): \stdClass
     {
-        if (!$this->initialized) {
-            $this->initialize();
-        }
+        $this->initialize();
         return (object)session()->get(self::SESSUID . '/status');
     }
 
     public function verifyAccessLevel(int $level): bool
     {
+        $this->initialize();
         if (!isset($this->access_levels[$level])) {
             return false;
         }
@@ -190,11 +192,13 @@ class User
 
     public function isAuthorized(): bool
     {
+        $this->initialize();
         return $this->authorized;
     }
 
     public function isAdmin(): bool
     {
+        $this->initialize();
         $admin_level = null;
         foreach ($this->accessList() as $access) {
             if (!in_array('admin', $access['allow'])) {
@@ -213,6 +217,7 @@ class User
      */
     public function getNameByUid(string|array $uid): ?array
     {
+        $this->initialize();
         if (is_string($uid)) {
             $uid = preg_split('/\D+/', $uid);
         }

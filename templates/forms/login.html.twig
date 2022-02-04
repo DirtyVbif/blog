@@ -1,0 +1,34 @@
+<form action="/user" method="POST" {{ id('form-login', true) }} class="form form_login">
+    <input type="hidden" name="type" value="login">
+    <div class="form__field form_login__field">
+        <label for="form-login--mail" class="form__field-label form_login__field-label">Логин:</label>
+        <input
+            type="email"
+            {{ id('form-login--mail', true) }}
+            name="mail"
+            max="255"
+            class="form__input form_login__input"
+            required>
+    </div>
+    <div class="form__field form_login__field">
+        <label for="form-login--password" class="form__field-label form_login__field-label">Пароль:</label>
+        <input
+            type="password"
+            {{ id('form-login--password', true) }}
+            name="password"
+            max="40"
+            class="form__input form_login__input"
+            required>
+    </div>
+    <div class="form__field form_login__field">
+        <input
+            type="checkbox"
+            {{ id('form-login--remember', true) }}
+            name="remember_me"
+            class="form__checkbox form_login__checkbox">
+        <label for="form-login--remember" class="form__field-label form_login__field-label">Запомнить меня</label>
+    </div>
+    <div class="form__field form_login__field">
+        <input type="submit" value="Войти" class="btn btn_transparent form__submit form_login__submit">
+    </div>
+</form>
