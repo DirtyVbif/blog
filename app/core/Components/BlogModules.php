@@ -13,6 +13,7 @@ use Blog\Modules\Response\Response;
 use Blog\Modules\Router\Router;
 use Blog\Modules\Template\Page;
 use Blog\Modules\User\User;
+use Blog\Modules\View\BaseView;
 
 trait BlogModules
 {
@@ -25,6 +26,8 @@ trait BlogModules
     private Mailer $mailer;
     private User $user;
     private Token $csrf;
+    /** @var BaseView[] $views */
+    private array $views;
 
     public function response(): Response
     {
@@ -106,5 +109,18 @@ trait BlogModules
             $this->csrf = new Token;
         }
         return $this->csrf;
+    }
+
+    public function view(string $view_name): ?BaseView
+    {
+        if (!isset($this->views[$view_name])) {
+            $view = '\\Blog\\Modules\\View\\' . pascalCase($view_name);
+            if (class_exists($view)) {
+                $this->views[$view_name] = new $view();
+            } else {
+                $this->views[$view_name] = null;
+            }
+        }
+        return $this->views[$view_name];
     }
 }

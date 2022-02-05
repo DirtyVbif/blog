@@ -1,0 +1,8 @@
+{{ wrapper.open() }}
+    <ul>
+        {% for item in items %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    {{ pager }}
+{{ wrapper.close() }}

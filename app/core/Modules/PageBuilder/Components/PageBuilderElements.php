@@ -135,15 +135,20 @@ trait PageBuilderElements
         $label->set(t('last posts in blog'));
         $label->addClass('section__header section_blog__header');
         $block->set('label', $label);
-        /** @var \Blog\Controller\BlogController */
-        $blog_controller = app()->controller('blog');
-        $items = [];
-        foreach ($blog_controller->getArticles(3, true) as $article_data) {
-            $article_data['url'] = '/blog/' . ($article_data['alias'] ?? $article_data['id']);
-            $article_data['date'] = new DateFormat($article_data['created']);
-            $items[] = new BlogArticle($article_data, 'preview');
-        }
-        $block->set('items', $items);
+        /** @var Blog\Modules\View\Blog $view */
+        $view = app()->view('blog');
+        $block->set('items', $view->preview(3, 'teaser'));
+        return $block;
+    }
+
+    public function getBlogPage(): Element
+    {
+        $block = new Element('ul');
+        $block->setName('blocks/blog--page');
+        /** @var Blog\Modules\View\Blog $view */
+        $view = app()->view('blog')->view();
+        $block->set('items', $view->items);
+        $block->set('pager', $view->pager);
         return $block;
     }
 
