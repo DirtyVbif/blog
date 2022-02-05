@@ -1,5 +1,23 @@
-{{ wrapper.open() }}
+{{ wrapper.addClass('pager').open() }}
     {% for item in items %}
-        <li>{{ item.label }}</li>
+        {% set item_class = 'pager__item' %}
+        {% if item.item_class %}
+            {% set item_class = item_class ~ ' ' ~ item.item_class %}
+        {% endif %}
+        <li class="{{ item_class }}">
+            {% if item.url %}
+                {% set class = 'pager__link' %}
+                {% if item.class %}
+                    {% set class = class ~ ' ' ~ item.class %}
+                {% endif %}
+                <a href="{{ item.url }}" class="{{ class }}">{{ item.label }}</a>
+            {% else %}
+                {% set class = 'pager__non-link' %}
+                {% if item.class %}
+                    {% set class = class ~ ' ' ~ item.class %}
+                {% endif %}
+                <span class="{{ class }}">{{ item.label }}</span>
+            {% endif %}
+        </li>
     {% endfor %}
 {{ wrapper.close() }}

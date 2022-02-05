@@ -9,6 +9,9 @@ class BlogController extends BaseController
         parent::prepare();
         // add main page elements
         app()->page()->setAttr('class', 'page_blog');
+        // use front page styles
+        app()->page()->useCss('blog.min');
+        // add blog page content
         app()->page()->addContent([
             app()->builder()->getBlogPage()
         ]);

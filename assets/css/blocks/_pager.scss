@@ -1,0 +1,57 @@
+.pager {
+    list-style-type: none;
+    padding: 30px 0;
+    display: flex;
+    justify-content: center;
+    font-size: 16px;
+
+    &__item {
+        &:not(:last-child) {
+            margin-right: 15px;
+        }
+
+        &.mobile-hidden {
+            @include vwMax($vwbp_s) {
+                display: none;
+            }
+        }
+    }
+
+    &__link,
+    &__non-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+
+        &.active {
+            color: $grey;
+            border-color: $grey;
+        }
+    }
+
+    &__link {
+        color: $btn_blue;
+        background-color: white;
+        &:hover {
+            color: $btn_blue_hover;
+            box-shadow: $shadow;
+        }
+        &:active {
+            box-shadow: none;
+            background-color: $grey_bright;
+        }
+        &_prev {
+            transform: rotateY(180deg);
+        }
+    }
+
+    &__arrow-img {
+        width: 50%;
+        height: auto;
+        object-fit: contain;
+    }
+}

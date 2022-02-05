@@ -75,7 +75,7 @@ class Blog extends BaseView
         $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
         $total_items = sql_select(from: 'articles')->count();
         if ($total_items > self::ITEMS_PER_PAGE) {
-            $view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
+            $view->pager = new Pager(33, self::ITEMS_PER_PAGE);
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
         $view->items = $this->getArticlesItemsFromData(

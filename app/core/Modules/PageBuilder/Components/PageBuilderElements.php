@@ -143,7 +143,7 @@ trait PageBuilderElements
 
     public function getBlogPage(): Element
     {
-        $block = new Element('ul');
+        $block = new Element;
         $block->setName('blocks/blog--page');
         /** @var Blog\Modules\View\Blog $view */
         $view = app()->view('blog')->view();
