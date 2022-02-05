@@ -1,4 +1,5 @@
 <form action="/user" method="POST" {{ id('form-login', true) }} class="form form_login">
+    {{ csrf() }}
     <input type="hidden" name="type" value="login">
     <div class="form__field form_login__field">
         <label for="form-login--mail" class="form__field-label form_login__field-label">Логин:</label>

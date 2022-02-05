@@ -2,6 +2,7 @@
 
 use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
+use Twig\Markup;
 
 function app(): \Blog\Blog
 {
@@ -63,4 +64,12 @@ function img(string $src): \Blog\Modules\TemplateFacade\Image
 {
     $img = new \Blog\Modules\TemplateFacade\Image($src);
     return $img;
+}
+
+function csrf(bool $render = true)
+{
+    if ($render) {
+        return new Markup(app()->csrf()->render(), CHARSET);
+    }
+    return app()->csrf();
 }

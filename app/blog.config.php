@@ -75,7 +75,8 @@ $__config['cache'] = [
  */
 $__config['user'] = [
     'utoken_lifetime' => 3600 * 24 * 7,
-    'utoken_timeout' => 60 * 5
+    'utoken_timeout' => 60 * 5,
+    'csrf_token_lifetime' => 60 * 10
 ];
 
 return $__config;

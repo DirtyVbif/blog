@@ -2,6 +2,8 @@
 
 namespace Blog\Request;
 
+use Blog\Modules\CSRF\Token;
+
 abstract class BaseRequest
 {
     use Components\BaseRequestFieldValidators;
@@ -27,6 +29,9 @@ abstract class BaseRequest
 
     protected function validate(): void
     {
+        if (!$this->validateCsrfToken()) {
+            return;
+        }
         $this->is_valid = true;
         foreach ($this->rules() as $name => $rule) {
             if (!isset($this->data[$name]) && ($rule['required'] ?? false)) {
@@ -44,6 +49,18 @@ abstract class BaseRequest
                 }
             }
         }
+    }
+
+    protected function validateCsrfToken(): bool
+    {
+        $csrf_token = $this->data[Token::FORM_ID] ?? null;
+        if (!$csrf_token || !app()->csrf()->validate($csrf_token)) {
+            $this->is_valid = false;
+            $this->errors[Token::FORM_ID] = [t('Form token is invalid or timed out. Please try again or contact administrator.')];
+            return false;
+        }
+        unset($this->data[Token::FORM_ID]);
+        return true;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Blog\Components;
 use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
+use Blog\Modules\CSRF\Token;
 use Blog\Modules\Mailer\Mailer;
 use Blog\Modules\PageBuilder\PageBuilder;
 use Blog\Modules\Messenger\Messenger;
@@ -23,6 +24,7 @@ trait BlogModules
     private Messenger $messenger;
     private Mailer $mailer;
     private User $user;
+    private Token $csrf;
 
     public function response(): Response
     {
@@ -96,5 +98,13 @@ trait BlogModules
             $this->user = new User;
         }
         return $this->user;
+    }
+
+    public function csrf(): Token
+    {
+        if (!isset($this->csrf)) {
+            $this->csrf = new Token;
+        }
+        return $this->csrf;
     }
 }

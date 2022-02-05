@@ -18,6 +18,7 @@
     <p>Либо отправить сообщение через форму обратной связи:</p>
     <div class="feedback-form">
         <form action="/" method="POST" {{ id('form-feedback', true) }} class="form form_feedback">
+            {{ csrf() }}
             <input type="hidden" name="type" value="feedback">
             <div class="form__field form_feedback__field">
                 <label for="form-feedback--name" class="form__field-label form_feedback__field-label">Ваше имя:</label>
