@@ -53,7 +53,7 @@ class Token
 
     public function validate(string $token, bool $regenerate = true): bool
     {
-        $validation = $this->get() === $token;
+        $validation = strcmp($this->get(), $token) === 0;
         if ($regenerate && $validation) {
             $this->regenerate();
         }
