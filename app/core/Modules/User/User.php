@@ -181,6 +181,7 @@ class User
 
     public function logout(): self
     {
+        $this->initialize();
         $utoken = $this->token()->utoken() ?? $this->token()->getCookieUToken();
         if ($utoken) {
             sql_delete(from: 'users_sessions')

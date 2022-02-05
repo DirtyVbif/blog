@@ -65,8 +65,8 @@ $__config['pdo'] = [
 $__config['cache'] = [
     'sql' => [
         'status' => true,
-        'lifetime' => 60 * 60 * 24,
-        'minimized' => false
+        'lifetime' => 3600,
+        'minimized' => true
     ]
 ];
 

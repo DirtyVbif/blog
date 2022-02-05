@@ -4,8 +4,16 @@
 [v] Complete send mail from contacts block;
 [v] Add enviroment config file for DB connecting and toher local config files;
 [v] Convert Database connection to env file;
+[v] Add user authentification module and form;
 
 [ ] Add CSRF-token module and verification methods;
 [ ] Add EN/RU switcher and translations;
 [ ] Test contact form mail sending on hosting;
-[ ] Add user authentification module and form;
+[ ] Add ajax login and contact forms support:
+    - Add messages output on error;
+[ ] Add blog articles edit form;
+[ ] Add system log on errors or wrong inputs;
+[ ] View articles on blog page with pager;
+[ ] Add expected arguments to controllers with page not found callback;
+[ ] Add "back to top" js scroll;
+[ ] Add cache clear for admin;
