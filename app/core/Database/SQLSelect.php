@@ -158,7 +158,7 @@ class SQLSelect extends SQLAbstractStatement
     {
         $args = func_get_args();
         if (isset($first)) {
-            unset($arg[0]);
+            unset($args[0]);
         } else {
             $first = $args[0] ?? false;
         }
@@ -186,6 +186,19 @@ class SQLSelect extends SQLAbstractStatement
     public function first(): array
     {
         return $this->exe(true);
+    }
+
+    /**
+     * Count total rows in table
+     */
+    public function count(): int
+    {
+        $sql_string = sprintf(
+            'SELECT COUNT(*) as count FROM %s;',
+            $this->currentSqlStringTables()
+        );
+        $result = sql()->query($sql_string)->fetch();
+        return (int)$result['count'];
     }
 
     /**
