@@ -35,14 +35,17 @@
         background: url('/images/icons/arrow.svg') no-repeat;
         background-position: center center;
         background-size: 40px 40px;
-        width: 60px;
+        width: 58px;
         cursor: pointer;
         transition: $transition;
         opacity: 0.6;
         flex-shrink: 0;
+        border: 1px solid transparent;
+        border-radius: 4px;
 
         &:hover {
             opacity: 0.9;
+            border-color: $grey_light;
         }
 
         &:active {

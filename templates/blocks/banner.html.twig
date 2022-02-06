@@ -1,4 +1,5 @@
 {{ wrapper.open() }}
-    <h1 class="slider__title">{{ t('Blog page') }}</h1>
-    <p class="slider__text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis rerum pariatur magnam quasi iusto ratione odio officia blanditiis, quas fugit molestiae nemo quod, placeat vel eum voluptatem non mollitia repellendus debitis perferendis.</p>
+    <h1 class="slider__title">Блог веб-разработчика</h1>
+    <p>Обратите внимание, в данный момент сайт находится в разработке. Проект этого сайта доступен в моём <a href="https://github.com/DirtyVbif/blog" target="_blank">репозитории на github'е</a>.</p>
+    <p class="slider__text">Приветствую, посетитель. Данный сайт сделан {{ link('about').label('мной').addClass('js-anchor-link') }} с целью демонстрации моего опыта и навыков в веб-разработке. То есть эта страница является моим резюме и портфолио одновременно. Кроме того я планирую обновлять раздел {{ link('blog').label('блога') }}, добавляя разные полезные материалы и статьи.</p>
 {{ wrapper.close() }}

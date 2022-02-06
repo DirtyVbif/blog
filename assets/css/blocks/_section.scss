@@ -13,6 +13,12 @@
         }
     }
 
+    &__footer {
+        display: flex;
+        justify-content: center;
+        padding: 15px 0;
+    }
+
     &__more-link {
         display: block;
         color: $btn_blue;

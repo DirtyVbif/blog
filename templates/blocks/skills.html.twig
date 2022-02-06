@@ -1,7 +1,7 @@
 {{ wrapper.open() }}
     {{ label }}
     <ul class="js-slider" {{ id('skills', true) }}>
-        <li class="js-slider__control prev"></li>
+        <li class="js-slider__control prev" role="button"></li>
         {% set i = 0 %}
         {% for key, item in items %}
             {% if i == 0 %}
@@ -19,6 +19,6 @@
             </li>
             {% set i = i + 1 %}
         {% endfor %}
-        <li class="js-slider__control next"></li>
+        <li class="js-slider__control next" role="button"></li>
     </ul>
 {{ wrapper.close() }}

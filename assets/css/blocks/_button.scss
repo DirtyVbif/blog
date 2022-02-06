@@ -34,3 +34,10 @@
         }
     }
 }
+
+#print-summary {
+    padding: 10px 20px;
+    &::first-letter {
+        text-transform: uppercase;
+    }
+}
