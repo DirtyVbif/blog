@@ -11,7 +11,7 @@ class Blog extends BaseView
 {
     protected const ITEMS_PER_PAGE = 12;
 
-    public function getArticles(int $limit = 0, bool $order_desc = false, int $offset = 0): array
+    public function loadArticlesData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
         $sql = sql_select(
             ['id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt'],
@@ -29,40 +29,54 @@ class Blog extends BaseView
         return $sql->all();
     }
 
-    public function getArticleById(int $id)
+    public function getArticleById(int $id): ?BlogArticle
+    {
+        $data = $this->loadArticleDataByColumn('id', $id);
+        if (empty($data)) {
+            return null;
+        }
+        $article = $this->getArticleFromData($data);
+        return $article;
+    }
+
+    public function getArticleByAlias(string $alias): ?BlogArticle
+    {
+        $data = $this->loadArticleDataByColumn('alias', $alias);
+        if (empty($data)) {
+            return null;
+        }
+        $article = $this->getArticleFromData($data);
+        return $article;
+    }
+
+    protected function loadArticleDataByColumn(string $column, string $search_value): array
     {
         $sql = sql_select(
-            ['id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt'],
+            ['id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt', 'author'],
             'articles'
         );
-        $sql->where(condition: ['id' => $id]);
+        $sql->where(condition: [$column => $search_value]);
         return $sql->first();
     }
     
     /**
      * @return BlogArticle[] $items
      */
-    public function preview(int $limit, string $view_format = 'teaser')
+    public function preview(int $limit, string $view_format = BlogArticle::VIEW_MODE_TEASER)
     {
-        $items = $this->getArticlesItemsFromData(
-            $this->getArticles($limit, true),
-            $view_format
-        );
+        $items = [];
+        foreach ($this->loadArticlesData($limit, true) as $data) {
+            $items[] = $this->getArticleFromData($data, $view_format);
+        }
         return $items;
     }
 
-    /**
-     * @return BlogArticle[] $items
-     */
-    protected function getArticlesItemsFromData(array $articles, string $view_format)
+    protected function getArticleFromData(array $data, string $view_format = BlogArticle::VIEW_MODE_FULL): BlogArticle
     {
-        $items = [];
-        foreach ($articles as $data) {
-            $data['url'] = '/blog/' . ($data['alias'] ?? $data['id']);
-            $data['date'] = new DateFormat($data['created']);
-            $items[] = new BlogArticle($data, $view_format);
-        }
-        return $items;
+        $data['url'] = '/blog/' . ($data['alias'] ?? $data['id']);
+        $data['date'] = new DateFormat($data['created']);
+        $article = new BlogArticle($data, $view_format);
+        return $article;
     }
     
     public function view(): object
@@ -71,17 +85,15 @@ class Blog extends BaseView
             'items' => [],
             'pager' => null
         ];
-        // TODO: complete view output with pager
         $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
         $total_items = sql_select(from: 'articles')->count();
         if ($total_items > self::ITEMS_PER_PAGE) {
             $view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
-        $view->items = $this->getArticlesItemsFromData(
-            $this->getArticles(self::ITEMS_PER_PAGE, true, $offset),
-            'preview'
-        );
+        foreach ($this->loadArticlesData(self::ITEMS_PER_PAGE, true, $offset) as $data) {
+            $view->items[] = $this->getArticleFromData($data, BlogArticle::VIEW_MODE_PREVIEW);
+        }
         return $view;
     }
 }

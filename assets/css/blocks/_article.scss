@@ -1,4 +1,9 @@
+// BLOCK -------------------------------------------------------------->
 .articles {
+    // ELEMENTS ------------------------------------------------------->
+    // ELEMENTS <-------------------------------------------------------
+
+    // MODIFICATORS --------------------------------------------------->
     &_teaser {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -6,9 +11,15 @@
         margin: 0 0 30px 0;
         column-gap: 30px;
         list-style-type: none;
-    }
-}
 
+        // MODIFICATOR ELEMENTS --------------------------------------->
+        // MODIFICATOR ELEMENTS <---------------------------------------
+    }
+    // MODIFICATORS <---------------------------------------------------
+}
+// BLOCK <--------------------------------------------------------------
+
+// BLOCK -------------------------------------------------------------->
 .article {
     position: relative;
     overflow: hidden;
@@ -16,29 +27,67 @@
     background-color: $bkgd;
     transition: $transition;
 
-    &:hover {
-        box-shadow: $shadow;
-    }
-
-    &:active {
-        box-shadow: none;
-        background-color: transparent;
-    }
-
+    // ELEMENTS ------------------------------------------------------->
     &__header {
         display: flex;
+    }
+
+    &__date {
+        font-size: 0.8em;
+        color: $grey;
     }
 
     &__summary {
         margin-top: 0;
     }
+    // ELEMENTS <-------------------------------------------------------
 
+    // MODIFICATORS --------------------------------------------------->
+    &_full {
+        padding: 30px;
+
+        // MODIFICATOR ELEMENTS --------------------------------------->
+        &__header,
+        &__footer {
+            padding: 15px 0;
+        }
+
+        &__body {
+            & p {
+                &::first-letter {
+                    margin-left: 2em;
+                }
+            }
+        }
+
+        &__footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        // MODIFICATOR ELEMENTS <---------------------------------------
+    }
+    
+    &_teaser,
+    &_preview {
+        // MODIFICATOR ELEMENTS --------------------------------------->
+        &:hover {
+            box-shadow: $shadow;
+        }
+
+        &:active {
+            box-shadow: none;
+            background-color: transparent;
+        }
+        // MODIFICATOR ELEMENTS <---------------------------------------
+    }
+    
     &_teaser {
         display: flex;
         flex-direction: column;
         font-size: 0.75em;
         height: 100%;
 
+        // MODIFICATOR ELEMENTS --------------------------------------->
         &__img {
             object-fit: cover;
             height: 210px;
@@ -62,8 +111,9 @@
         &__date {
             margin: auto 15px 15px auto;
         }
+        // MODIFICATOR ELEMENTS <---------------------------------------
     }
-
+    
     &_preview {
         display: grid;
         padding-right: 20px;
@@ -74,6 +124,7 @@
             "header summary"
             "header date";
 
+        // MODIFICATOR ELEMENTS --------------------------------------->
         &__header {
             grid-area: header;
             overflow: hidden;
@@ -103,8 +154,9 @@
         &__date {
             grid-area: date;
             margin-bottom: 12px;
-            font-size: 0.8em;
-            color: $grey;
         }
+        // MODIFICATOR ELEMENTS <---------------------------------------
     }
+    // MODIFICATORS <---------------------------------------------------
 }
+// BLOCK <--------------------------------------------------------------

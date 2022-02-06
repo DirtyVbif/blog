@@ -2,7 +2,10 @@
     background: $document;
 
     &__title {
+        @include wrapper();
         text-align: center;
+        padding-left: 15px;
+        padding-right: 15px;
         &::first-letter {
             text-transform: uppercase;
         }
