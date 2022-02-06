@@ -6,14 +6,16 @@
 [v] Convert Database connection to env file;
 [v] Add user authentification module and form;
 [v] Add CSRF-token protection in POST requests;
+[v] View articles on blog page with pager;
+[v] Add system log on errors or wrong inputs or requests;
 
 [ ] Add EN/RU switcher and translations;
 [ ] Test contact form mail sending on hosting;
 [ ] Add ajax login and contact forms support:
     - Add messages output on error;
 [ ] Add blog articles edit form;
-[ ] Add system log on errors or wrong inputs or requests;
-[ ] View articles on blog page with pager;
 [ ] Add expected arguments to controllers with page not found callback;
 [ ] Add "back to top" js scroll;
 [ ] Add cache clear for admin;
+[ ] Add comment to articles in blog;
+[ ] Add Entity::module for specific entities types;

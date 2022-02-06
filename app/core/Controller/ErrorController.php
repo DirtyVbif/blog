@@ -4,9 +4,11 @@ namespace Blog\Controller;
 
 class ErrorController extends BaseController
 {
-    public function prepare(): void
+    public function prepare(int $status = 404): void
     {
         parent::prepare();
+        // TODO: parse status for specific errors output
+        app()->page()->setTitle($this->getTitle());
         return;
     }
 

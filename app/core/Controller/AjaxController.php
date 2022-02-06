@@ -11,6 +11,10 @@ class AjaxController extends BaseController
     public function prepare(): void
     {
         $this->prepareResponse();
+        if ($this->isStatus400()) {
+            app()->controller('error')->prepare();
+            return;
+        }
         app()->response()->set($this->getResponse());
         return;
     }
@@ -24,7 +28,7 @@ class AjaxController extends BaseController
     {
         $this->response = [
             'status' => 200,
-            'output' => 1
+            'output' => null
         ];
         $this->parseRequest();
     }
@@ -43,14 +47,28 @@ class AjaxController extends BaseController
                 /** @var \Blog\Components\AjaxModule $module */
                 $module = app()->$module_name();
                 $this->resposne = $module->ajaxRequest();
-                return;
+            } else {
+                $this->response['status'] = 404;
             }
+        } else {
+            $this->response['status'] = 404;
         }
+        return;
     }
 
     public function postRequest(): void
     {
         $this->prepare();
         return;
+    }
+
+    protected function status(): int
+    {
+        return $this->response['status'];
+    }
+
+    protected function isStatus400(): bool
+    {
+        return preg_match('/4\d\d/', $this->status());
     }
 }

@@ -8,18 +8,39 @@ class UserController extends BaseController
 {
     protected string $title;
 
+    public function __construct()
+    {
+        $this->title = t('Admin authorization');
+    }
+
     public function prepare(): void
     {
         parent::prepare();
-        // add main page elements
-        app()->page()->addClass('page_login');
-        // add page content
-        if (!app()->user()->isAuthorized()) {
-            app()->page()->addContent([
-                // set login form
-                app()->builder()->getLoginForm()
-            ]);
+        $request_is_valid = true;
+        if ($sub_argument = app()->router()->arg(3)) {
+            $request_is_valid = false;
         }
+        if ($argument = app()->router()->arg(2)) {
+            if ($argument === 'login' && !app()->user()->isAuthorized()) {
+                $this->loadLoginForm();
+            } else {
+                $request_is_valid = false;
+            }
+        } else if (!app()->user()->isAuthorized()) {
+            $this->loadLoginForm();
+        }
+        if (!$request_is_valid) {
+            app()->controller('error')->prepare();
+        }
+        return;
+    }
+
+    protected function loadLoginForm(): void
+    {
+        app()->page()->addClass('page_login');
+        app()->page()->addContent(
+            app()->builder()->getLoginForm()
+        );
         return;
     }
 
@@ -37,9 +58,7 @@ class UserController extends BaseController
 
     public function getTitle(): string
     {
-        if (!app()->user()->isAuthorized()) {
-            $this->title = t('Admin authorization');
-        } else {
+        if (app()->user()->isAuthorized()) {
             $this->title = t('Hello, @name', ['name' => app()->user()->name()]);
         }
         return $this->title;
