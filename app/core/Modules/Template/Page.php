@@ -15,6 +15,7 @@ class Page extends BaseTemplate
     protected array $js = [];
     protected array $content = [];
     protected array $modal = [];
+    protected Element $content_tpl;
 
     public function __construct(
         protected string $template_name = 'page'
@@ -53,6 +54,15 @@ class Page extends BaseTemplate
         return $this;
     }
 
+    public function content(): Element
+    {
+        if (!isset($this->content_tpl)) {
+            $this->content_tpl = new Element('main');
+            $this->content_tpl->addClass('container container_main');
+        }
+        return $this->content_tpl;
+    }
+
     public function render()
     {
         $this->data['attributes'] = $this->attributes();
@@ -61,10 +71,8 @@ class Page extends BaseTemplate
         $this->data['page']['title'] = $this->getTitle();
         $this->data['page']['modal'] = $this->getModal();
         if (!empty($this->content)) {
-            $content = new Element('main');
-            $content->setAttr('class', 'container container_main');
-            $content->setContent(implode($this->content));
-            $this->data['page']['content'] = $content;
+            $this->content()->setContent(implode($this->content));
+            $this->data['page']['content'] = $this->content();
         }
         $this->data['page']['messenger'] = msgr();
         return parent::render();
