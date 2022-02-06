@@ -1,5 +1,5 @@
 .articles {
-    &_preview {
+    &_teaser {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         padding: 0;
@@ -13,7 +13,7 @@
     position: relative;
     overflow: hidden;
     border-radius: 5px;
-    background-color: white;
+    background-color: $bkgd;
     transition: $transition;
 
     &:hover {
@@ -25,11 +25,15 @@
         background-color: transparent;
     }
 
+    &__header {
+        display: flex;
+    }
+
     &__summary {
         margin-top: 0;
     }
 
-    &_preview {
+    &_teaser {
         display: flex;
         flex-direction: column;
         font-size: 0.75em;
@@ -42,7 +46,6 @@
         }
 
         &__header {
-            display: flex;
             flex-direction: column;
             color: inherit;
         }
@@ -58,6 +61,50 @@
 
         &__date {
             margin: auto 15px 15px auto;
+        }
+    }
+
+    &_preview {
+        display: grid;
+        padding-right: 20px;
+        column-gap: 20px;
+        grid-template-columns: 280px 1fr;
+        grid-template-areas: 
+            "header title"
+            "header summary"
+            "header date";
+
+        &__header {
+            grid-area: header;
+            overflow: hidden;
+        }
+
+
+        &__img {
+            object-fit: cover;
+            min-width: 100%;
+            height: auto;
+        }
+
+        &__title {
+            grid-area: title;
+            margin: 15px 0 12px;
+        }
+
+        &__title-link {
+            color: inherit;
+        }
+
+        &__summary {
+            grid-area: summary;
+            margin: 0 0 12px 0;
+        }
+
+        &__date {
+            grid-area: date;
+            margin-bottom: 12px;
+            font-size: 0.8em;
+            color: $grey;
         }
     }
 }

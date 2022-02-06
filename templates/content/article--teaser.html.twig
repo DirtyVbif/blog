@@ -1,8 +1,8 @@
-{{ wrapper.addClass('article article_preview').open() }}
-    <a href="{{ url }}" title="Читать подробнее про &laquo;{{ title }}&raquo;" class="article__header article_preview__header">
-        {{ img(preview_src).alt(preview_alt ?? title).addClass('article__img article_preview__img') }}
-        <h4 class="article__title article_preview__title">{{ title }}</h4>
+{{ wrapper.addClass('article article_teaser').open() }}
+    <a href="{{ url }}" title="Читать подробнее про &laquo;{{ title }}&raquo;" class="article__header article_teaser__header">
+        {{ img(preview_src).alt(preview_alt ?? title).addClass('article__img article_teaser__img') }}
+        <h4 class="article__title article_teaser__title">{{ title }}</h4>
     </a>
-    <p class="article__summary article_preview__summary">{{ summary }}</p>
-    <div class="article__date article_preview__date">{{ date }}</div>
+    <p class="article__summary article_teaser__summary">{{ summary }}</p>
+    <div class="article__date article_teaser__date">{{ date }}</div>
 {{ wrapper.close() }}

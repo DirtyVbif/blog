@@ -1,0 +1,11 @@
+.blog {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+
+    &__item {
+        &:not(:last-child) {
+            margin-bottom: 30px;
+        }
+    }
+}

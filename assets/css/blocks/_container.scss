@@ -1,10 +1,10 @@
 .container {
     @include wrapper();
 
-    &_main {
-        background: $bkgd;
-        overflow: hidden;
-        border-radius: 5px;
-        box-shadow: $shadow;
-    }
+    // &_main:not(&_blog) {
+    //     background: $bkgd;
+    //     overflow: hidden;
+    //     border-radius: 5px;
+    //     box-shadow: $shadow;
+    // }
 }
