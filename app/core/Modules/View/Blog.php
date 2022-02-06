@@ -11,7 +11,40 @@ class Blog extends BaseView
 {
     protected const ITEMS_PER_PAGE = 12;
 
-    public function loadArticlesData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
+    public static function viewBlogArticle(string|int $argument): bool
+    {
+        // check argument for matching with blog article
+        if (is_numeric($argument) && $article = self::getArticleById($argument)) {
+            // if argument is numeric and equals to blog article id then redirect to named url alias of that article
+            app()->router()->redirect($article->url);
+            return true;
+        } else if (is_numeric($argument)) {
+            // if argument is numeric and there is no blog article with such id then url is unexisting
+            return false;
+        }
+        // try to load article by url alias
+        $article = self::getArticleByAlias($argument);
+        if (!$article) {
+            return false;
+        }
+        // view loaded blog article
+        app()->page()->setTitle($article->title);
+        app()->page()->addContent($article);
+        app()->page()->content()->addClass('container_article');
+        // TODO: set page meta shortlink
+        return true;
+    }
+
+    public static function viewBlogPage(): void
+    {
+        app()->page()->addContent(
+            app()->builder()->getBlogPage()
+        );
+        app()->page()->content()->addClass('container_blog');
+        return;
+    }
+
+    public static function loadArticlesData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
         $sql = sql_select(
             ['id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt'],
@@ -29,27 +62,27 @@ class Blog extends BaseView
         return $sql->all();
     }
 
-    public function getArticleById(int $id): ?BlogArticle
+    public static function getArticleById(int $id): ?BlogArticle
     {
-        $data = $this->loadArticleDataByColumn('id', $id);
+        $data = self::loadArticleDataByColumn('id', $id);
         if (empty($data)) {
             return null;
         }
-        $article = $this->getArticleFromData($data);
+        $article = self::getArticleFromData($data);
         return $article;
     }
 
-    public function getArticleByAlias(string $alias): ?BlogArticle
+    public static function getArticleByAlias(string $alias): ?BlogArticle
     {
-        $data = $this->loadArticleDataByColumn('alias', $alias);
+        $data = self::loadArticleDataByColumn('alias', $alias);
         if (empty($data)) {
             return null;
         }
-        $article = $this->getArticleFromData($data);
+        $article = self::getArticleFromData($data);
         return $article;
     }
 
-    protected function loadArticleDataByColumn(string $column, string $search_value): array
+    protected static function loadArticleDataByColumn(string $column, string $search_value): array
     {
         $sql = sql_select(
             ['id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt', 'author'],
@@ -66,12 +99,12 @@ class Blog extends BaseView
     {
         $items = [];
         foreach ($this->loadArticlesData($limit, true) as $data) {
-            $items[] = $this->getArticleFromData($data, $view_format);
+            $items[] = self::getArticleFromData($data, $view_format);
         }
         return $items;
     }
 
-    protected function getArticleFromData(array $data, string $view_format = BlogArticle::VIEW_MODE_FULL): BlogArticle
+    protected static function getArticleFromData(array $data, string $view_format = BlogArticle::VIEW_MODE_FULL): BlogArticle
     {
         $data['url'] = '/blog/' . ($data['alias'] ?? $data['id']);
         $data['date'] = new DateFormat($data['created']);
@@ -92,7 +125,7 @@ class Blog extends BaseView
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
         foreach ($this->loadArticlesData(self::ITEMS_PER_PAGE, true, $offset) as $data) {
-            $view->items[] = $this->getArticleFromData($data, BlogArticle::VIEW_MODE_PREVIEW);
+            $view->items[] = self::getArticleFromData($data, BlogArticle::VIEW_MODE_PREVIEW);
         }
         return $view;
     }

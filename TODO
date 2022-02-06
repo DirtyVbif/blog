@@ -19,3 +19,4 @@
 [ ] Add cache clear for admin;
 [ ] Add comment to articles in blog;
 [ ] Add Entity::module for specific entities types;
+[ ] Add admin view for feedbacks;
