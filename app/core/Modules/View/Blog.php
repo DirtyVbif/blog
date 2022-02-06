@@ -9,7 +9,7 @@ use Blog\Modules\View\BaseView;
 
 class Blog extends BaseView
 {
-    protected const ITEMS_PER_PAGE = 3;
+    protected const ITEMS_PER_PAGE = 12;
 
     public function getArticles(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
@@ -42,7 +42,7 @@ class Blog extends BaseView
     /**
      * @return BlogArticle[] $items
      */
-    public function preview(int $limit, string $view_format = 'preview')
+    public function preview(int $limit, string $view_format = 'teaser')
     {
         $items = $this->getArticlesItemsFromData(
             $this->getArticles($limit, true),
@@ -75,7 +75,7 @@ class Blog extends BaseView
         $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
         $total_items = sql_select(from: 'articles')->count();
         if ($total_items > self::ITEMS_PER_PAGE) {
-            $view->pager = new Pager(33, self::ITEMS_PER_PAGE);
+            $view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
         $view->items = $this->getArticlesItemsFromData(

@@ -12,6 +12,7 @@ class BlogController extends BaseController
         // use front page styles
         app()->page()->useCss('blog.min');
         // add blog page content
+        app()->page()->content()->addClass('container_blog');
         app()->page()->addContent([
             app()->builder()->getBlogPage()
         ]);
