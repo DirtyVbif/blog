@@ -3,6 +3,7 @@
 namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
+use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Request\BaseRequest;
 use Twig\Markup;
@@ -34,7 +35,17 @@ class BlogArticle extends BaseEntity
         } else {
             $this->data = $data;
         }
+        $this->preprocessData();
         $this->setViewMode($view_mode);
+    }
+
+    protected function preprocessData(): void
+    {
+        if (!empty($this->data)) {            
+            $this->data['url'] = '/blog/' . ($this->data['alias'] ?? $this->data['id']);
+            $this->data['date'] = new DateFormat($this->data['created']);
+        }
+        return;
     }
 
     /**

@@ -104,14 +104,6 @@ class Blog extends BaseView
         }
         return $items;
     }
-
-    protected static function getArticleFromData(array $data, string $view_format = BlogArticle::VIEW_MODE_FULL): BlogArticle
-    {
-        $data['url'] = '/blog/' . ($data['alias'] ?? $data['id']);
-        $data['date'] = new DateFormat($data['created']);
-        $article = new BlogArticle($data, $view_format);
-        return $article;
-    }
     
     public function view(): object
     {
@@ -126,7 +118,7 @@ class Blog extends BaseView
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
         foreach ($this->loadArticlesData(self::ITEMS_PER_PAGE, true, $offset) as $data) {
-            $view->items[] = self::getArticleFromData($data, BlogArticle::VIEW_MODE_PREVIEW);
+            $view->items[] = new BlogArticle($data, BlogArticle::VIEW_MODE_PREVIEW);
         }
         return $view;
     }
