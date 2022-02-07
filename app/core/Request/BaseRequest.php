@@ -22,6 +22,9 @@ abstract class BaseRequest
 
     abstract protected function getFieldName(string $name): string;
 
+    /**
+     * Checks if request data is valid
+     */
     public function isValid(): bool
     {
         return $this->is_valid ?? false;
@@ -29,10 +32,18 @@ abstract class BaseRequest
 
     protected function validate(): void
     {
+        // validate form CSRF token
         if (!$this->validateCsrfToken()) {
             return;
         }
+        // authorize valid form fields
+        foreach ($this->data as $field_name => $value) {
+            if (!$this->validateFieldName($field_name)) {
+                unset($this->data[$field_name]);
+            }
+        }
         $this->is_valid = true;
+        // validate form fields value
         foreach ($this->rules() as $name => $rule) {
             if (!isset($this->data[$name]) && ($rule['required'] ?? false)) {
                 $this->is_valid = false;
@@ -49,6 +60,7 @@ abstract class BaseRequest
                 }
             }
         }
+        return;
     }
 
     protected function validateCsrfToken(): bool
@@ -61,6 +73,12 @@ abstract class BaseRequest
         }
         unset($this->data[Token::FORM_ID]);
         return true;
+    }
+
+    protected function validateFieldName(string $field_name): bool
+    {
+        $rules = $this->rules();
+        return isset($rules[$field_name]);
     }
 
     /**

@@ -11,12 +11,7 @@ trait BaseRequestFieldValidators
         foreach ($rule as $name => $valid) {
             switch ($name) {
                 case 'required':
-                    if (!$this->validateRequiredValue($value, $valid)) {
-                        $errors[] = t(
-                            'Field `@field_name` is required.',
-                            ['field_name' => $this->getFieldName($field_name)]
-                        );
-                    }
+                    $this->validateRequiredValue($value, $valid, $field_name, $errors);
                     break;
                 case 'max_length':
                     if (!$this->validateStringMaxLength($value, $valid)) {
@@ -42,9 +37,16 @@ trait BaseRequestFieldValidators
         return $errors;
     }
 
-    protected function validateRequiredValue($value, bool $required): bool
+    protected function validateRequiredValue($value, bool $required, string $field_name, array &$errors): bool
     {
         if ($required && !$value) {
+            array_push(
+                $errors,
+                t(
+                    'Field `@field_name` is required.',
+                    ['field_name' => $this->getFieldName($field_name)]
+                )
+            );
             return false;
         }
         return true;
@@ -67,12 +69,7 @@ trait BaseRequestFieldValidators
         foreach ($rule as $rule_name => $valid) {
             switch ($rule_name) {
                 case 'required':
-                    if (!$this->validateRequiredValue($value, $valid)) {
-                        $errors[] = t(
-                            'Field `@field_name` is required.',
-                            ['field_name' => $this->getFieldName($field_name)]
-                        );
-                    }
+                    $this->validateRequiredValue($value, $valid, $field_name, $errors);
                     break;
             }
         }
@@ -89,16 +86,32 @@ trait BaseRequestFieldValidators
         foreach ($rule as $rule_name => $valid) {
             switch ($rule_name) {
                 case 'required':
-                    if (!$this->validateRequiredValue($value, $valid)) {
-                        $errors[] = t(
-                            'Field `@field_name` is required.',
-                            ['field_name' => $this->getFieldName($field_name)]
-                        );
-                    }
+                    $this->validateRequiredValue($value, $valid, $field_name, $errors);
                     break;
             }
         }
         $this->data[$field_name] = $value;
+        return $errors;
+    }
+
+    protected function validateFieldInt(string $field_name, array $rules): array
+    {
+        $value = $this->data[$field_name] ?? null;
+        $errors = [];
+        if ($value && !is_numeric($value)) {
+            $errors[] = t(
+                'Invalid value for field `@field_name`.',
+                ['field_name' => $this->getFieldName($field_name)]
+            );
+        } else {
+            foreach ($rules as $rule_name => $valid) {
+                switch ($rule_name) {
+                    case 'required':
+                        $this->validateRequiredValue($value, $valid, $field_name, $errors);
+                        break;
+                }
+            }
+        }
         return $errors;
     }
 }
