@@ -39,9 +39,9 @@ function cookies(): \Blog\Client\CookiesFacade
     return CookiesFacade::instance();
 }
 
-function tpllink(string $name): \Blog\Modules\TemplateFacade\Link
+function tpllink(string $name, ?string $hash_base_path = null): \Blog\Modules\TemplateFacade\Link
 {
-    return new \Blog\Modules\TemplateFacade\Link($name);
+    return new \Blog\Modules\TemplateFacade\Link($name, $hash_base_path);
 }
 
 /**

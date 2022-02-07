@@ -8,11 +8,13 @@ blog: {
 }
 about: {
   url: '#about',
-  label: 'about'
+  label: 'about',
+  hash_base: '/'
 }
 contacts: {
   url: '#contacts',
-  label: 'contacts'
+  label: 'contacts',
+  hash_base: '/'
 }
 cookie_agreement: {
   url: '/agreement-cookie',
