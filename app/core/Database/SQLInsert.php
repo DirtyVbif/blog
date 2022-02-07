@@ -78,9 +78,9 @@ class SQLInsert extends SQLAbstractStatement
     }
 
     /**
-     * @return int last inserted id
+     * @return string last inserted id
      */
-    public function exe(): int
+    public function exe(): string|false
     {
         return sql()->insert($this->raw(), $this->data());
     }

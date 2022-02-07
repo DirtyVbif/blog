@@ -110,9 +110,9 @@ class Bridge
     /**
      * Make INSERT sql-request and get the last inserted primary key
      * 
-     * @return int last inserted id on success
+     * @return string last inserted id on success
      */
-    public function insert(string $request, array $data = []): string
+    public function insert(string $request, array $data = []): string|false
     {
         $cache_request = $this->bindVariables($request, $data);
         $this->markupCacheToUpdate($cache_request);
