@@ -39,7 +39,7 @@ trait BaseRequestFieldValidators
 
     protected function validateRequiredValue($value, bool $required, string $field_name, array &$errors): bool
     {
-        if ($required && !$value) {
+        if ($required && is_null($value)) {
             array_push(
                 $errors,
                 t(

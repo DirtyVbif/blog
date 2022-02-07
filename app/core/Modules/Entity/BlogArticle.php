@@ -44,6 +44,7 @@ class BlogArticle extends BaseEntity
         if (!empty($this->data)) {            
             $this->data['url'] = '/blog/' . ($this->data['alias'] ?? $this->data['id']);
             $this->data['date'] = new DateFormat($this->data['created']);
+            $this->loadComments();
         }
         return;
     }
@@ -80,16 +81,19 @@ class BlogArticle extends BaseEntity
         ];
     }
 
-    protected function preprocessSqlSelect(SQLSelect &$sql): void
+    protected function queryDataFromStorage(SQLSelect $sql): array
     {
-        $sql->join(['ac' => 'article_comments'], on: ['a.id' => 'ac.aid']);
+        $sql->join(['ac' => 'article_comments'], on: ['a.id', 'ac.aid']);
         $sql->where(['a.id' => $this->id()]);
-        return;
+        return $sql()->first();
     }
 
-    public function create(BaseRequest $data): self
+    public function create(BaseRequest $data): bool
     {
-        return $this;
+        // TODO: complete creation of article
+        pre($data);
+        die;
+        return false;
     }
 
     /**
@@ -106,5 +110,19 @@ class BlogArticle extends BaseEntity
             $this->view_mode = self::VIEW_MODE_FULL;
         }
         return $this;
+    }
+
+    public function loadComments(): void
+    {
+        $sql = sql_select(from: ['ac' => 'article_comments']);
+        $sql->join(['c' => 'comments'], using: 'cid');
+        $sql->columns([
+            'ac' => ['cid'],
+            'c' => ['pid', 'created', 'name', 'email', 'body', 'status', 'ip']
+        ]);
+        $sql->where(['ac.aid' => $this->id()]);
+        $comments = $sql->all();
+        pre($comments);
+        return;
     }
 }

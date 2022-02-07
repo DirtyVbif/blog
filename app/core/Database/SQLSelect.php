@@ -91,7 +91,9 @@ class SQLSelect extends SQLAbstractStatement
      * @param array $table table name for join must contains:
      * * only one pair of `table_alias => table_name`
      * * or only one value `table_name`
-     * @param array|null $on if using `JOIN ON` condition type set array with two columns name that would use @param $on_operator as operator. Table name prefix for column names are available
+     * @param array|null $on if using `JOIN ON` condition type set array with two columns name that would use @param $on_operator as operator. Table name prefix for column names are available.
+     * `array $on` must contains only 2 values with column names that must be equals with array keys `0` and `1` e.g.:
+     * `[0 => 'column_name_1', 1 => 'column_name_2']`
      * @param array|null $using if using `JOIN USING()` condition type set name of using column. Table name prefix for column names are available
      * @param string $type any available `SQL JOIN` type
      * @param string $on_operator any available `SQL cONDITION OPERATOR` for `JOIN ON` condition only

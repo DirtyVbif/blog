@@ -17,14 +17,11 @@ abstract class BaseEntity extends TemplateFacade
     abstract protected function setEntityDefaults(): void;
 
     /**
-     * Set condition for entity selection query
-     */
-    abstract protected function preprocessSqlSelect(SQLSelect &$sql): void;
-
-    /**
      * Create new entity from data
      */
-    abstract public function create(BaseRequest $data): self;
+    abstract public function create(BaseRequest $data): bool;
+
+    abstract protected function queryDataFromStorage(SQLSelect $sql): array;
 
     public function __construct(
         protected int $id
@@ -49,8 +46,7 @@ abstract class BaseEntity extends TemplateFacade
         if ($this->id > 0) {
             $sql = sql_select(from: $this->getTableName());
             $sql->columns($this->getColumnsQuery());
-            $this->preprocessSqlSelect($sql);
-            $this->data = $sql->first();
+            $this->data = $this->queryDataFromStorage($sql);
         } else {
             $this->data = [];
         }
@@ -68,7 +64,7 @@ abstract class BaseEntity extends TemplateFacade
     /**
      * Get entity storage name
      */
-    protected function getTableName(): string
+    protected function getTableName(): string|array
     {
         return $this->table_name;
     }

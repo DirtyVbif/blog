@@ -2,7 +2,6 @@
 
 namespace Blog\Modules\View;
 
-use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Entity\BlogArticle;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Pager;

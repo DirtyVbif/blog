@@ -25,24 +25,25 @@ class Comment extends BaseEntity
         ];
     }
 
-    protected function preprocessSqlSelect(SQLSelect &$sql): void
+    protected function queryDataFromStorage(SQLSelect $sql): array
     {
         $sql->join(table: ['ac' => 'article_comments'], using: 'cid');
         $sql->where(['c.cid' => $this->id()]);
-        return;
+        return $sql()->first();
     }
     
     /**
      * @param \Blog\Request\CommentRequest $data
      */
-    public function create(BaseRequest $data): self
+    public function create(BaseRequest $data): bool
     {
         if (!$data->isValid()) {
-            return $this;
+            return false;
         }
-        $sql = sql_insert($this->getTableName());
+        $sql = sql_insert('comments');
+        $pid = $data->parent_id ? $data->parent_id : null;
         $sql->set(
-            [$data->parent_id, time(), $data->name, $data->email, $data->subject, 0, $_SERVER['REMOTE_ADDR']],
+            [$pid, time(), $data->name, $data->email, $data->subject, 0, $_SERVER['REMOTE_ADDR']],
             ['pid', 'created', 'name', 'email', 'body', 'status', 'ip']
         );
         $cid = (int)$sql->exe();
@@ -53,7 +54,8 @@ class Comment extends BaseEntity
                 ['aid', 'cid']
             );
             $sql->exe();
+            return true;
         }
-        return $this;
+        return false;
     }
 }
