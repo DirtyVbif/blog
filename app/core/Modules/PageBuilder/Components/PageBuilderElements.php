@@ -8,6 +8,7 @@ use Blog\Modules\Template\PageFooter;
 use Blog\Modules\Template\PageHeader;
 use Blog\Modules\TemplateFacade\BlogArticle;
 use Blog\Modules\TemplateFacade\BodyText;
+use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Image;
 use Blog\Modules\TemplateFacade\Title;
 
@@ -122,6 +123,8 @@ trait PageBuilderElements
         $label->set(t('contacts'));
         $label->addClass('section__header section_contacts__header');
         $block->set('label', $label);
+        $form = new Form('feedback');
+        $block->set('form', $form);
         return $block;
     }
 
