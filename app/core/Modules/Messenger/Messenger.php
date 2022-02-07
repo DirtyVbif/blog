@@ -56,12 +56,17 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
         return $list;
     }
 
-    protected function set(string $text, string $type, $prefix = null, int $access = self::ACCESS_LEVEL_ALL): void
+    protected function set(string $text, string $type, $prefix = null, ?array $markup = null): void
     {
-        // TODO: verify message access level
+        $text = strip_tags($text);
+        if (!empty($markup)) {
+            foreach ($markup as $key => $value) {
+                $text = str_replace("@{$key}", $value, $text);
+            }
+        }
         $message = [
             'prefix' => $prefix,
-            'text' => $text,
+            'text' => new \Twig\Markup($text, CHARSET),
             'type' => $type,
             'time' => time(),
             'status' => 0
@@ -70,28 +75,28 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
         return;
     }
 
-    public function debug(string $text, int $access = self::ACCESS_LEVEL_ALL): void
+    public function debug(string $text): void
     {
         $called_filename = strTrimServDir(debugFileCalled());
         $this->set($text, 'debug', $called_filename);
         return;
     }
 
-    public function notice(string $text, int $access = self::ACCESS_LEVEL_ALL): void
+    public function notice(string $text, ?array $markup = null): void
     {
-        $this->set($text, 'notice');
+        $this->set($text, 'notice', markup: $markup);
         return;
     }
 
-    public function warning(string $text, int $access = self::ACCESS_LEVEL_ALL): void
+    public function warning(string $text, ?array $markup = null): void
     {
-        $this->set($text, 'warning');
+        $this->set($text, 'warning', markup: $markup);
         return;
     }
 
-    public function error(string $text, int $access = self::ACCESS_LEVEL_ALL): void
+    public function error(string $text, ?array $markup = null): void
     {
-        $this->set($text, 'error');
+        $this->set($text, 'error', markup: $markup);
         return;
     }
 }
