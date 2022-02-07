@@ -4,6 +4,7 @@ namespace Blog\Modules\View;
 
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\TemplateFacade\BlogArticle;
+use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Pager;
 use Blog\Modules\View\BaseView;
 
@@ -30,6 +31,10 @@ class Blog extends BaseView
         // view loaded blog article
         app()->page()->setTitle($article->title);
         app()->page()->addContent($article);
+        $comment_form = new Form('comment');
+        $comment_form->tpl()->set('article_id', $article->id);
+        $comment_form->tpl()->set('parent_id', 0);
+        app()->page()->addContent($comment_form);
         app()->page()->content()->addClass('container_article');
         // TODO: set page meta shortlink
         return true;
