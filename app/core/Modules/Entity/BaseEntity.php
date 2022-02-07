@@ -3,21 +3,23 @@
 namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
+use Blog\Modules\TemplateFacade\TemplateFacade;
 use Blog\Request\BaseRequest;
 
-abstract class BaseEntity
+abstract class BaseEntity extends TemplateFacade
 {
     protected string|array $table_name;
     protected array $table_columns_query;
     protected array $data;
     protected bool $is_exists;
+    protected bool $loaded = false;
 
     abstract protected function setEntityDefaults(): void;
 
     /**
      * Set condition for entity selection query
      */
-    abstract protected function preprocessSqlSelect(SQLSelect $sql): void;
+    abstract protected function preprocessSqlSelect(SQLSelect &$sql): void;
 
     /**
      * Create new entity from data
@@ -27,8 +29,8 @@ abstract class BaseEntity
     public function __construct(
         protected int $id
     ) {
-        $this->setEntityDefaults();
         $this->loadEntityData();
+        $this->setId();
         if (!$this->exists()) {
             $this->id = 0;
         }
@@ -43,6 +45,7 @@ abstract class BaseEntity
 
     protected function loadEntityData(): void
     {
+        $this->setEntityDefaults();
         if ($this->id > 0) {
             $sql = sql_select(from: $this->getTableName());
             $sql->columns($this->getColumnsQuery());
@@ -51,7 +54,14 @@ abstract class BaseEntity
         } else {
             $this->data = [];
         }
+        $this->loaded = true;
         $this->is_exists = !empty($this->data);
+        return;
+    }
+
+    protected function setId(): void
+    {
+        $this->id = $this->data['id'] ?? 0;
         return;
     }
 
@@ -73,6 +83,9 @@ abstract class BaseEntity
      */
     public function id(): int
     {
+        if (!isset($this->id)) {
+            $this->id = $this->data['id'] ?? 0;
+        }
         return $this->id;
     }
 
@@ -81,6 +94,9 @@ abstract class BaseEntity
      */
     public function exists(): bool
     {
-        return $this->is_exists;
+        if ($this->loaded) {
+            return $this->is_exists ?? false;
+        }
+        return $this->id();
     }
 }

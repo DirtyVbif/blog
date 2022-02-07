@@ -1,11 +1,13 @@
 <?php
 
-namespace Blog\Modules\TemplateFacade;
+namespace Blog\Modules\Entity;
 
+use Blog\Database\SQLSelect;
 use Blog\Modules\Template\Element;
+use Blog\Request\BaseRequest;
 use Twig\Markup;
 
-class BlogArticle extends TemplateFacade
+class BlogArticle extends BaseEntity
 {
     public const VIEW_MODE_FULL = 'full';
     public const VIEW_MODE_TEASER = 'teaser';
@@ -18,21 +20,26 @@ class BlogArticle extends TemplateFacade
 
     protected string $view_mode;
 
+    /**
+     * @param int|array $data is an id of article that must be loaded or already loaded article data.
+     * If integer id provided as `int $data` then article will be automatically loaded from storage.
+     * Else if array with article data provided as `array $data` then article wouldn't be loaded from storage and accept provided data.
+     */
     public function __construct(
-        protected array $data,
-        $view_mode = self::VIEW_MODE_FULL
+        int|array $data,
+        string $view_mode = self::VIEW_MODE_FULL
     ) {
+        if (is_int($data)) {
+            parent::__construct($data);
+        } else {
+            $this->data = $data;
+        }
         $this->setViewMode($view_mode);
     }
 
-    public function __get(string $name)
-    {
-        if (isset($this->data[$name])) {
-            return $this->data[$name];
-        }
-    }
-
-    /** @return Element */
+    /**
+     * @return Element $tpl;
+     */
     public function tpl()
     {
         if (!isset($this->tpl)) {
@@ -51,6 +58,27 @@ class BlogArticle extends TemplateFacade
             $this->tpl()->set($key, $value);
         }
         return parent::render();
+    }
+
+    protected function setEntityDefaults(): void
+    {
+        $this->table_name = ['a' => 'articles'];
+        $this->table_columns_query = [
+            'a' => ['id', 'title', 'summary', 'body', 'alias', 'body', 'created', 'updated', 'preview_src', 'preview_alt', 'author', 'views'],
+            'ac' => ['cid']
+        ];
+    }
+
+    protected function preprocessSqlSelect(SQLSelect &$sql): void
+    {
+        $sql->join(['ac' => 'article_comments'], on: ['a.id' => 'ac.aid']);
+        $sql->where(['a.id' => $this->id()]);
+        return;
+    }
+
+    public function create(BaseRequest $data): self
+    {
+        return $this;
     }
 
     /**

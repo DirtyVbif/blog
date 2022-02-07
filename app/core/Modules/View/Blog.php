@@ -3,7 +3,7 @@
 namespace Blog\Modules\View;
 
 use Blog\Modules\DateFormat\DateFormat;
-use Blog\Modules\TemplateFacade\BlogArticle;
+use Blog\Modules\Entity\BlogArticle;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Pager;
 use Blog\Modules\View\BaseView;
@@ -69,12 +69,8 @@ class Blog extends BaseView
 
     public static function getArticleById(int $id): ?BlogArticle
     {
-        $data = self::loadArticleDataByColumn('id', $id);
-        if (empty($data)) {
-            return null;
-        }
-        $article = self::getArticleFromData($data);
-        return $article;
+        $article = new BlogArticle($id);
+        return $article->exists() ? $article : null;
     }
 
     public static function getArticleByAlias(string $alias): ?BlogArticle
@@ -83,7 +79,7 @@ class Blog extends BaseView
         if (empty($data)) {
             return null;
         }
-        $article = self::getArticleFromData($data);
+        $article = new BlogArticle($data);
         return $article;
     }
 
@@ -104,7 +100,7 @@ class Blog extends BaseView
     {
         $items = [];
         foreach ($this->loadArticlesData($limit, true) as $data) {
-            $items[] = self::getArticleFromData($data, $view_format);
+            $items[] = new BlogArticle($data, $view_format);
         }
         return $items;
     }

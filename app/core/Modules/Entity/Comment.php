@@ -3,10 +3,19 @@
 namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
+use Blog\Modules\Template\Element;
 use Blog\Request\BaseRequest;
 
 class Comment extends BaseEntity
 {
+    public function tpl()
+    {
+        if (!isset($this->tpl)) {
+            $this->tpl = new Element;
+        }
+        return $this->tpl;
+    }
+
     protected function setEntityDefaults(): void
     {
         $this->table_name = ['c' => 'comments'];

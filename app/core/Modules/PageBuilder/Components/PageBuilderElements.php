@@ -2,11 +2,9 @@
 
 namespace Blog\Modules\PageBuilder\Components;
 
-use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Modules\Template\PageFooter;
 use Blog\Modules\Template\PageHeader;
-use Blog\Modules\TemplateFacade\BlogArticle;
 use Blog\Modules\TemplateFacade\BodyText;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Image;
