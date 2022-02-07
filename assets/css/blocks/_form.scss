@@ -1,3 +1,13 @@
+.form-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    column-gap: 30px;
+
+    @include vwMax($vwbp_xl) {
+        grid-template-columns: 1fr;
+    }
+}
+
 .form {
     position: relative;
     width: 100%;

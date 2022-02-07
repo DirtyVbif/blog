@@ -1,39 +1,52 @@
-<form action="{{ link('blog') }}" method="POST" {{ id('form-comment', true) }} class="form form_comment">
-    {{ csrf() }}
-    <input type="hidden" name="type" value="comment">
-    <input type="hidden" name="parent_id" value="{{ parent_id }}">
-    <input type="hidden" name="article_id" value="{{ article_id }}">
-    <div class="form__field form_comment__field">
-        <label for="form-comment--name" class="form__field-label form_comment__field-label">Ваше имя:</label>
-        <input
-            type="text"
-            {{ id('form-comment--name', true) }}
-            name="name"
-            max="60"
-            class="form__input form_comment__input"
-            required>
+{{ wrapper.addClass('form-wrapper form-wrapper_comment').open() }}
+    <form action="{{ link('blog').raw() }}" method="POST" {{ id('form-comment', true) }} class="form form_comment">
+        {{ csrf() }}
+        <input type="hidden" name="type" value="comment">
+        <input type="hidden" name="parent_id" value="{{ parent_id }}">
+        <input type="hidden" name="article_id" value="{{ article_id }}">
+        <div class="form__field form_comment__field">
+            <label for="form-comment--name" class="form__field-label form_comment__field-label">Ваше имя:</label>
+            <input
+                type="text"
+                {{ id('form-comment--name', true) }}
+                name="name"
+                max="60"
+                class="form__input form_comment__input"
+                required>
+        </div>
+        <div class="form__field form_comment__field">
+            <label for="form-comment--mail" class="form__field-label form_comment__field-label">Ваш e-mail:</label>
+            <input
+                type="email"
+                {{ id('form-comment--mail', true) }}
+                name="email"
+                max="255"
+                class="form__input form_comment__input"
+                required>
+            <span class="form__field-anno form_comment__field-anno">Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.</span>
+        </div>
+        <div class="form__field form_comment__field">
+            <label for="form-comment--subject" class="form__field-label form_comment__field-label">Комментарий:</label>
+            <textarea
+                {{ id('form-comment--subject', true) }}
+                name="subject"
+                class="form__textarea form_comment__textarea"
+                rows="6"
+                required></textarea>
+        </div>
+        <div class="form__field form_comment__field">
+            <input type="submit" value="Отправить" class="btn btn_transparent form__submit form_comment__submit">
+        </div>
+    </form>
+
+    <div class="form-wrapper__rules">
+        <p>Во избежание публикации нежелательного контента, все комментарии проходят премодерацию.</p>
+        <p>Пожалуйста воздержитесь от отправки комментария, если он содержит:</p>
+        <ul>
+            <li>Ругань и ненормативную лексику при отсутствии смысловой нагрузки;</li>
+            <li>Рекламу (услуги, товары, ссылки и пр.);</li>
+            <li>Неинформативный текст, флуд, спам.</li>
+        </ul>
+        <p>Комментарии подобного характера не будут опубликованы.</p>
     </div>
-    <div class="form__field form_comment__field">
-        <label for="form-comment--mail" class="form__field-label form_comment__field-label">Ваш e-mail:</label>
-        <input
-            type="email"
-            {{ id('form-comment--mail', true) }}
-            name="email"
-            max="255"
-            class="form__input form_comment__input"
-            required>
-        <span class="form__field-anno form_comment__field-anno">Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.</span>
-    </div>
-    <div class="form__field form_comment__field">
-        <label for="form-comment--subject" class="form__field-label form_comment__field-label">Комментарий:</label>
-        <textarea
-            {{ id('form-comment--subject', true) }}
-            name="subject"
-            class="form__textarea form_comment__textarea"
-            rows="6"
-            required></textarea>
-    </div>
-    <div class="form__field form_comment__field">
-        <input type="submit" value="Отправить" class="btn btn_transparent form__submit form_comment__submit">
-    </div>
-</form>
+{{ wrapper.close() }}

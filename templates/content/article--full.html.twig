@@ -1,15 +1,13 @@
-{{ wrapper.open() }}
-    <article class="article article_full">
-        <h2 class="visually-hidden">{{ title }}</h2>
+{{ wrapper.addClass('article article_full').open() }}
+    <h2 class="visually-hidden">{{ title }}</h2>
 
-        <header class="article__header article_full__header">
-            <div class="article__date article_full__date">{{ date }}</div>
-        </header>
+    <header class="article__header article_full__header">
+        <div class="article__date article_full__date">{{ date }}</div>
+    </header>
 
-        <div class="article__body article_full__body">{{ body }}</div>
-        
-        <footer class="article__footer article_full__footer">
-            <div class="article__author article_full__author">{{ author }}</div>
-        </footer>
-    </article>
+    <div class="article__body article_full__body">{{ body }}</div>
+    
+    <footer class="article__footer article_full__footer">
+        <div class="article__author article_full__author">{{ author }}</div>
+    </footer>
 {{ wrapper.close() }}

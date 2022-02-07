@@ -35,6 +35,17 @@
         background-color: #bdd4b3;
     }
 
+    &_error,
+    &_warning {
+        & a {
+            color: $btn_blue;
+
+            &:hover {
+                color: $btn_blue_hover;
+            }
+        }
+    }
+
     &_warning {
         color: #836700;
         border-color: #b89100;
