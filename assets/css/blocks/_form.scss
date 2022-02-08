@@ -1,3 +1,4 @@
+// BLOCK -------------------------------------------------------------->
 .form-wrapper {
     display: grid;
     grid-template-columns: 1fr 400px;
@@ -7,16 +8,28 @@
         grid-template-columns: 1fr;
     }
 
+    // ELEMENTS ------------------------------------------------------->
     &__rules {
         font-size: .9em;
     }
-}
+    // ELEMENTS <-------------------------------------------------------
 
+    // MODIFICATORS --------------------------------------------------->
+    &_login {
+        display: flex;
+        justify-content: center;
+    }
+    // MODIFICATORS <---------------------------------------------------
+}
+// BLOCK <--------------------------------------------------------------
+
+// BLOCK -------------------------------------------------------------->
 .form {
     position: relative;
     width: 100%;
     margin: 0 auto;
 
+    // ELEMENTS ------------------------------------------------------->
     &__field {
         display: flex;
         flex-wrap: wrap;
@@ -30,6 +43,11 @@
 
         @include vwMax($vwbp_s) {
             width: 110px;
+        }
+
+        &_checkbox {
+            width: auto;
+            margin-left: 1em;
         }
     }
 
@@ -68,6 +86,13 @@
         resize: vertical;
     }
 
+    &__footer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
     &__submit {
         outline: none;
         font: inherit;
@@ -75,4 +100,35 @@
             border-color: $link_hover;
         }
     }
+    // ELEMENTS <-------------------------------------------------------
+
+    // MODIFICATORS --------------------------------------------------->
+    &_login {
+        max-width: 600px;
+
+        &__field {
+            &_checkbox {
+                margin-left: 1em;
+
+                @include vwMax(400px) {
+                    margin-left: 0;
+                    order: 1;
+                }
+            }
+
+            &_submit {
+                @include vwMax(400px) {
+                    order: 2;
+                }
+            }
+        }
+
+        &__footer {
+            @include vwMax(400px) {
+                flex-direction: column;
+            }
+        }
+    }
+    // MODIFICATORS <---------------------------------------------------
 }
+// BLOCK <--------------------------------------------------------------

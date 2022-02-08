@@ -15,6 +15,7 @@
 [v] Fixed blog issue with articles alias and shortlink;
 [v] Add comments counts to blog articles;
 [v] Add "back to top" js scroll;
+[v] Add comment moderates links for admin;
 
 [ ] Add EN/RU switcher and translations;
 [ ] Test contact form mail sending on hosting;
@@ -23,4 +24,4 @@
 [ ] Add blog articles edit form;
 [ ] Add cache clear for admin;
 [ ] Add admin view for feedbacks;
-[ ] Add comment moderates links for admin;
+[ ] Add blog view for all blog comments;
