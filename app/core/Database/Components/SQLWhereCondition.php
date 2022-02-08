@@ -21,13 +21,15 @@ trait SQLWhereCondition
         ?array $condition = null,
         string $operator = '=',
         ?array $equal_columns = null,
-        bool $not = false
+        bool $not = false,
+        bool $rewrite = false
     ): self {
         return $this->whereAdd(
             condition: $condition,
             operator: $operator,
             equal_columns: $equal_columns,
-            not: $not
+            not: $not,
+            rewrite: $rewrite
         );
     }
 
@@ -84,7 +86,8 @@ trait SQLWhereCondition
         string $operator,
         ?array $equal_columns,
         bool $not,
-        ?string $type = null
+        ?string $type = null,
+        bool $rewrite = false
     ): self {
         if ($condition) {
             $condition = $this->parseWhereCondition($condition);
@@ -95,7 +98,9 @@ trait SQLWhereCondition
         }
         $condition['op'] = $operator;
         $condition['not'] = $not;
-        if (!isset($this->where_conditions[0])) {
+        if ($rewrite) {
+            $this->where_conditions = [$condition];
+        } else if (!isset($this->where_conditions[0])) {
             $this->where_conditions[0] = $condition;
         } else {
             $condition['type'] = $type;
