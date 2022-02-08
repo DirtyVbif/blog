@@ -11,5 +11,13 @@
 
     <p class="article__summary article_preview__summary">{{ summary }}</p>
 
-    <div class="article__date article_preview__date">{{ date }}</div>
+    <footer class="article__footer article_preview__footer">
+        <span class="article__date article_preview__date">{{ date }}</span>
+        {% if comments_count %}
+            <span class="article__comments article_preview__comments">
+                {{ img('/images/icons/comment.svg').alt(t('comments')) }}
+                <span>{{ comments_count }}</span>
+            </span>
+        {% endif %}
+    </footer>
 {{ wrapper.close() }}

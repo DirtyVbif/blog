@@ -42,13 +42,30 @@
         display: flex;
     }
 
-    &__date {
+    &__date,
+    &__comments {
         font-size: 0.8em;
         color: $grey;
     }
 
     &__summary {
         margin-top: 0;
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+    }
+
+    &__comments {
+        display: flex;
+        align-items: center;
+        & img {
+            height: 24px;
+            width: auto;
+            object-fit: contain;
+            margin-right: .5em;
+        }
     }
     // ELEMENTS <-------------------------------------------------------
 
@@ -168,7 +185,11 @@
 
         &__date {
             grid-area: date;
-            margin-bottom: 12px;
+            margin-right: 1em;
+        }
+
+        &__footer {
+            padding-bottom: 10px;
         }
         // MODIFICATOR ELEMENTS <---------------------------------------
     }
