@@ -71,12 +71,12 @@ class PageBuilder
         return $links;
     }
 
-    public function getLink(string $name): array
+    public function getLink(string $name): ?array
     {
         if (!isset($this->links)) {
             $this->links = $this->getContent('routes');
         }
-        return $this->links[$name];
+        return $this->links[$name] ?? null;
     }
 
     protected function getContent(string $name): array
@@ -89,7 +89,7 @@ class PageBuilder
     public function useId(string $id): bool
     {
         if (!IDList::instance()->use($id)) {
-            msgr()->warning("На странице имеется повторяющийся #id: {$id}", Messenger::ACCESS_LEVEL_ADMIN);
+            msgr()->warning("На странице имеется повторяющийся #id: {$id}");
             return false;
         }
         return true;

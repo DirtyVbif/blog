@@ -6,18 +6,24 @@ use Blog\Modules\Template\Element;
 
 class Link extends TemplateFacade
 {
+    protected string $name;
     protected string $url;
     protected string $label;
     protected string $hash_base_path;
 
     public function __construct(
-        protected string $name,
+        string $link,
         ?string $hash_base_path = null
     ) {
-        $data = app()->builder()->getLink($this->name);
-        $this->url = $data['url'];
-        $this->label = $data['label'];
-        $hash_base_path ??= $data['hash_base'] ?? null;
+        $data = app()->builder()->getLink($link);
+        if ($data) {
+            $this->name = $link;
+            $this->url = $data['url'];
+            $this->label = $data['label'];
+            $hash_base_path ??= $data['hash_base'] ?? null;
+        } else {
+            $this->url = $link;
+        }
         if ($hash_base_path) {
             $this->setHashBasePath($hash_base_path);
         }
