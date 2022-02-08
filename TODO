@@ -12,15 +12,15 @@
 [v] Add comment to articles in blog;
 [v] Add expected arguments to controllers with page not found callback;
 [v] Corrent comment count method not to count unpublished comments;
+[v] Fixed blog issue with articles alias and shortlink;
+[v] Add comments counts to blog articles;
+[v] Add "back to top" js scroll;
 
 [ ] Add EN/RU switcher and translations;
 [ ] Test contact form mail sending on hosting;
 [ ] Add ajax login and contact forms support:
     - Add messages output on error;
 [ ] Add blog articles edit form;
-[ ] Add "back to top" js scroll;
 [ ] Add cache clear for admin;
 [ ] Add admin view for feedbacks;
 [ ] Add comment moderates links for admin;
-[ ] Add comments counts to blog articles;
-[ ] Fixed blog issue with articles alias and shortlink;
