@@ -1,0 +1,7 @@
+{{ wrapper.addClass('comment comment_full').open() }}
+    <header class="comment__header">
+        <span class="comment__author">{{ name }}</span>
+        <span class="comment__date">{{ date }}</span>
+    </header>
+    <p class="comment__body">{{ body }}</p>
+{{ wrapper.close() }}

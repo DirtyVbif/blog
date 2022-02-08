@@ -8,26 +8,21 @@ use Blog\Request\BaseRequest;
 
 abstract class BaseEntity extends TemplateFacade
 {
-    protected string|array $table_name;
-    protected array $table_columns_query;
     protected array $data;
     protected bool $is_exists;
     protected bool $loaded = false;
-
-    abstract protected function setEntityDefaults(): void;
 
     /**
      * Create new entity from data
      */
     abstract public function create(BaseRequest $data): bool;
 
-    abstract protected function queryDataFromStorage(SQLSelect $sql): array;
+    abstract public function loadById(int $id): self;
 
     public function __construct(
         protected int $id
     ) {
         $this->loadEntityData();
-        $this->setId();
         if (!$this->exists()) {
             $this->id = 0;
         }
@@ -42,36 +37,14 @@ abstract class BaseEntity extends TemplateFacade
 
     protected function loadEntityData(): void
     {
-        $this->setEntityDefaults();
         if ($this->id > 0) {
-            $sql = sql_select(from: $this->getTableName());
-            $sql->columns($this->getColumnsQuery());
-            $this->data = $this->queryDataFromStorage($sql);
+            $this->loadById($this->id);
         } else {
             $this->data = [];
         }
         $this->loaded = true;
         $this->is_exists = !empty($this->data);
         return;
-    }
-
-    protected function setId(): void
-    {
-        $this->id = $this->data['id'] ?? 0;
-        return;
-    }
-
-    /**
-     * Get entity storage name
-     */
-    protected function getTableName(): string|array
-    {
-        return $this->table_name;
-    }
-
-    protected function getColumnsQuery(): array
-    {
-        return $this->table_columns_query;
     }
 
     /**

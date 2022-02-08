@@ -3,11 +3,42 @@
 namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
+use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Request\BaseRequest;
 
 class Comment extends BaseEntity
 {
+    protected const ENTITY_TABLE = 'comments';
+    protected const ENTITY_COLUMNS = ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'];
+    public const VIEW_MODE_FULL = 'full';
+    protected const VIEW_MODES = [
+        0 => self::VIEW_MODE_FULL
+    ];
+
+    protected SQLSelect $sql;
+
+    /**
+     * @param int|array $data is an id of article that must be loaded or already loaded article data.
+     * If integer id provided as `int $data` then article will be automatically loaded from storage.
+     * Else if array with article data provided as `array $data` then article wouldn't be loaded from storage and accept provided data.
+     */
+    public function __construct(
+        int|array $data,
+        string $view_mode = self::VIEW_MODE_FULL
+    ) {
+        if (is_int($data)) {
+            parent::__construct($data);
+        } else {
+            $this->data = $data;
+            $this->id = $data['cid'] ?? 0;
+        }
+        $this->setViewMode($view_mode);
+    }
+
+    /**
+     * @return Element $tpl
+     */
     public function tpl()
     {
         if (!isset($this->tpl)) {
@@ -16,20 +47,42 @@ class Comment extends BaseEntity
         return $this->tpl;
     }
 
-    protected function setEntityDefaults(): void
+    public function render()
     {
-        $this->table_name = ['c' => 'comments'];
-        $this->table_columns_query = [
-            'c' => ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'],
-            'ac' => ['aid']
-        ];
+        $this->preprocessData();
+        $this->tpl()->setName('content/comment--' . $this->view_mode);
+        $this->tpl()->setId('comment-' . $this->id());
+        foreach ($this->data as $key => $value) {
+            $this->tpl()->set($key, $value);
+        }
+        if (!$this->status()) {
+            $this->tpl()->addClass('unpublished');
+        }
+        return parent::render();
     }
 
-    protected function queryDataFromStorage(SQLSelect $sql): array
+    protected function preprocessData(): void
     {
-        $sql->join(table: ['ac' => 'article_comments'], using: 'cid');
-        $sql->where(['c.cid' => $this->id()]);
-        return $sql()->first();
+        if (!empty($this->data)) {
+            $this->data['date'] = new DateFormat($this->data['created']);
+        }
+        return;
+    }
+
+    public function loadById(int $id): self
+    {
+        $sql = self::sql();
+        $sql->where(['cid' => $id]);
+        $this->data = $sql->first();
+        $this->loaded = true;
+        $this->exists = !empty($this->data);
+        return $this;
+    }
+
+    public function status(): bool
+    {
+        $status = (int)$this->data['status'] ?? 0;
+        return $status;
     }
     
     /**
@@ -57,5 +110,66 @@ class Comment extends BaseEntity
             return true;
         }
         return false;
+    }
+
+    public static function sql(): SQLSelect
+    {
+        $sql = sql_select(from: ['c' => self::ENTITY_TABLE]);
+        $sql->join(table: ['ac' => 'article_comments'], using: 'cid');
+        $sql->columns([
+            'c' => self::ENTITY_COLUMNS,
+            'ac' => ['aid']
+        ]);
+        return $sql;
+    }
+
+    /**
+     * @return Comments[] $comments
+     */
+    public static function loadByIds(array $ids): array
+    {
+        $comments = [];
+        $sql = self::sql();
+        $sql->where(condition: ['c.cid' => $ids], operator: 'IN');
+        $sql->andWhere(condition: ['ac.deleted' => 0]);
+        if (!app()->user()->verifyAccessLevel(4)) {
+            $sql->andWhere(condition: ['c.status' => 1]);
+        }
+        foreach ($sql->all() as $comment) {
+            $comments[$comment['cid']] = new self($comment);
+        }
+        return $comments;
+    }
+    
+    /**
+     * @return Comments[] $comments
+     */
+    public static function loadByArticleId(int $aid): array
+    {
+        $comments = [];
+        $sql = self::sql();
+        $sql->where(condition: ['ac.aid' => $aid]);
+        $sql->andWhere(condition: ['ac.deleted' => 0]);
+        if (!app()->user()->verifyAccessLevel(4)) {
+            $sql->andWhere(condition: ['c.status' => 1]);
+        }
+        foreach ($sql->all() as $comment) {
+            $comments[$comment['cid']] = new self($comment);
+        }
+        return $comments;
+    }
+
+    /**
+     * @param string $view_mode is name of view mode. Also named constants are available:
+     * * Comment::VIEW_MODE_FULL
+     */
+    public function setViewMode(string $view_mode): self
+    {
+        if (in_array($view_mode, self::VIEW_MODES)) {
+            $this->view_mode = $view_mode;
+        } else {
+            $this->view_mode = self::VIEW_MODE_FULL;
+        }
+        return $this;
     }
 }

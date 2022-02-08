@@ -1,4 +1,5 @@
-{{ wrapper.addClass('form-wrapper form-wrapper_comment').open() }}
+{{ wrapper.addClass('section section_comment-form form-wrapper').open() }}
+    <h2 class="section__header section_comment-form__header">Оставьте свой комментарий</h2>
     <form action="{{ link('blog').raw() }}" method="POST" {{ id('form-comment', true) }} class="form form_comment">
         {{ csrf() }}
         <input type="hidden" name="type" value="comment">

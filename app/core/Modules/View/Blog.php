@@ -3,6 +3,7 @@
 namespace Blog\Modules\View;
 
 use Blog\Modules\Entity\BlogArticle;
+use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Pager;
 use Blog\Modules\View\BaseView;
@@ -30,11 +31,16 @@ class Blog extends BaseView
         // view loaded blog article
         app()->page()->setTitle($article->title);
         app()->page()->addContent($article);
-        $comment_form = new Form('comment');
+        $comment_form = new Form('comment', 'section');
         $comment_form->tpl()->set('article_id', $article->id);
         $comment_form->tpl()->set('parent_id', 0);
         app()->page()->addContent($comment_form);
         app()->page()->content()->addClass('container_article');
+        // pre($article->getComments());
+        $comments = new Element('section');
+        $comments->setName('blocks/article--comments');
+        $comments->set('items', $article->getComments());
+        app()->page()->addContent($comments);
         // TODO: set page meta shortlink
         return true;
     }
@@ -74,12 +80,9 @@ class Blog extends BaseView
 
     public static function getArticleByAlias(string $alias): ?BlogArticle
     {
-        $data = self::loadArticleDataByColumn('alias', $alias);
-        if (empty($data)) {
-            return null;
-        }
-        $article = new BlogArticle($data);
-        return $article;
+        $article = new BlogArticle(0);
+        $article->loadByAlias($alias);
+        return $article->exists() ? $article : null;
     }
 
     protected static function loadArticleDataByColumn(string $column, string $search_value): array

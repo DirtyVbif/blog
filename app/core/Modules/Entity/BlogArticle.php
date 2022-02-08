@@ -18,8 +18,15 @@ class BlogArticle extends BaseEntity
         1 => self::VIEW_MODE_TEASER,
         2 => self::VIEW_MODE_PREVIEW
     ];
+    protected const ENTITY_TABLE = 'articles';
+    protected const ENTITY_COLUMNS = ['id', 'title', 'summary', 'body', 'alias', 'body', 'created', 'updated', 'preview_src', 'preview_alt', 'author', 'views'];
 
     protected string $view_mode;
+    protected SQLSelect $sql;
+    protected array $comments;
+    protected bool $comments_loaded = false;
+    protected bool $comments_preloaded;
+    protected int $comments_count;
 
     /**
      * @param int|array $data is an id of article that must be loaded or already loaded article data.
@@ -34,8 +41,8 @@ class BlogArticle extends BaseEntity
             parent::__construct($data);
         } else {
             $this->data = $data;
+            $this->comments_preloaded = false;
         }
-        $this->preprocessData();
         $this->setViewMode($view_mode);
     }
 
@@ -44,7 +51,7 @@ class BlogArticle extends BaseEntity
         if (!empty($this->data)) {            
             $this->data['url'] = '/blog/' . ($this->data['alias'] ?? $this->data['id']);
             $this->data['date'] = new DateFormat($this->data['created']);
-            $this->loadComments();
+            $this->data['comments_count'] = $this->getCommentsCount();
         }
         return;
     }
@@ -63,6 +70,7 @@ class BlogArticle extends BaseEntity
     public function render()
     {
         $this->tpl()->setName('content/article--' . $this->view_mode);
+        $this->preprocessData();
         foreach ($this->data as $key => $value) {
             if ($key === 'body') {
                 $value = new Markup($value, CHARSET);
@@ -72,20 +80,59 @@ class BlogArticle extends BaseEntity
         return parent::render();
     }
 
-    protected function setEntityDefaults(): void
+    protected function sql(): SQLSelect
     {
-        $this->table_name = ['a' => 'articles'];
-        $this->table_columns_query = [
-            'a' => ['id', 'title', 'summary', 'body', 'alias', 'body', 'created', 'updated', 'preview_src', 'preview_alt', 'author', 'views'],
-            'ac' => ['cid']
-        ];
+        if (!isset($this->sql)) {
+            $this->sql = sql_select(from: ['a' => self::ENTITY_TABLE]);
+            $this->sql->columns([
+                'a' => self::ENTITY_COLUMNS,
+                'ac' => ['cid']
+            ]);
+            $this->sql->join(['ac' => 'article_comments'], on: ['a.id', 'ac.aid']);
+        }
+        return $this->sql;
     }
 
-    protected function queryDataFromStorage(SQLSelect $sql): array
+    public function loadById(int $id): self
     {
-        $sql->join(['ac' => 'article_comments'], on: ['a.id', 'ac.aid']);
-        $sql->where(['a.id' => $this->id()]);
-        return $sql()->first();
+        $this->sql()->where(condition: ['a.id' => $id]);
+        $this->sql()->andWhere(condition: ['ac.deleted' => 0]);
+        $result = $this->sql()->all();
+        $this->setLoadedData($result);
+        return $this;
+    }
+
+    public function loadByAlias(string $alias): self
+    {
+        $this->sql()->where(condition: ['a.alias' => $alias]);
+        $this->sql()->andWhere(condition: ['ac.deleted' => 0]);
+        $result = $this->sql()->all();
+        $this->setLoadedData($result);
+        return $this;
+    }
+
+    protected function setLoadedData(array $data): void
+    {
+        $this->comments = [];
+        if (empty($data)) {
+            $this->data = [];
+        } else {
+            foreach (self::ENTITY_COLUMNS as $column) {
+                $this->data[$column] = $data[0][$column];
+            }
+            foreach ($data as $row) {
+                if (!$row['cid']) {
+                    continue;
+                }
+                $this->comments[$row['cid']] = [];
+            }
+            $this->data['comments_count'] = count(array_keys($this->comments));
+            $this->id = $this->data['id'];
+        }
+        $this->is_exists = !empty($this->data);
+        $this->loaded = true;
+        $this->comments_preloaded = true;
+        return;
     }
 
     public function create(BaseRequest $data): bool
@@ -124,5 +171,34 @@ class BlogArticle extends BaseEntity
         $comments = $sql->all();
         pre($comments);
         return;
+    }
+
+    /**
+     * @return Comment[] $comments
+     */
+    public function getComments(): array
+    {
+        if (!$this->comments_loaded && $this->comments_preloaded && !empty($this->comments)) {
+            $this->comments = Comment::loadByIds(array_keys($this->comments));
+            $this->comments_loaded = true;
+        } else if (!$this->comments_loaded && !$this->comments_preloaded) {
+            $this->comments = Comment::loadByArticleId($this->id());
+            $this->comments_loaded = true;
+        }
+        return $this->comments;
+    }
+
+    public function getCommentsCount(): int
+    {
+        if (!isset($this->comments_count)) {
+            $this->comments_count = 0;
+            /** @var Comment $comment */
+            foreach ($this->getComments() as $comment) {
+                if ($comment->status()) {
+                    $this->comments_count++;
+                }
+            }
+        }
+        return $this->comments_count;
     }
 }
