@@ -1,0 +1,19 @@
+.copyrights {
+    display: flex;
+
+    &__icon {
+        width: 32px;
+        height: auto;
+        object-fit: contain;
+        opacity: .4;
+    }
+
+    &__text {
+        margin-left: 1em;
+        color: $grey;
+    }
+
+    &__date {
+        white-space: nowrap;
+    }
+}

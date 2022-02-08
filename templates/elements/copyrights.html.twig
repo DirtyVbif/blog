@@ -3,5 +3,10 @@
 {% set date = date ~ '—' ~ current_year %}
 {% endif %}
 {{ wrapper.open() }}
-    <p>All rights reserved © <a href="https://vk.com/uspmm" target="_blank" title="Я ВКонтакте">Michael Uspensky</a>, {{ date }}</p>
+    {{ img('/images/icons/copyright.svg').alt('copyright').addClass('copyrights__icon') }}
+    <p class="copyrights__text">
+        All rights reserved ©
+        <a href="https://vk.com/uspmm" target="_blank" title="Я ВКонтакте">Michael&nbsp;Uspensky</a>,
+        <span class="copyrights__date">{{ date }}</span>
+    </p>
 {{ wrapper.close() }}
