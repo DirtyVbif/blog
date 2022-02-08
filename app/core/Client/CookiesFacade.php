@@ -35,7 +35,7 @@ class CookiesFacade implements AjaxModule
     public function unset(string $name): self
     {
         unset($_COOKIE[$name]);
-        setcookie($name, null, -1, '/');
+        setcookie($name, '', -1, '/');
         return $this;
     }
 
