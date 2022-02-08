@@ -43,6 +43,7 @@ class BlogArticle extends BaseEntity
             $this->data = $data;
             $this->comments_preloaded = false;
         }
+        $this->preprocessData();
         $this->setViewMode($view_mode);
     }
 
@@ -70,7 +71,6 @@ class BlogArticle extends BaseEntity
     public function render()
     {
         $this->tpl()->setName('content/article--' . $this->view_mode);
-        $this->preprocessData();
         foreach ($this->data as $key => $value) {
             if ($key === 'body') {
                 $value = new Markup($value, CHARSET);
@@ -86,7 +86,7 @@ class BlogArticle extends BaseEntity
             $this->sql = sql_select(from: ['a' => self::ENTITY_TABLE]);
             $this->sql->columns([
                 'a' => self::ENTITY_COLUMNS,
-                'ac' => ['cid']
+                'ac' => ['cid', 'deleted']
             ]);
             $this->sql->join(['ac' => 'article_comments'], on: ['a.id', 'ac.aid']);
         }
@@ -96,7 +96,6 @@ class BlogArticle extends BaseEntity
     public function loadById(int $id): self
     {
         $this->sql()->where(condition: ['a.id' => $id]);
-        $this->sql()->andWhere(condition: ['ac.deleted' => 0]);
         $result = $this->sql()->all();
         $this->setLoadedData($result);
         return $this;
@@ -105,7 +104,6 @@ class BlogArticle extends BaseEntity
     public function loadByAlias(string $alias): self
     {
         $this->sql()->where(condition: ['a.alias' => $alias]);
-        $this->sql()->andWhere(condition: ['ac.deleted' => 0]);
         $result = $this->sql()->all();
         $this->setLoadedData($result);
         return $this;
@@ -120,13 +118,19 @@ class BlogArticle extends BaseEntity
             foreach (self::ENTITY_COLUMNS as $column) {
                 $this->data[$column] = $data[0][$column];
             }
+            $comments_count = 0;
             foreach ($data as $row) {
                 if (!$row['cid']) {
                     continue;
                 }
-                $this->comments[$row['cid']] = [];
+                $this->comments[$row['cid']] = [
+                    'deleted' => $row['deleted']
+                ];
+                if ($row['deleted'] == 0) {
+                    $comments_count++;
+                }
             }
-            $this->data['comments_count'] = count(array_keys($this->comments));
+            $this->comments_count = $comments_count;
             $this->id = $this->data['id'];
         }
         $this->is_exists = !empty($this->data);
