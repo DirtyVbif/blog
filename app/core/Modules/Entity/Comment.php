@@ -179,13 +179,13 @@ class Comment extends BaseEntity
     public function approve(): void
     {
         if ($this->status()) {
-            msgr()->warning(t('Comment #@id already published.'. ['id' => $this->id()]));
+            msgr()->warning(t('Comment #@id already published.', ['id' => $this->id()]));
             return;
         }
         $sql = sql_update(['status' => 1], 'comments');
         $sql->where(['cid' => $this->id()]);
         if ($sql->update()) {
-            msgr()->notice(t('Comment #@id was published.'. ['id' => $this->id()]));
+            msgr()->notice(t('Comment #@id was published.', ['id' => $this->id()]));
         } else {
             msgr()->error(t('Comment #@id wasn\'t published.', ['id' => $this->id()]));
         }
