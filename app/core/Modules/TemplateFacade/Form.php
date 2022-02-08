@@ -7,9 +7,10 @@ use Blog\Modules\Template\Element;
 class Form extends TemplateFacade
 {
     public function __construct(
-        protected string $name
+        protected string $name,
+        string $wrapper_tag = 'div'
     ) {
-        
+        $this->tpl()->tag($wrapper_tag);
     }
 
     /**
