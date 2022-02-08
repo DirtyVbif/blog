@@ -6,6 +6,10 @@
     @include vwMax($vwbp_xl) {
         grid-template-columns: 1fr;
     }
+
+    &__rules {
+        font-size: .9em;
+    }
 }
 
 .form {

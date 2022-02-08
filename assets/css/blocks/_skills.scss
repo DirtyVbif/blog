@@ -1,28 +1,37 @@
-$skill_card_width: 500px;
-$skill_icon_width: 140px;
-
 .skill {
-    background: $grey_very_light;
-    box-shadow: $shadow;
-    border-radius: 12px;
-
-    &:hover {
-        background-color: $bkgd;
-    }
+    background: $bkgd;
+    border-radius: 8px;
 
     &__icon {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: $skill_icon_width;
-        height: $skill_icon_width;
+        width: 140px;
+        height: 140px;
         padding: 10px;
         float: left;
+
+        @include vwMax($vwbp_xl) {
+            width: 120px;
+            height: 120px;
+        }
+
+        @include vwMax($vwbp_l) {
+            width: 100px;
+            height: 100px;
+        }
+
+        & img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
     }
 
     &__title {
         font-size: 1.2em;
         margin-right: 12px;
+        margin-left: 12px;
         margin-top: 12px;
         margin-bottom: 10px;
         font-weight: 400;
@@ -30,6 +39,7 @@ $skill_icon_width: 140px;
 
     &__desc {
         margin-right: 12px;
+        margin-left: 12px;
         font-size: 15px;
         & p {
             margin-top: 0;
@@ -37,15 +47,37 @@ $skill_icon_width: 140px;
         }
     }
 
-    &.left &__title,
-    &.left &__desc,
-    &.right &__title,
-    &.right &__desc {
-        display: none;
+    &.left,
+    &.right {
+        width: 100px;
+        height: 100px;
+        margin: 0 20px;
+        align-self: center;
+
+        @include vwMax($vwbp_m) {
+            margin: 0;
+        }
+
+        & .skill__icon {
+            width: 100%;
+            height: 100%;
+        }
+        & .skill__title,
+        & .skill__desc {
+            display: none;
+        }
     }
 
     &.middle {
-        background-color: $bkgd;
-        width: $skill_card_width;
+        box-shadow: $shadow;
+        width: 480px;
+
+        @include vwMax($vwbp_xl) {
+            width: 360px;
+        }
+
+        @include vwMax($vwbp_m) {
+            width: 100%;
+        }
     }
 }

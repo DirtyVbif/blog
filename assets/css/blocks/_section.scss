@@ -71,6 +71,14 @@
 
         & h1 {
             font-size: 60px;
+
+            @include vwMax($vwbp_m) {
+                font-size: 40px;
+            }
+
+            @include vwMax($vwbp_s) {
+                font-size: 28px;
+            }
         }
     }
 
@@ -95,5 +103,12 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+    
+    &_comment-form {
+        &__header {
+            grid-column: 1 / -1;
+        }
+        padding-bottom: 0;
     }
 }

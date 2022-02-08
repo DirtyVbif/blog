@@ -28,11 +28,11 @@ class SkillSlider
     initialize()
     {
         this.slider = document.querySelector(this.s.trigger);
-        this.btn_next = this.slider.querySelector(this.s.trigger + '__control.' + this.s.control_next);
-        this.btn_prev = this.slider.querySelector(this.s.trigger + '__control.' + this.s.control_prev);
-        if (!this.slider || !this.btn_next || !this.btn_prev) {
+        if (!this.slider) {
             return;
         }
+        this.btn_next = this.slider.querySelector(this.s.trigger + '__control.' + this.s.control_next);
+        this.btn_prev = this.slider.querySelector(this.s.trigger + '__control.' + this.s.control_prev);
         this.items = this.slider.querySelectorAll(this.s.trigger + '__item');
         this._setCurrentIndex();
         this._createEvents();

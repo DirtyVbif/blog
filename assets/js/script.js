@@ -1,9 +1,11 @@
 docready(() => {
     const cookie_agreement = new CookieAgreement,
-        skill_slider = new SkillSlider;
+        skill_slider = new SkillSlider,
+        btt = new BackToTop;
 
     cookie_agreement.initialize();
     skill_slider.initialize();
+    btt.set();
 
     const print_summary = document.getElementById('print-summary');
     if (print_summary) {

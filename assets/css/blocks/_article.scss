@@ -12,6 +12,16 @@
         column-gap: 30px;
         list-style-type: none;
 
+        @include vwMax($vwbp_xl) {
+            grid-template-columns: repeat(2, 1fr);
+            row-gap: 30px;
+        }
+
+        @include vwMax($vwbp_s) {
+            grid-template-columns: 1fr;
+            row-gap: 20px;
+        }
+
         // MODIFICATOR ELEMENTS --------------------------------------->
         // MODIFICATOR ELEMENTS <---------------------------------------
     }
@@ -90,8 +100,13 @@
         // MODIFICATOR ELEMENTS --------------------------------------->
         &__img {
             object-fit: cover;
-            height: 210px;
+            max-height: 210px;
+            height: 100%;
             width: auto;
+
+            @include vwMax($vwbp_m) {
+                max-height: 190px;
+            }
         }
 
         &__header {

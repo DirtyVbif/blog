@@ -1,0 +1,45 @@
+.article-comments {
+    padding: 0;
+    list-style-type: none;
+    margin: 0;
+
+    &__item {
+        &:not(:last-child) {
+            margin-bottom: 30px;
+        }
+    }
+}
+
+.comment {
+    padding: 10px 30px;
+    border-radius: 4px;
+    background-color: $bkgd;
+    transition: $transition;
+
+    &.unpublished {
+        background-color: $unpublished;
+    }
+
+    &:hover {
+        box-shadow: $shadow;
+    }
+
+    &__header {
+        display: flex;
+        font-size: .9em;
+    }
+
+    &__author {
+        font-weight: 600;
+    }
+
+    &__date {
+        color: $grey;
+        margin-left: 1em;
+    }
+
+    &__body {
+        font-style: italic;
+        margin: 0;
+    }
+}

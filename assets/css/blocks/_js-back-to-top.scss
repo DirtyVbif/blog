@@ -1,0 +1,29 @@
+.js-back-to-top {
+    position: fixed;
+    bottom: 60px;
+    right: 90px;
+    display: block;
+    opacity: 1;
+    width: 90px;
+    height: 90px;
+    border-radius: 45px;
+    background: url('/images/icons/arrow-blue.svg') no-repeat;
+    background-color: $grey_light;
+    background-size: 36px 36px;
+    background-position: center;
+    transition: $transition;
+    transform: rotateZ(90deg);
+    cursor: pointer;
+    border: none;
+
+    &:hover {
+        background-color: $bkgd;
+        box-shadow: $shadow;
+    }
+
+    &.hidden {
+        visibility: hidden;
+        bottom: -100%;
+        opacity: 0;
+    }
+}

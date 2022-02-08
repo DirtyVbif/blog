@@ -1,0 +1,12 @@
+{{ wrapper.addClass('section section_comments').open() }}
+    <h2 class="section__header section_comments__header">{{ t('Users comments') }}</h2>
+    {% if items is not empty %}
+        <ul class="article-comments">
+        {% for item in items %}
+            <li class="article-comments__item">{{ item }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Пока ещё никто не оставил комментариев к этому материалу.</p>
+    {% endif %}
+{{ wrapper.close() }}

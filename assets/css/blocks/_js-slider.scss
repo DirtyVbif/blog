@@ -5,28 +5,52 @@
     justify-content: space-between;
     padding: 0;
 
+    @include vwMax($vwbp_m) {
+        justify-content: center;
+    }
+
     &__item {
-        transition: $transition;
+        transition: .2s opacity, background ease-in-out;
         &.left,
         &.right {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            opacity: .6;
+            opacity: .5;
             cursor: pointer;
-        }
-        &.left {
-            transform: translate(calc(-50% - 360px), -50%) scale(.6);
+            flex-shrink: 0;
+
             &:hover {
-                transform: translate(calc(-50% - 360px), -50%) scale(.7);
                 opacity: .9;
             }
+
+            @include vwMax($vwbp_m) {
+                z-index: 1;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+            }
         }
+
+        &.left {
+            grid-area: left;
+            order: 1;
+        }
+
+        &.middle {
+            grid-area: middle;
+            order: 2;
+
+            @include vwMax($vwbp_m) {
+                margin: 0 60px 60px 60px;
+                z-index: 2;
+            }
+        }
+
         &.right {
-            transform: translate(calc(-50% + 360px), -50%) scale(.6);
-            &:hover {
-                transform: translate(calc(-50% + 360px), -50%) scale(.7);
-                opacity: .9;
+            grid-area: right;
+            order: 3;
+
+            @include vwMax($vwbp_m) {
+                left: auto;
+                right: 0;
             }
         }
     }
@@ -43,8 +67,12 @@
         border: 1px solid transparent;
         border-radius: 4px;
 
+        @include vwMax($vwbp_m) {
+            display: none;
+        }
+
         &:hover {
-            opacity: 0.9;
+            opacity: .9;
             border-color: $grey_light;
         }
 
@@ -53,7 +81,14 @@
             box-shadow: none;
         }
 
+        &.prev {
+            grid-area: prev;
+            order: 0;
+        }
+
         &.next {
+            grid-area: next;
+            order: 4;
             transform: rotate(180deg);
         }
     }
