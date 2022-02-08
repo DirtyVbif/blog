@@ -1,11 +1,13 @@
 docready(() => {
     const cookie_agreement = new CookieAgreement,
         skill_slider = new SkillSlider,
-        btt = new BackToTop;
+        btt = new BackToTop,
+        mob_menu = new MobileMenu;
 
     cookie_agreement.initialize();
     skill_slider.initialize();
     btt.set();
+    mob_menu.initialize();
 
     const print_summary = document.getElementById('print-summary');
     if (print_summary) {

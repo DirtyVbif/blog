@@ -1,3 +1,14 @@
+// Z-INDEX -------------------------------------->
+// 1: ---------------------------->
+//      .js-slider__item.left,
+//      .js-slider__item.right
+// 2: ---------------------------->
+//      .js-slider__item.middle,
+//      .menu_main
+// 3: ---------------------------->
+//      .js-back-to-top
+// Z-INDEX <--------------------------------------
+
 // VARIABLES ------------------------------------>
 @import 'blocks/variables';
 // <----------------------------------------------
@@ -23,3 +34,4 @@
 @import 'blocks/article';
 @import 'blocks/form';
 @import 'blocks/js-back-to-top';
+@import 'blocks/copyrights';

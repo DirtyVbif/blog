@@ -15,6 +15,17 @@
     transform: rotateZ(90deg);
     cursor: pointer;
     border: none;
+    z-index: 3;
+
+    @include vwMax($vwbp_m) {
+        bottom: 30px;
+        right: 30px;
+    }
+
+    @include vwMax($vwbp_xs) {
+        width: 60px;
+        height: 60px;
+    }
 
     &:hover {
         background-color: $bkgd;

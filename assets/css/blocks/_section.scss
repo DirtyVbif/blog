@@ -58,8 +58,8 @@
 
     &_banner {
         width: 100%;
-        padding: 15px 90px;
-        min-height: 440px;
+        padding: 15px 90px 60px;
+        // min-height: 440px;
         text-align: center;
         background-image: url('/images/banner.jpg');
         background-color: #f2e7d3;
@@ -69,6 +69,15 @@
         font-size: 0.9em;
         font-weight: bold;
 
+        @include vwMax($vwbp_s) {
+            padding: 15px 40px;
+        }
+        
+        @include vwMax($vwbp_xs) {
+            font-size: 0.85em;
+            padding: 15px 30px;
+        }
+
         & h1 {
             font-size: 60px;
 
@@ -77,7 +86,7 @@
             }
 
             @include vwMax($vwbp_s) {
-                font-size: 28px;
+                font-size: 24px;
             }
         }
     }

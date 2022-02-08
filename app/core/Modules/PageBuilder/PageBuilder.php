@@ -33,6 +33,7 @@ class PageBuilder
         $menu->setName('elements/menu')
             ->set('items', $links);
         $menu->setAttr('class', "menu menu_{$name}");
+        $menu->setId(kebabCase("menu {$name}"));
         return $menu;
     }
 

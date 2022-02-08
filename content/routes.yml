@@ -18,5 +18,5 @@ contacts: {
 }
 cookie_agreement: {
   url: '/agreement-cookie',
-  label: 'Использование cookie-файлов'
+  label: 'cookie-файлы'
 }
