@@ -58,6 +58,9 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
 
     protected function set(string $text, string $type, $prefix = null, ?array $markup = null): void
     {
+        if (app()->router()->isAjaxRequest()) {
+            return;
+        }
         $text = strip_tags($text);
         if (!empty($markup)) {
             foreach ($markup as $key => $value) {
