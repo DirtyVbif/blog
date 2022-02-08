@@ -4,4 +4,10 @@
         <span class="comment__date">{{ date }}</span>
     </header>
     <p class="comment__body">{{ body }}</p>
+    {% if admin_access %}
+        <footer>
+            {{ link('/blog/comment/' ~ cid ~ '/approve').label(t('approve')) }}
+            {{ link('/blog/comment/' ~ cid ~ '/delete').label(t('delete')) }}
+        </footer>
+    {% endif %}
 {{ wrapper.close() }}

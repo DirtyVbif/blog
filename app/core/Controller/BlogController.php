@@ -10,12 +10,16 @@ class BlogController extends BaseController
 {
     protected \Blog\Modules\Template\Element $content;
 
+    protected int $status;
+
     public function prepare(): void
     {
         parent::prepare();
         if (!$this->validateRequest()) {
             // if blog arguments is invalide then load error controller with status 404
-            app()->controller('error')->prepare();
+            /** @var ErrorController $err_c */
+            $err_c = app()->controller('error');
+            $err_c->prepare($this->status);
             return;
         }
         app()->page()->addClass('page_blog');
@@ -26,12 +30,18 @@ class BlogController extends BaseController
 
     protected function validateRequest(): bool
     {
-        // blog controller recieves only 1 argument
-        if ($sub_argument = app()->router()->arg(3)) {
-            // every url offset of 3rd level is unexisting
-            return false;
-        }
+        $this->status = 200;
         if ($argument = app()->router()->arg(2)) {
+            // check if controller method requested
+            $method = pascalCase("get request {$argument}");
+            if (method_exists($this, $method)) {
+                // use specified controller method
+                return $this->$method();
+            } else if ($sub_argument = app()->router()->arg(3)) {
+                // every other url offset of 3rd level without controller method is unexisting
+                $this->status = 404;
+                return false;
+            }
             return Blog::viewBlogArticle($argument);
         }        
         Blog::viewBlogPage();
@@ -56,7 +66,7 @@ class BlogController extends BaseController
         exit;
     }
 
-    protected function postRequestComment(array $data): void
+    protected function postRequestCommentAdd(array $data): void
     {
         $request = new CommentRequest($data);
         if ($request->isValid()) {
@@ -73,5 +83,30 @@ class BlogController extends BaseController
         $redirect = ($data['article_id'] ?? false) ? '/blog/' . $data['article_id'] : '<current>';
         app()->router()->redirect($redirect);
         return;
+    }
+
+    protected function getRequestComment(): bool
+    {
+        // verify user access level
+        if (!app()->user()->verifyAccessLevel(4)) {
+            $this->status = 403;
+            return false;
+        }
+        // check request arguments
+        $cid = app()->router()->arg(3);
+        $action = app()->router()->arg(4);
+        if (!$cid || !$action) {
+            $this->status = 404;
+            return false;
+        }
+        $action = pascalCase($action);
+        $comment = new Comment($cid);
+        if (!$comment->exists() || !method_exists($comment, $action)) {
+            $this->status = 404;
+            return false;
+        }
+        $comment->$action();
+        app()->router()->redirect('<previous>');
+        return true;
     }
 }

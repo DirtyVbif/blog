@@ -2,7 +2,7 @@
     <h2 class="section__header section_comment-form__header">Оставьте свой комментарий</h2>
     <form action="{{ link('blog').raw() }}" method="POST" {{ id('form-comment', true) }} class="form form_comment">
         {{ csrf() }}
-        <input type="hidden" name="type" value="comment">
+        <input type="hidden" name="type" value="comment-add">
         <input type="hidden" name="parent_id" value="{{ parent_id }}">
         <input type="hidden" name="article_id" value="{{ article_id }}">
         <div class="form__field form_comment__field">

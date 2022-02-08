@@ -58,6 +58,9 @@ class Comment extends BaseEntity
         if (!$this->status()) {
             $this->tpl()->addClass('unpublished');
         }
+        if (app()->user()->verifyAccessLevel(4)) {
+            $this->tpl()->set('admin_access', true);
+        }
         return parent::render();
     }
 
@@ -171,5 +174,29 @@ class Comment extends BaseEntity
             $this->view_mode = self::VIEW_MODE_FULL;
         }
         return $this;
+    }
+
+    public function approve(): void
+    {
+        $sql = sql_update(['status' => 1], 'comments');
+        $sql->where(['cid' => $this->id()]);
+        if ($sql->update()) {
+            msgr()->notice(t('Comment #@id was published.'. ['id' => $this->id()]));
+        } else {
+            msgr()->error(t('Comment #@id wasn\'t published.', ['id' => $this->id()]));
+        }
+        return;
+    }
+
+    public function delete(): void
+    {
+        $sql = sql_update(['deleted' => 1], 'article_comments');
+        $sql->where(['cid' => $this->id()]);
+        if ($sql->update()) {
+            msgr()->notice(t('Comment #@id was deleted.', ['id' => $this->id()]));
+        } else {
+            msgr()->error(t('Comment #@id wasn\'t deleted.', ['id' => $this->id()]));
+        }
+        return;
     }
 }
