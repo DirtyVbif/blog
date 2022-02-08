@@ -16,6 +16,7 @@
 [v] Add comments counts to blog articles;
 [v] Add "back to top" js scroll;
 [v] Add comment moderates links for admin;
+[v] Add controller for custom pages such as cookie-agreement;
 
 [ ] Add EN/RU switcher and translations;
 [ ] Test contact form mail sending on hosting;

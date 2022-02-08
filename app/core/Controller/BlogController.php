@@ -16,7 +16,7 @@ class BlogController extends BaseController
     {
         parent::prepare();
         if (!$this->validateRequest()) {
-            // if blog arguments is invalide then load error controller with status 404
+            // if access denied
             /** @var ErrorController $err_c */
             $err_c = app()->controller('error');
             $err_c->prepare($this->status);

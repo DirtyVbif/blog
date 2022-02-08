@@ -39,7 +39,7 @@ class Blog
         }
         if (!isset($this->controller)) {
             $name = $prefix . $this->router()->get('controller');
-            $this->controller = class_exists($name) ? new $name : new \Blog\Controller\ErrorController;
+            $this->controller = class_exists($name) ? new $name : new \Blog\Controller\CustomController;
         }
         return $this->controller;
     }
