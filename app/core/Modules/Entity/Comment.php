@@ -178,6 +178,10 @@ class Comment extends BaseEntity
 
     public function approve(): void
     {
+        if ($this->status()) {
+            msgr()->warning(t('Comment #@id already published.'. ['id' => $this->id()]));
+            return;
+        }
         $sql = sql_update(['status' => 1], 'comments');
         $sql->where(['cid' => $this->id()]);
         if ($sql->update()) {
@@ -190,6 +194,10 @@ class Comment extends BaseEntity
 
     public function delete(): void
     {
+        if ($this->deleted) {
+            msgr()->warning(t('Comment #@id already deleted.', ['id' => $this->id()]));
+            return;
+        }
         $sql = sql_update(['deleted' => 1], 'article_comments');
         $sql->where(['cid' => $this->id()]);
         if ($sql->update()) {

@@ -39,9 +39,11 @@ class BlogArticle extends BaseEntity
     ) {
         if (is_int($data)) {
             parent::__construct($data);
-        } else {
+        } else if ($data) {
             $this->data = $data;
             $this->comments_preloaded = false;
+        } else {
+            $this->data = [];
         }
         $this->preprocessData();
         $this->setViewMode($view_mode);
@@ -106,6 +108,7 @@ class BlogArticle extends BaseEntity
         $this->sql()->where(condition: ['a.alias' => $alias]);
         $result = $this->sql()->all();
         $this->setLoadedData($result);
+        $this->preprocessData();
         return $this;
     }
 
