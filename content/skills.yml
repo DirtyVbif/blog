@@ -1,55 +1,55 @@
 drupal: {
   icon: '/images/logo-drupal.svg',
   label: 'Drupal',
-  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  desc: "С этим чудом, иначе эту CMS не назвать, я познакомился довольно плотно за 2 года разработки и поддержи нескольких проектов, использующих 7 и 8 версию. Умею разрабатывать и настраивать темизацию, делать собственные модули, использовать хуки, а так же полностью знаком с разделом администрирования и многими известными модулями. Для решения задач всегда стараюсь использовать drupal way вместо типичных костылей в хуках.",
   class: ''
 }
 
 php: {
   icon: '/images/logo-php.svg',
   label: 'PHP',
-  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  desc: "Этот язык я начал изучать с версии 7.0. На данный момент мои знания php сводятся к знанию отличий между php 5, 7 и 8, использованию ООП, pattern'ов и моделей, вроде MVC. Понимаю такие страшные вещи, как наследование, инкапсуляция и полиморфизм.\nСтараюсь использовать версию 8 и типизацию переменных и параметров по максимуму. Так же соблюдаю code-style и нейминг согласно PSR. Для отладки использую xdebug модуль. Умею в настройку php.ini.\nВ качестве примера доступен проект этого сайта <a href=\"https://github.com/DirtyVbif/blog\" target=\"_blank\">на github'e</a>, движок которого написан мной с нуля.",
   class: ''
 }
 
 javascript: {
   icon: '/images/logo-js.svg',
   label: 'JavaScript',
-  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  desc: "Все же знакомы с Джимом Керри? Именно такие результаты гугл пытается подсунуть при попытках решить какую-либо задачу. И конечно же <code>2 + 2 = 22</code>. Так же стараюсь придерживаться разумного баланса процедурного и ООП стилей.\nСчитаю, что js может быть слишком много и не понимаю людей, которые декларируют абсолютно все переменные как <code>var</code>. Стараюсь использовать использовать его аккуратно и использую <code>let | const | var</code> по необходимости и в зависимости от области видимости.\nПоверхностно знаком с фреймворками Vue и React, но сам их не использую. jQuery конечно же знаю, но предпочитаю ванильный js.",
   class: ''
 }
 
 html: {
   icon: '/images/logo-html-css.svg',
   label: 'HTML 5 / CSS 3',
-  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  desc: "HTML 5 потому что мне знакомы семантические теги и места их применения. Стараюсь делать валидную вёрстку с использованием атрибутов <code>role | aria-label</code> там, где это необходимо.\nТаблицу стилей стараюсь делать максимально гибкой, без использования inline-стилей, придерживаясь именных классов. Предпочитаю использовать методологию BEM для неймнига.\nАктивно использую препроцессор SASS/SCSS, комплириуя его с использованием npm gulp. Примером так же будет проект этого сайта <a href=\"https://github.com/DirtyVbif/blog\" target=\"_blank\">на github'e</a> с исходным кодом шаблонов с вёрсткой и файлов scss.",
   class: ''
 }
 
 sql: {
   icon: '/images/logo-sql.png',
   label: 'SQL Databases',
-  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  desc: "Нормальная форма для меня не имеет ничего общего с внешним видом. Это очень полезные принципы проектирования структуры хранения данных в реляционных БД. Умею составлять запросы с использованием DML для работы с данными, а так же запросы DDL на изменение структуры данных. Стараюсь использовать соответствующие типы данных. В данный момент этот сайт использует MySQL драйвер.",
   class: ''
 }
 
 terminal: {
   icon: '/images/logo-terminal.svg',
   label: 'Command Line',
-  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  desc: "ssh-доступ, docker, composer, npm, sudo, git - вполне обычные для меня вещи. Регулярно пользуюсь composer'ом и npm при разработке веб-проектов, а так же при работе с drupal и laravel познакомился с такими интерфейсами, как drush и artisan.",
   class: ''
 }
 
 turbo: {
   icon: '/images/logo-amp-turbo.svg',
   label: 'AMP & Turbo pages',
-  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  desc: "Технология AMP и Yandex.Turbo принципиально разные вещи, хотя преследуют одну и ту же цель. На данный момент мой сайт не использует подбных технологий, но адаптацию вёрски под AMP для гугл и вывод контента в поток данных для yandex.turbo я успел изучить сполна, пока разрабатывал проекты на друпале.",
   class: ''
 }
 
 laravel: {
   icon: '/images/logo-laravel.svg',
   label: 'Laravel Framework',
-  desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius id facilis minus!\nVeritatis facere maxime rerum harum odio velit quisquam ex, officia placeat doloribus.",
+  desc: "Интересный php-фреймворк для не сложных проектов, хотя никто не мешает дорабатывать и адаптировать его и для сложных задач, так как он довольно удобен и прост. Готовых проектов на нём не имею, хотя познакомиться успел подробно.",
   class: ''
 }

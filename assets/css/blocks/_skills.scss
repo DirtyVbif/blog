@@ -6,20 +6,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 140px;
-        height: 140px;
+        width: 54px;
+        height: 54px;
         padding: 10px;
         float: left;
-
-        @include vwMax($vwbp_xl) {
-            width: 120px;
-            height: 120px;
-        }
-
-        @include vwMax($vwbp_l) {
-            width: 100px;
-            height: 100px;
-        }
 
         & img {
             width: 100%;
