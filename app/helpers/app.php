@@ -1,9 +1,5 @@
 <?php
 
-use Blog\Client\CookiesFacade;
-use Blog\Client\SessionFacade;
-use Twig\Markup;
-
 function app(): \Blog\Blog
 {
     return \Blog\Blog::instance();
@@ -31,12 +27,12 @@ function f(string $name, string $directory, ?string $extension = null, int $perm
 
 function session(): \Blog\Client\SessionFacade
 {
-    return SessionFacade::instance();
+    return \Blog\Client\SessionFacade::instance();
 }
 
 function cookies(): \Blog\Client\CookiesFacade
 {
-    return CookiesFacade::instance();
+    return \Blog\Client\CookiesFacade::instance();
 }
 
 function tpllink(string $name, ?string $hash_base_path = null): \Blog\Modules\TemplateFacade\Link
@@ -63,18 +59,4 @@ function fullUrlTo(string $offset = '/'): string
 function msgr(): \Blog\Modules\Messenger\Messenger
 {
     return app()->messenger();
-}
-
-function img(string $src): \Blog\Modules\TemplateFacade\Image
-{
-    $img = new \Blog\Modules\TemplateFacade\Image($src);
-    return $img;
-}
-
-function csrf(bool $render = true)
-{
-    if ($render) {
-        return new Markup(app()->csrf()->render(), CHARSET);
-    }
-    return app()->csrf();
 }
