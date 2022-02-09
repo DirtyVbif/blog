@@ -1,5 +1,6 @@
 .container {
     @include wrapper();
+    position: relative;
 
     &_footer {
         display: flex;

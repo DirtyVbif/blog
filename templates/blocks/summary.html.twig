@@ -78,6 +78,10 @@
         <p>&emsp;Так же знаком со спортом на &laquo;ты&raquo;. С 3-х лет управляю велосипедом не слезая, который и по сей день предпочитаю для передвижения по Москве. Успел плотно познакомиться с роликами, сноубордом, паркуром, брейкдансом.</p>
     </article>
     <footer class="section__footer">
-        <button {{ id('print-summary', true) }} class="btn btn_transparent">{{ t('print summary') }}</button>
+        <button {{ id('button-summary-print', true) }} class="btn btn_transparent" aria-label="{{ t('print summary') }}">{{ t('print summary') }}</button>
+        <button {{ id('button-summary-open', true) }} aria-label="развернуть резюме" class="section_summary__scroll-button">
+            <span>развернуть резюме</span>
+            {{ img('/images/icons/arrow-thin.svg').alt('развернуть резюме') }}
+        </button>
     </footer>
 {{ wrapper.close() }}
