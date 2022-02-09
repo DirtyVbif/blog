@@ -56,22 +56,23 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
         return $list;
     }
 
-    protected function set(string $text, string $type, $prefix = null, ?array $markup = null): void
+    protected function set(string $text, array $options): void
     {
         if (app()->router()->isAjaxRequest()) {
             return;
         }
         $text = strip_tags($text);
-        if (!empty($markup)) {
-            foreach ($markup as $key => $value) {
+        if (!empty($options['markup'] ?? [])) {
+            foreach ($options['markup'] as $key => $value) {
                 $text = str_replace("@{$key}", $value, $text);
             }
         }
         $message = [
-            'prefix' => $prefix,
+            'prefix' => $options['prefix'] ?? null,
             'text' => new \Twig\Markup($text, CHARSET),
-            'type' => $type,
+            'type' => $options['type'],
             'time' => time(),
+            'class' => $options['class'] ?? null,
             'status' => 0
         ];
         session()->append(self::SESSIONID . '/list', $message);
@@ -81,25 +82,44 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
     public function debug(string $text): void
     {
         $called_filename = strTrimServDir(debugFileCalled());
-        $this->set($text, 'debug', $called_filename);
+        $options = [
+            'type' => 'debug',
+            'prefix' => $called_filename
+        ];
+        $this->set($text, $options);
         return;
     }
 
-    public function notice(string $text, ?array $markup = null): void
+    public function notice(string $text, ?array $markup = null, ?string $class = null): void
     {
-        $this->set($text, 'notice', markup: $markup);
+        $options = [
+            'type' => 'notice',
+            'markup' => $markup,
+            'class' => $class
+        ];
+        $this->set($text, $options);
         return;
     }
 
-    public function warning(string $text, ?array $markup = null): void
+    public function warning(string $text, ?array $markup = null, ?string $class = null): void
     {
-        $this->set($text, 'warning', markup: $markup);
+        $options = [
+            'type' => 'warning',
+            'markup' => $markup,
+            'class' => $class
+        ];
+        $this->set($text, $options);
         return;
     }
 
-    public function error(string $text, ?array $markup = null): void
+    public function error(string $text, ?array $markup = null, ?string $class = null): void
     {
-        $this->set($text, 'error', markup: $markup);
+        $options = [
+            'type' => 'error',
+            'markup' => $markup,
+            'class' => $class
+        ];
+        $this->set($text, $options);
         return;
     }
 }

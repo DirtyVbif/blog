@@ -1,13 +1,14 @@
 {{ wrapper.open() }}
-    <ul class="status-container__list">
+    <ul class="status-messages">
         {% for item in items %}
-            <li class="status-message status-message_{{ item.type }}">
+            {% set class = 'status-message ' ~ classlistToString('status-message_', '', [item.type, item.class]) %}
+            <li class="{{ class }}">
                 {% if item.prefix %}
-                    <p class="status-message__prefix status-message_{{ item.type }}__prefix">
+                    <p class="{{ classlistToString(class, '', '__prefix') }}">
                         {{- item.prefix -}}
                     </p>
                 {% endif %}
-                <p class="status-message__output status-message_{{ item.type }}__output">
+                <p class="{{ classlistToString(class, '', '__output') }}">
                     {{- item.text -}}
                 </p>
             </li>
