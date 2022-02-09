@@ -43,7 +43,13 @@ class BlogController extends BaseController
                 return false;
             }
             return Blog::viewBlogArticle($argument);
-        }        
+        }
+        // set page meta
+        app()->page()->setMetaTitle('Блог веб-разработчика | mublog.site');
+        app()->page()->setMeta('description', [
+            'name' => 'description',
+            'content' => 'Полезные и интересные материалы и статьи в персональном блоге веб-разработчика'
+        ]);
         Blog::viewBlogPage();
         return true;
     }

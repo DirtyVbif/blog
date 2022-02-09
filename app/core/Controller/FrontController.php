@@ -24,6 +24,12 @@ class FrontController extends BaseController
             // set front page contacts block
             app()->builder()->getContactsBlock()
         ]);
+        // set page meta
+        app()->page()->setMetaTitle('Блог веб-разработчика | mublog.site');
+        app()->page()->setMeta('description', [
+            'name' => 'description',
+            'content' => 'Пренсональный блог веб-разработчка на php с целью демонстрации навыков и опыта.'
+        ]);
         return;
     }
 

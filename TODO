@@ -18,6 +18,7 @@
 [v] Add comment moderates links for admin;
 [v] Add controller for custom pages such as cookie-agreement;
 [v] Add adaptive style for main menu (mobile hamburger menu);
+[v] Add meta;
 
 [ ] Add EN/RU switcher and translations;
 [ ] Test contact form mail sending on hosting;
@@ -27,4 +28,4 @@
 [ ] Add cache clear for admin;
 [ ] Add admin view for feedbacks;
 [ ] Add blog view for all blog comments;
-[ ] Add meta;
+[ ] Complete ErrorController::class output;

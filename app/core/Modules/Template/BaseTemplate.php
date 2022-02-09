@@ -78,6 +78,7 @@ class BaseTemplate
     protected function setGlobals()
     {
         $this->set('langcode', app()->getLangcode());
+        $this->set('charset', CHARSET);
     }
 
     public function safety(?bool $is_safe = null): bool|self

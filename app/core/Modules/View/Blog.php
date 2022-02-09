@@ -28,6 +28,20 @@ class Blog extends BaseView
         if (!$article) {
             return false;
         }
+        // set page meta
+        app()->page()->setMetaTitle($article->title . ' | mublog.site');
+        app()->page()->setMeta('description', [
+            'name' => 'description',
+            'content' => $article->summary
+        ]);
+        app()->page()->setMeta('canonical', [
+            'rel' => 'canonical',
+            'href' => fullUrlTo($article->url)
+        ], 'link');
+        app()->page()->setMeta('shortlink', [
+            'rel' => 'shortlink',
+            'href' => fullUrlTo('blog/' . $article->id())
+        ], 'link');
         // view loaded blog article
         app()->page()->setTitle($article->title);
         app()->page()->addContent($article);

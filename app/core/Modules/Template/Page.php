@@ -16,6 +16,9 @@ class Page extends BaseTemplate
     protected array $content = [];
     protected array $modal = [];
     protected Element $content_tpl;
+    /** @var Element[] $meta */
+    protected array $meta = [];
+    protected string $meta_title;
 
     public function __construct(
         protected string $template_name = 'page'
@@ -65,6 +68,9 @@ class Page extends BaseTemplate
 
     public function render()
     {
+        $this->useGlobals(true);
+        $this->data['meta'] = $this->meta;
+        $this->data['title'] = $this->meta_title ?? null;
         $this->data['attributes'] = $this->attributes();
         $this->data['css'] = $this->css;
         $this->data['js'] = $this->getJsSrc();
@@ -140,5 +146,25 @@ class Page extends BaseTemplate
             $this->content[] = $content;
         }
         return $this;
+    }
+
+    public function setMetaTitle(string $title): self
+    {
+        $this->meta_title = $title;
+        return $this;
+    }
+
+    public function setMeta(string $name, array $attributes, string $tag = 'meta'): self
+    {
+        $this->meta[$name] = new Element($tag);
+        foreach ($attributes as $attribute => $value) {
+            $this->meta[$name]->setAttr($attribute, $value);
+        }
+        return $this;
+    }
+
+    public function getMeta(string $name): ?Element
+    {
+        return $this->meta[$name] ?? null;
     }
 }
