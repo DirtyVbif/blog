@@ -2,6 +2,8 @@
 
 namespace Blog\Controller;
 
+use Blog\Modules\Template\Element;
+
 class CustomController extends BaseController
 {
     protected int $status;
@@ -72,5 +74,9 @@ class CustomController extends BaseController
     protected function getRequestAgreementCookie(): void
     {
         app()->page()->setTitle('Политика использования cookie-файлов');
+        $cookie_agreement = new Element;
+        $cookie_agreement->setName('content/cookie-agreement');
+        $cookie_agreement->addClass('cookie-files');
+        app()->page()->addContent([$cookie_agreement]);
     }
 }
