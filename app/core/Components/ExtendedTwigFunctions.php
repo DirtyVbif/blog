@@ -9,7 +9,7 @@ class ExtendedTwigFunctions
 {
     protected array $functions = [];
     protected array $function_names = [
-        't', 'link', 'url', 'html id', 'img', 'csrf'
+        't', 'link', 'url', 'html id', 'img', 'csrf', 'classlist to string'
     ];
 
     public function __construct()
@@ -67,5 +67,10 @@ class ExtendedTwigFunctions
     protected function initFunctionCsrf(): TwigFunction
     {
         return new TwigFunction('csrf', 'csrf');
+    }
+
+    protected function initFunctionClasslistToString(): TwigFunction
+    {
+        return new TwigFunction('classlistToString', 'classlistToString');
     }
 }

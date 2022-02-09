@@ -59,15 +59,15 @@
     &_banner {
         width: 100%;
         padding: 15px 90px 60px;
-        // min-height: 440px;
         text-align: center;
-        background-image: url('/images/banner.jpg');
-        background-color: #f2e7d3;
+        background-image: url('/images/banner-v2.jpg');
+        background-color: $bkgd;
         background-position: center center;
         background-repeat: no-repeat;
         background-size: 100% auto;
         font-size: 0.9em;
         font-weight: bold;
+        border-radius: 4px;
 
         @include vwMax($vwbp_s) {
             padding: 15px 40px;

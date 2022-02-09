@@ -12,7 +12,7 @@
 [v] Add comment to articles in blog;
 [v] Add expected arguments to controllers with page not found callback;
 [v] Corrent comment count method not to count unpublished comments;
-[v] Fixe blog issue with articles alias and shortlink;
+[v] Fix blog issue with articles alias and shortlink;
 [v] Add comments counts to blog articles;
 [v] Add "back to top" js scroll;
 [v] Add comment moderates links for admin;
