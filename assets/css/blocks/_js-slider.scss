@@ -42,6 +42,14 @@
                 margin: 0 60px 60px 60px;
                 z-index: 2;
             }
+
+            @include vwMax($vwbp_s) {
+                margin: 0 45px 60px 45px;
+            }
+
+            @include vwMax($vwbp_s) {
+                margin: 0 30px 60px 30px;
+            }
         }
 
         &.right {
@@ -59,12 +67,11 @@
         background: url('/images/icons/arrow.svg') no-repeat;
         background-position: center center;
         background-size: 40px 40px;
-        width: 58px;
+        width: 60px;
         cursor: pointer;
         transition: $transition;
         opacity: 0.6;
         flex-shrink: 0;
-        border: 1px solid transparent;
         border-radius: 4px;
 
         @include vwMax($vwbp_m) {
@@ -72,13 +79,11 @@
         }
 
         &:hover {
-            opacity: .9;
-            border-color: $grey_light;
+            opacity: 1;
         }
 
         &:active {
-            background-color: $grey_bright;
-            box-shadow: none;
+            background-color: $grey_very_light;
         }
 
         &.prev {
