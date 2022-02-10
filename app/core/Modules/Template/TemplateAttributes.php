@@ -9,7 +9,7 @@ class TemplateAttributes extends BaseTemplateElement
 
     public function render()
     {
-        $stack = [$this->renderClasses()];
+        $stack = [];
         foreach ($this->attributes as $name => $value) {
             $stack[] = is_null($value) ? $name : "{$name}=\"{$value}\"";
         }

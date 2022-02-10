@@ -69,7 +69,7 @@ class Image extends TemplateFacade
     public function width(?float $max_width = null): self|float|null
     {
         if (is_null($max_width)) {
-            return $this->width ?? null;
+            return isset($this->width) ? round($this->width) : null;
         } else if ($max_width > 0) {
             $this->max_width = $max_width;
             $this->max_height = 0;
@@ -80,7 +80,7 @@ class Image extends TemplateFacade
     public function height(?float $max_height = null): self|float|null
     {
         if (is_null($max_height)) {
-            return $this->height ?? null;
+            return isset($this->height) ? round($this->height) : null;
         } else if ($max_height > 0) {
             $this->max_height = $max_height;
             $this->max_width = 0;
