@@ -20,6 +20,12 @@
         justify-content: center;
     }
     // MODIFICATORS <---------------------------------------------------
+
+    // MODIFICATORS --------------------------------------------------->
+    &_blog-article {
+        display: block;
+    }
+    // MODIFICATORS <---------------------------------------------------
 }
 // BLOCK <--------------------------------------------------------------
 
@@ -127,6 +133,30 @@
             @include vwMax(400px) {
                 flex-direction: column;
             }
+        }
+    }
+    
+    &_blog-article {
+        &__field {
+            &_checkbox {
+                margin-left: 1em;
+            }
+        }
+        
+        &__field-label {
+            &:not(&_checkbox) {
+                width: 100%;
+            }
+        }
+
+        &__input-line {
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        &__input {
+            width: 100%;
         }
     }
     // MODIFICATORS <---------------------------------------------------
