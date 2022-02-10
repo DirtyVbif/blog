@@ -2,8 +2,11 @@
 
 namespace Blog\Controller;
 
+use Blog\Modules\Entity\BlogArticle;
 use Blog\Modules\Entity\Comment;
+use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\View\Blog;
+use Blog\Request\BlogArticleCreateRequest;
 use Blog\Request\CommentRequest;
 
 class BlogController extends BaseController
@@ -76,8 +79,7 @@ class BlogController extends BaseController
     {
         $request = new CommentRequest($data);
         if ($request->isValid()) {
-            $comment = new Comment(0);
-            $result = $comment->create($request);
+            $result = Comment::create($request);
         } else {
             $result = null;
         }
@@ -114,5 +116,43 @@ class BlogController extends BaseController
         $comment->$action();
         app()->router()->redirect('<previous>');
         return true;
+    }
+
+    protected function getRequestCreate(): bool
+    {
+        // verify user access level
+        if (!app()->user()->verifyAccessLevel(4)) {
+            $this->status = 403;
+            return false;
+        }
+        $form = new Form('blog-article');
+        app()->page()->setTitle('Создание нового материала для блога');
+        app()->page()->addContent($form);
+        return true;
+    }
+
+    protected function postRequestBlogArticleCreate(array $data): void
+    {
+        // verify user access level
+        if (!app()->user()->verifyAccessLevel(4)) {
+            $this->status = 403;
+            msgr()->error('Данная операция доступна только администратору сайта.');
+            app()->router()->redirect('<previous>');
+            return;
+        }
+        $data = new BlogArticleCreateRequest($data);
+        if ($data->isValid()) {
+            $result = BlogArticle::create($data);
+        } else {
+            $result = null;
+        }
+        if ($result) {
+            msgr()->notice(t('Blog article "@name" published.', ['name' => $data->title]));
+            app()->router()->redirect('<current>');
+        } else {
+            msgr()->warning(t('There was an error wile creating article "@name".', ['name' => $data->title]));
+            app()->router()->redirect('<previous>');
+        }
+        exit;
     }
 }

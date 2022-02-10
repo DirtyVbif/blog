@@ -75,7 +75,7 @@ class BlogArticle extends BaseEntity
         $this->tpl()->setName('content/article--' . $this->view_mode);
         foreach ($this->data as $key => $value) {
             if ($key === 'body') {
-                $value = new Markup($value, CHARSET);
+                $value = new Markup(htmlspecialchars_decode($value), CHARSET);
             }
             $this->tpl()->set($key, $value);
         }
@@ -142,14 +142,6 @@ class BlogArticle extends BaseEntity
         return;
     }
 
-    public function create(BaseRequest $data): bool
-    {
-        // TODO: complete creation of article
-        pre($data);
-        die;
-        return false;
-    }
-
     /**
      * @param string $view_mode is name of view mode. Also named constants are available:
      * * BlogArticle::VIEW_MODE_FULL
@@ -207,5 +199,48 @@ class BlogArticle extends BaseEntity
             }
         }
         return $this->comments_count;
+    }
+
+    public static function create(BaseRequest $data): bool
+    {
+        $data->setDefaultValues([
+            'author' => 'mublog.site',
+            'alias' => kebabCase($data->title, true),
+            'created' => time()
+        ]);
+        if (self::isAliasExists($data->alias)) {
+            $data->set('alias', $data->alias . '_' . self::getNewId());
+        }
+        $values = [
+            $data->title, $data->summary, $data->body,
+            $data->alias, $data->get('created'), $data->status,
+            $data->preview_src, $data->preview_alt, $data->author
+        ];
+        $sql = sql_insert(self::ENTITY_TABLE);
+        $sql->set(
+            values: $values,
+            columns: ['title', 'summary', 'body', 'alias', 'created', 'status', 'preview_src', 'preview_alt', 'author']
+        );
+        $result = $sql->exe();
+        return $result;
+    }
+
+    protected static function isAliasExists(string $alias): bool
+    {
+        $sql = sql_select(['id'], self::ENTITY_TABLE);
+        $sql->where(['alias' => $alias]);
+        $result = $sql->exe();
+        return !empty($result);
+    }
+
+    protected static function getNewId(): int
+    {
+        $sql = sql()->query(
+            'SELECT AUTO_INCREMENT'
+            . ' FROM information_schema.TABLES'
+            . ' WHERE TABLE_SCHEMA = "' . app()->env()->DB['NAME'] . '"'
+            . ' AND `TABLE_NAME` = "' . self::ENTITY_TABLE . '";');
+        $result = $sql->fetch();
+        return $result['AUTO_INCREMENT'];
     }
 }
