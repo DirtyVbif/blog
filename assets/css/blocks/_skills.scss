@@ -28,12 +28,16 @@
     }
 
     &__desc {
-        margin-right: 12px;
-        margin-left: 12px;
-        font-size: 15px;
+        padding: 0 12px 5px 12px;
+        font-size: 14px;
+
+        @include vwMax($vwbp_xs) {
+            font-size: 12px;
+        }
+
         & p {
             margin-top: 0;
-            margin-bottom: 6px;
+            margin-bottom: 7px;
         }
     }
 

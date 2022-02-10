@@ -186,6 +186,9 @@
             }
         }
 
+        &__header:hover ~ &__title {
+            color: $link_hover;
+        }
 
         &__img {
             object-fit: cover;

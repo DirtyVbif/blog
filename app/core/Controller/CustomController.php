@@ -73,7 +73,15 @@ class CustomController extends BaseController
 
     protected function getRequestAgreementCookie(): void
     {
-        app()->page()->setTitle('Политика использования cookie-файлов');
+        $title = 'Политика использования cookie-файлов';
+        app()->page()->setTitle($title);
+        app()->page()->setMetaTitle($title);
+        app()->page()->setMeta(
+            'name',
+            [
+                'name' => 'description',
+                'content' => 'Основные положения и политика исопльзования cookie-файлов'
+        ]);
         $cookie_agreement = new Element;
         $cookie_agreement->setName('content/cookie-agreement');
         $cookie_agreement->addClass('cookie-files');

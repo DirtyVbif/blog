@@ -18,7 +18,7 @@ class BackToTop
         this.btt_btn = document.createElement('button');
         this.btt_btn.setAttribute('id', 'back-to-top');
         this.btt_btn.setAttribute('aria-label', 'наверх');
-        this.btt_btn.classList.add(this.s.class);
+        this.btt_btn.classList.add(this.s.class, 'hidden');
         document.body.appendChild(this.btt_btn);
         this._activate();
         document.addEventListener('scroll', event => {

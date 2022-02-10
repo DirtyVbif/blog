@@ -19,13 +19,17 @@
 [v] Add controller for custom pages such as cookie-agreement;
 [v] Add adaptive style for main menu (mobile hamburger menu);
 [v] Add meta;
+[v] Add blog articles edit form;
+[v] Test contact form mail sending on hosting;
 
 [ ] Add EN/RU switcher and translations;
-[ ] Test contact form mail sending on hosting;
 [ ] Add ajax login and contact forms support:
     - Add messages output in response;
-[ ] Add blog articles edit form;
 [ ] Add cache clear for admin;
 [ ] Add admin view for feedbacks;
 [ ] Add blog view for all blog comments;
 [ ] Complete ErrorController::class output;
+[ ] Rebuild User\Agent::class information collecting:
+    - replace using of get_browser() with js tool;
+[ ] Add sitemap;
+[ ] Add text tokenizer and site info variables;
