@@ -36,7 +36,7 @@
             height: 30px;
             background: url('/images/icons/arrow-thin.svg') no-repeat;
             background-size: 16px 16px;
-            background-position: center center;
+            background-position: center;
             top: calc(50% - 16px);
             right: 0;
             transition: $transition;
@@ -124,7 +124,7 @@
             width: 100%;
             height: 100px;
             border: none;
-            background: linear-gradient(0deg, $document 0%, $document 40%, #f7f7f700 100%);
+            background: linear-gradient(0deg, $document 0%, $document 50%, #f7f7f700 100%);
             transition: $transition;
             cursor: pointer;
             color: $btn_blue;
@@ -135,7 +135,7 @@
             padding-bottom: 15px;
 
             &:hover {
-                background: linear-gradient(0deg, $bkgd 0%, $bkgd 40%, #f7f7f700 100%);
+                background: linear-gradient(0deg, $bkgd 0%, $bkgd 50%, #f7f7f700 100%);
             }
 
             & img {

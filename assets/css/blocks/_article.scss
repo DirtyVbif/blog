@@ -111,19 +111,27 @@
     &_teaser {
         display: flex;
         flex-direction: column;
-        font-size: 0.75em;
         height: 100%;
 
         // MODIFICATOR ELEMENTS --------------------------------------->
-        &__img {
-            object-fit: cover;
-            max-height: 210px;
-            height: 100%;
-            width: auto;
+        &__image-wrapper {
+            overflow: hidden;
+            width: 100%;
+            height: 210px;
 
             @include vwMax($vwbp_m) {
-                max-height: 190px;
+                height: 180px;
             }
+
+            @include vwMax($vwbp_s) {
+                height: auto;
+            }
+        }
+
+        &__img {
+            object-fit: cover;
+            height: 100%;
+            width: 100%;
         }
 
         &__header {
@@ -133,6 +141,7 @@
 
         &__title,
         &__summary {
+            font-size: 14px;
             padding: 0 15px;
         }
 
@@ -156,22 +165,46 @@
             "header summary"
             "header date";
 
+        @include vwMax($vwbp_m) {
+            display: flex;
+            flex-direction: column;
+            padding-right: 0;
+            height: 100%;
+        }
+
         // MODIFICATOR ELEMENTS --------------------------------------->
         &__header {
             grid-area: header;
             overflow: hidden;
+            width: 100%;
+
+            @include vwMax($vwbp_m) {
+                height: 180px;
+            }
+            @include vwMax($vwbp_s) {
+                height: auto;
+            }
         }
 
 
         &__img {
             object-fit: cover;
-            min-width: 100%;
+            width: 100%;
             height: auto;
+
+            @include vwMax($vwbp_m) {
+                height: 100%;
+                width: 100%;
+            }
         }
 
         &__title {
             grid-area: title;
             margin: 15px 0 12px;
+
+            @include vwMax($vwbp_m) {
+                padding: 0 15px;
+            }
         }
 
         &__title-link {
@@ -181,6 +214,10 @@
         &__summary {
             grid-area: summary;
             margin: 0 0 12px 0;
+
+            @include vwMax($vwbp_m) {
+                padding: 0 15px;
+            }
         }
 
         &__date {
@@ -190,6 +227,11 @@
 
         &__footer {
             padding-bottom: 10px;
+
+            @include vwMax($vwbp_m) {
+                margin-top: auto;
+                padding: 0 15px 15px;
+            }
         }
         // MODIFICATOR ELEMENTS <---------------------------------------
     }

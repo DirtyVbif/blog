@@ -59,8 +59,12 @@
 
     &__field-anno {
         width: 100%;
-        font-size: 0.7em;
+        font-size: 15px;
         color: $grey_strong;
+
+        @include vwMax($vwbp_m) {
+            font-size: 12px;
+        }
     }
 
     &__textarea,
