@@ -4,12 +4,14 @@ namespace Blog\Modules\FileSystem;
 
 class File
 {
+    protected const DEFAULT_FILE_PERMISIONS = 0644;
+
     protected string $dir;
     protected string $name;
     protected string $extension;
     protected string $content;
     protected bool $created = false;
-    protected int $permissions = 644;
+    protected int $permissions = 0644;
 
     /**
      * @var resource|false a file pointer resource on success, or false on error
@@ -114,7 +116,7 @@ class File
             fwrite($this->handle, $this->content());
             $this->created = true;
             fclose($this->handle);
-            chmod($file, $this->permissions());
+            chmod($file, self::DEFAULT_FILE_PERMISIONS);
         }
         return $this;
     }
