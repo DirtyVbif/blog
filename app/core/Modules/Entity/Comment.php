@@ -91,7 +91,7 @@ class Comment extends BaseEntity
     /**
      * @param \Blog\Request\CommentRequest $data
      */
-    public function create(BaseRequest $data): bool
+    public static function create(BaseRequest $data): bool
     {
         if (!$data->isValid()) {
             return false;
