@@ -4,6 +4,12 @@ namespace Blog\Request\Components;
 
 trait BaseRequestFieldValidators
 {
+    // ------------------------------------------------------------------------------>
+    // VALIDATORS BY FIELD TYPE
+
+    /**
+     * Validate field of type `string`
+     */
     protected function validateFieldString(string $field_name, array $rule): array
     {
         $errors = [];
@@ -14,54 +20,19 @@ trait BaseRequestFieldValidators
                     $this->validateRequiredValue($value, $valid, $field_name, $errors);
                     break;
                 case 'max_length':
-                    if (!$this->validateStringMaxLength($value, $valid)) {
-                        $errors[] = t(
-                            'Field `@field_name` length must be lesser than @n symbols.',
-                            [
-                                'field_name' => $this->getFieldName($field_name),
-                                'n' => $valid
-                            ]
-                        );
-                    }
+                    $this->validateStringMaxLength($value, $valid, $field_name, $errors);
                     break;
                 case 'pattern':
-                    if (!$this->validateStringPattern($value, $valid)) {
-                        $errors[] = t(
-                            'Field `@field_name` contains invalid value.',
-                            ['field_name' => $this->getFieldName($field_name)]
-                        );
-                    }
+                    $this->validateStringPattern($value, $valid, $field_name, $errors);
                     break;
             }
         }
         return $errors;
     }
 
-    protected function validateRequiredValue($value, bool $required, string $field_name, array &$errors): bool
-    {
-        if ($required && is_null($value)) {
-            array_push(
-                $errors,
-                t(
-                    'Field `@field_name` is required.',
-                    ['field_name' => $this->getFieldName($field_name)]
-                )
-            );
-            return false;
-        }
-        return true;
-    }
-
-    protected function validateStringMaxLength(string $value, int $max): bool
-    {
-        return mb_strlen($value) <= $max;
-    }
-
-    protected function validateStringPattern(string $value, string $pattern): bool
-    {
-        return preg_match($pattern, $value);
-    }
-
+    /**
+     * Validate field of type `plain_text`
+     */
     protected function validateFieldPlainText(string $field_name, array $rule): array
     {
         $value = $this->data[$field_name] ?? null;
@@ -79,6 +50,9 @@ trait BaseRequestFieldValidators
         return $errors;
     }
 
+    /**
+     * Validate field of type `boolean`
+     */
     protected function validateFieldBoolean(string $field_name, array $rule): array
     {
         $value = ($this->data[$field_name] ?? false) ? true : false;
@@ -94,6 +68,9 @@ trait BaseRequestFieldValidators
         return $errors;
     }
 
+    /**
+     * Validate field of type `int`
+     */
     protected function validateFieldInt(string $field_name, array $rules): array
     {
         $value = $this->data[$field_name] ?? null;
@@ -113,5 +90,80 @@ trait BaseRequestFieldValidators
             }
         }
         return $errors;
+    }
+
+    /**
+     * Validate field of type `plain_text`
+     */
+    protected function validateFieldHtmlText(string $field_name, array $rule): array
+    {
+        $value = $this->data[$field_name] ?? null;
+        $errors = [];
+        foreach ($rule as $rule_name => $valid) {
+            switch ($rule_name) {
+                case 'required':
+                    $this->validateRequiredValue($value, $valid, $field_name, $errors);
+                    break;
+            }
+        }
+        if (isset($this->data[$field_name])) {
+            $this->data[$field_name] = htmlspecialchars($this->data[$field_name]);
+        }
+        return $errors;
+    }
+
+    
+    // ------------------------------------------------------------------------------>
+    // FIELD VALUE VALIDATORS BY RULE
+
+    /**
+     * Validate field rule `reqiered`
+     */
+    protected function validateRequiredValue($value, bool $required, string $field_name, array &$errors): bool
+    {
+        if ($required && is_null($value)) {
+            array_push(
+                $errors,
+                t(
+                    'Field `@field_name` is required.',
+                    ['field_name' => $this->getFieldName($field_name)]
+                )
+            );
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate field rule `max_length`
+     */
+    protected function validateStringMaxLength(string $value, int $max, string $field_name, array &$errors): bool
+    {
+        if (mb_strlen($value) > $max) {
+            $errors[] = t(
+                'Field `@field_name` length must be lesser than @n symbols.',
+                [
+                    'field_name' => $this->getFieldName($field_name),
+                    'n' => $max
+                ]
+            );
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate field rule `pattern`
+     */
+    protected function validateStringPattern(string $value, string $pattern, string $field_name, array &$errors): bool
+    {
+        if (!preg_match($pattern, $value)) {
+            $errors[] = t(
+                'Field `@field_name` contains invalid value.',
+                ['field_name' => $this->getFieldName($field_name)]
+            );
+            return false;
+        }
+        return true;
     }
 }

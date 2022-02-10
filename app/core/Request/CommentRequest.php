@@ -11,6 +11,7 @@ class CommentRequest extends BaseRequest
         'parent_id' => 'Parent comment id',
         'article_id' => 'Article id'
     ];
+    protected const ACCESS_LEVEL = 2;
 
     protected function rules(): array
     {

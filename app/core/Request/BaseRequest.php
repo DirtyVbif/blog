@@ -10,6 +10,7 @@ abstract class BaseRequest
 
     protected bool $is_valid;
     protected array $errors = [];
+    protected const ACCESS_LEVEL = 1;
 
     public function __construct(
         protected array $data
@@ -32,8 +33,18 @@ abstract class BaseRequest
 
     protected function validate(): void
     {
+        if (!app()->user()->verifyAccessLevel(self::ACCESS_LEVEL)) {
+            msgr()->error(t('You have no permission for that action. If you think that it\'s an error, please contact administrator.'));
+            return;
+        }
+        $rules = $this->rules();
+        $csrf_skip = false;
+        if (isset($rules['csrf-token'])) {
+            $csrf_skip = $rules['csrf-token']['skip'] ?? false;
+            unset($rules['csrf-token']);
+        }
         // validate form CSRF token
-        if (!$this->validateCsrfToken()) {
+        if (!$this->validateCsrfToken($csrf_skip)) {
             return;
         }
         // authorize valid form fields
@@ -44,7 +55,7 @@ abstract class BaseRequest
         }
         $this->is_valid = true;
         // validate form fields value
-        foreach ($this->rules() as $name => $rule) {
+        foreach ($rules as $name => $rule) {
             if (!isset($this->data[$name]) && ($rule['required'] ?? false)) {
                 $this->is_valid = false;
                 $this->errors[$name] = [
@@ -63,8 +74,11 @@ abstract class BaseRequest
         return;
     }
 
-    protected function validateCsrfToken(): bool
+    protected function validateCsrfToken(bool $skip): bool
     {
+        if ($skip) {
+            return true;
+        }
         $csrf_token = $this->data[Token::FORM_ID] ?? null;
         if (!$csrf_token || !app()->csrf()->validate($csrf_token)) {
             $this->is_valid = false;
@@ -99,5 +113,32 @@ abstract class BaseRequest
             }
         }
         return;
+    }
+
+    /**
+     * Set default values on emtpy fields
+     * 
+     * @param array $defaults with `field_name => value` pairs of default values for fields by field name as array key.
+     */
+    public function setDefaultValues(array $defaults): void
+    {
+        foreach ($defaults as $field_name => $value) {
+            if ($this->data[$field_name] ?? false) {
+                continue;
+            }
+            $this->data[$field_name] = $value;
+        }
+        return;
+    }
+
+    public function set(string $field_name, $value): void
+    {
+        $this->data[$field_name] = $value;
+        return;
+    }
+
+    public function get(string $field_name)
+    {
+        return $this->data[$field_name] ?? null;
     }
 }

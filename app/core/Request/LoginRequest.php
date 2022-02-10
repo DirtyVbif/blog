@@ -9,6 +9,7 @@ class LoginRequest extends BaseRequest
         'password' => 'Password',
         'remember_me' => 'Remember login session'
     ];
+    protected const ACCESS_LEVEL = 1;
 
     protected function rules(): array
     {

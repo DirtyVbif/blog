@@ -9,6 +9,7 @@ class FeedbackRequest extends BaseRequest
         'email' => 'E-mail',
         'subject' => 'Message'
     ];
+    protected const ACCESS_LEVEL = 2;
 
     protected function rules(): array
     {
