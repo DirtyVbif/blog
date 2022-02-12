@@ -15,9 +15,13 @@ class PageBuilder
     protected array $links;
     protected array $used_tpl_id = [];
     protected array $content = [];
+    protected bool $prepared = false;
 
     public function preparePage(): void
     {
+        if ($this->prepared) {
+            return;
+        }
         app()->page()->setTitle(app()->controller()->getTitle());
         app()->page()->setHeader($this->header());
         app()->page()->setFooter($this->footer());
@@ -25,6 +29,7 @@ class PageBuilder
         app()->page()->useJs('js/classes.min');
         app()->page()->useJs('js/script.min');
         $this->setAdminElement();
+        $this->prepared = true;
         return;
     }
 
@@ -62,5 +67,10 @@ class PageBuilder
         app()->page()->addClass('is-admin');
         app()->page()->useCss('admin.min');
         return;
+    }
+
+    public function prepared(): bool
+    {
+        return $this->prepared;
     }
 }

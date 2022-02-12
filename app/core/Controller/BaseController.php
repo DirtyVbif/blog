@@ -6,11 +6,13 @@ abstract class BaseController
 {
     public function prepare(): void
     {
-        app()->builder()->preparePage();
-        app()->response()->set(app()->page());
-        app()->page()->setAttr('class', 'page');
-        app()->page()->getTitle()->setAttr('class', 'page__title');
-        $this->setDefaultMeta();
+        if (!app()->builder()->prepared()) {
+            app()->builder()->preparePage();
+            app()->response()->set(app()->page());
+            app()->page()->setAttr('class', 'page');
+            app()->page()->getTitle()->setAttr('class', 'page__title');
+            $this->setDefaultMeta();
+        }
         return;
     }
 
@@ -24,22 +26,23 @@ abstract class BaseController
             'name' => 'keywords',
             'content' => 'веб-разработка, блог, резюме, портфолио, php-разработчик, front-end, back-end, full-stack'
         ]);
-        app()->page()->setMeta('icon', [
+        app()->page()->setMeta('favicon', [
+            'rel' => 'icon',
+            'href' => fullUrlTo('/favicon.ico'),
+            'sizes' => 'any'
+        ], 'link');
+        app()->page()->setMeta('favicon-svg', [
             'rel' => 'icon',
             'href' => fullUrlTo('/favicon.svg'),
             'type' => 'image/svg+xml'
         ], 'link');
-        app()->page()->setMeta('shortcut icon', [
-            'rel' => 'shortcut icon',
-            'href' => fullUrlTo('/favicon.svg')
-        ], 'link');
         app()->page()->setMeta('apple-touch-icon', [
             'rel' => 'apple-touch-icon',
-            'href' => fullUrlTo('/favicon.svg')
+            'href' => fullUrlTo('/favicon.png')
         ], 'link');
-        app()->page()->setMeta('image_src', [
-            'rel' => 'image_src',
-            'href' => fullUrlTo('/favicon.svg')
+        app()->page()->setMeta('manifest', [
+            'rel' => 'manifest',
+            'href' => fullUrlTo('/manifest.json')
         ], 'link');
         app()->page()->setMeta('og:image', [
             'protperty' => 'og:image',
