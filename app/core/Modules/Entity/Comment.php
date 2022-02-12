@@ -11,10 +11,13 @@ class Comment extends BaseEntity
 {
     protected const ENTITY_TABLE = 'comments';
     protected const ENTITY_COLUMNS = ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'];
-    public const VIEW_MODE_FULL = 'full';
     protected const VIEW_MODES = [
         0 => self::VIEW_MODE_FULL
     ];
+
+    public const VIEW_MODE_FULL = 'full';
+    public const SITEMAP_PRIORITY = 0.1;
+    public const SITEMAP_CHANGEFREQ = 'yearly';
 
     protected SQLSelect $sql;
 
@@ -206,5 +209,15 @@ class Comment extends BaseEntity
             msgr()->error(t('Comment #@id wasn\'t deleted.', ['id' => $this->id()]));
         }
         return;
+    }
+
+    public static function getSitemapPriority(): float
+    {
+        return self::SITEMAP_PRIORITY;
+    }
+
+    public static function getSitemapChangefreq(): string
+    {
+        return self::SITEMAP_CHANGEFREQ;
     }
 }

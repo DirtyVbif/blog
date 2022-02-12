@@ -14,6 +14,7 @@ class PageBuilder
     protected array $menu_links;
     protected array $links;
     protected array $used_tpl_id = [];
+    protected array $content = [];
 
     public function preparePage(): void
     {
@@ -27,11 +28,14 @@ class PageBuilder
         return;
     }
 
-    protected function getContent(string $name): array
+    public function getContent(string $name): array
     {
-        $name = strSuffix($name, '.yml');
-        $filename = ROOTDIR . "content/{$name}";
-        return file_exists($filename) ? Yaml::parseFile($filename) : [];
+        if (!isset($this->content[$name])) {
+            $name = strSuffix($name, '.yml');
+            $filename = ROOTDIR . "content/{$name}";
+            $this->content[$name] = file_exists($filename) ? Yaml::parseFile($filename) : [];
+        }
+        return $this->content[$name];
     }
 
     public function useId(string $id): bool

@@ -29,7 +29,7 @@ trait PageBuilderMenu
     protected function getMenuData(string $menu_name): array
     {
         if (!isset($this->menu_links)) {
-            $this->menu_links = $this->getContent('menu-links');
+            $this->menu_links = app()->builder()->getContent('menu-links');
         }
         return $this->menu_links[$menu_name] ?? [];
     }
@@ -68,7 +68,7 @@ trait PageBuilderMenu
     public function getLink(string $name): ?array
     {
         if (!isset($this->links)) {
-            $this->links = $this->getContent('routes');
+            $this->links = app()->builder()->getContent('routes');
         }
         return $this->links[$name] ?? null;
     }
