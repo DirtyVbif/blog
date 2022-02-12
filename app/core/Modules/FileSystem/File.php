@@ -51,12 +51,11 @@ class File
      */
     public function extension(?string $extension = null)
     {
-        if (!$extension) {
+        if (is_null($extension)) {
             return $this->extension ?? null;
         }
-
         $extension = preg_replace('/^\.+/', '', $extension);
-        if ($extension !== $this->extension && $this->created) {
+        if ($extension !== $this->extension() && $this->created) {
             rename($this->filename(), strSuffix($this->name(), '.' . $extension));
         }
         $this->extension = $extension;
@@ -93,7 +92,11 @@ class File
 
     public function addContent(string $content): self
     {
-        $this->content .= $content;
+        if (!isset($this->content)) {
+            $this->content($content);
+        } else {
+            $this->content .= $content;
+        }
         return $this;
     }
 
