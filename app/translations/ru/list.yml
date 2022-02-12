@@ -36,6 +36,9 @@
 'print summary': 'распечатать резюме'
 'Users comments': 'Комментарии пользователей'
 'cookie-files': 'cookie-файлы'
+'#404 Page not found': '#404 Страница не найдена'
+'#403 Access denied': '#403 Доступ закрыт'
+'Error': 'Ошибка'
 
 'Field `@field_name` is required.': 'Поле `@field_name` обязательно для заполнения.'
 'Field `@field_name` length must be lesser than @n symbols.': 'Содержимое поля `@field_name` должно быть не более @n символов.'

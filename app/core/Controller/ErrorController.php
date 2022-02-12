@@ -2,13 +2,26 @@
 
 namespace Blog\Controller;
 
+use Blog\Modules\Template\Element;
+
 class ErrorController extends BaseController
 {
+    protected const ERROR_STATUS_TITLES = [
+        403 => '#403 Access denied',
+        404 => '#404 Page not found'
+    ];
+
     public function prepare(int $status = 404): void
     {
+        $title = t(self::ERROR_STATUS_TITLES[$status] ?? self::ERROR_STATUS_TITLES[404]);
         parent::prepare();
-        // TODO: parse status for specific errors output
-        app()->page()->setTitle($this->getTitle());
+        app()->page()->setTitle($title);
+        $content = new Element;
+        $content->setName("content/error--{$status}");
+        app()->page()->addContent($content);
+        app()->page()->useCss('error.min');
+        http_response_code($status);
+        app()->page()->setMetaTitle(str_replace('#', t('Error') . ' ', $title) . ' | mublog.site');
         return;
     }
 
