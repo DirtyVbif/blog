@@ -192,7 +192,8 @@ class User
                 ->where(['token' => $this->token()->getTokenString($utoken)])
                 ->delete();
         }
-        return $this->setDefaultStatus();
+        $this->setDefaultStatus();
+        return $this;
     }
 
     public function isAuthorized(): bool
