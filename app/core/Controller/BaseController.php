@@ -24,6 +24,11 @@ abstract class BaseController
             'name' => 'keywords',
             'content' => 'веб-разработка, блог, резюме, портфолио, php-разработчик, front-end, back-end, full-stack'
         ]);
+        app()->page()->setMeta('icon', [
+            'rel' => 'icon',
+            'href' => fullUrlTo('/favicon.svg'),
+            'type' => 'image/svg+xml'
+        ], 'link');
         app()->page()->setMeta('shortcut icon', [
             'rel' => 'shortcut icon',
             'href' => fullUrlTo('/favicon.svg')
