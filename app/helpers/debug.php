@@ -7,10 +7,12 @@ function debugFileCalled(): string
 }
 
 /**
- * Main application debug helper with pre HTML-tag.
+ * Main application debug helper with pre HTML-tag. Permanently prints debug output.
  * 
  * Can recieve multiple values;
  * Use `--v` flag in arguments for more verbosity;
+ * 
+ * @return void permanently prints debug output
  */
 function pre(): void
 {
@@ -36,10 +38,12 @@ function pre(): void
 }
 
 /**
- * Main application debug helper.
+ * Get debug result output as string
  * 
  * Can recieve multiple values;
  * Use `--v` flag in arguments for more verbosity;
+ * 
+ * @return string debug output result
  */
 function debug(): string
 {
@@ -55,5 +59,5 @@ function debug(): string
     foreach ($arguments as $data) {
         $verbouse ? var_dump($data) : print_r($data);
     }
-    return "<i>debug from: " . debugFileCalled() . "</i><br>" . ob_get_clean();
+    return ob_get_clean();
 }

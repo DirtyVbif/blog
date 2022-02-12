@@ -221,7 +221,7 @@ class Token
             ])->where(['uid' => $this->udata['uid']])
             ->andWhere(['token' => $token]);
         if (!$update_result->update()) {
-            pre([
+            msgr()->debug([
                 'message' => 'Following SQL-request made zero changes',
                 'update-sql' => $update_result->raw(),
                 'update-sql-data' => $update_result->data(),

@@ -32,6 +32,6 @@
     - replace using of get_browser() with js tool;
 [ ] Add sitemap;
 [ ] Add text tokenizer and site info variables;
-[ ] Fix debug message output on authorization by saved in cookie user token when updating usser sesion in storage;
-[ ] Set debug messages access level for admins only;
+[v] Fix debug message output on authorization by saved in cookie user token when updating usser sesion in storage;
+[v] Set debug messages access level for admins only;
 [ ] Rebuild js classes and html elements as outside libraries;

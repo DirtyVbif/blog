@@ -21,7 +21,8 @@
     }
 
     &_debug {
-        font: $font_code;
+        font: 14px/1.2 monospace;
+        white-space: pre-wrap;
         &__prefix {
             font-style: italic;
         }
