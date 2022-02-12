@@ -8,6 +8,8 @@ define('COREDIR', APPDIR . 'core/');
 define('HELPERS', APPDIR . 'helpers/');
 /** @var string absolute path to the project folder on server. Includes trailing slash */
 define('SERVERDIR', preg_replace('/(\\\|\/)app$/i', '', __DIR__));
+/** @var string relative path to libraries */
+define('LIBDIR', ROOTDIR . 'libraries/');
 
 $namespaces = require_once APPDIR . 'namespaces.php';
 $includes = require_once APPDIR . 'includes.php';
@@ -57,6 +59,7 @@ function autoload(string $class_required): void
         print '</pre>';
         die;
     }
+    $path = str_replace('@classname', $classname, $path);
     $file = $path . implode(DIRECTORY_SEPARATOR, $namespace) . "/$classname.php";
     if (file_exists($file)) {
         require_once $file;

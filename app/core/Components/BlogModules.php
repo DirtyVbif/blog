@@ -6,6 +6,7 @@ use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
 use Blog\Modules\CSRF\Token;
+use Blog\Modules\Library\AbstractLibrary;
 use Blog\Modules\Mailer\Mailer;
 use Blog\Modules\PageBuilder\PageBuilder;
 use Blog\Modules\Messenger\Messenger;
@@ -28,6 +29,8 @@ trait BlogModules
     private Token $csrf;
     /** @var BaseView[] $views */
     private array $views;
+    /** @var AbstractLibrary[] $libraries */
+    private array $libraries;
 
     public function response(): Response
     {
@@ -122,5 +125,16 @@ trait BlogModules
             }
         }
         return $this->views[$view_name];
+    }
+
+    public function library(string $name): ?AbstractLibrary
+    {
+        $classname = '\\BlogLibrary\\' . pascalCase($name);
+        if (!class_exists($classname)) {
+            return null;
+        } else if (!isset($this->libraries[$classname])) {
+            $this->libraries[$classname] = new $classname;
+        }
+        return $this->libraries[$classname];
     }
 }

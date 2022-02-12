@@ -4,9 +4,12 @@ const src = {
     assets: {
         css: 'assets/css/**/*.+(scss|sass)',
         js: 'assets/js/*.js',
-        jsc: 'assets/js/classes/**/*.js'
+        jsc: 'assets/js/classes/**/*.js',
+        lib_js: 'assets/libraries/**/js/*.js',
+        lib_css: 'assets/libraries/**/css/**/*.+(scss|sass)'
     },
-    dest: 'public/'
+    dest: 'public/',
+    dest_lib: 'libraries/'
 },
 opt = {
     css: {
@@ -19,6 +22,10 @@ opt = {
     },
     src:  {
         base: 'assets/',
+        sourcemap: true
+    },
+    lib: {
+        base: 'assets/libraries/',
         sourcemap: true
     }
 },
@@ -61,10 +68,27 @@ function css() {
         .pipe(gulp.dest(src.dest));
 }
 
+function css_lib() {
+    return gulp.src(src.assets.lib_css, opt.lib)
+        .pipe(
+            sass(opt.css)
+                .on('error', sass.logError)
+        ).pipe(autoPrefixer())
+        .pipe(cssMin())
+        .pipe(rename({
+            suffix: '.min'
+        }))
+        .pipe(gulp.dest(src.dest_lib));
+}
+
 // =====================================================================
 // watch css changes
 function watch_css() {
     return gulp.watch(src.assets.css, css);
+}
+
+function watch_css_lib() {
+    return gulp.watch(src.assets.lib_css, css_lib);
 }
 
 // =====================================================================
@@ -88,6 +112,16 @@ function jsc() {
         ).pipe(gulp.dest(src.dest + 'js/'));
 }
 
+function js_lib() {
+    return gulp.src(src.assets.lib_js, { base: 'assets/libraries/', sourcemap: true })
+        // .pipe(concat('script.js'))
+        // .pipe(addHeader('"use strict";'))
+        .pipe(minifyJS())
+        .pipe(
+            rename({ suffix: '.min' })
+        ).pipe(gulp.dest(src.dest_lib));
+}
+
 // =====================================================================
 // watch js changes
 function watch_js() {
@@ -96,6 +130,10 @@ function watch_js() {
 
 function watch_jsc() {
     return gulp.watch(src.assets.jsc, jsc);
+}
+
+function watch_js_lib() {
+    return gulp.watch(src.assets.lib_js, js_lib);
 }
 
 // =====================================================================
@@ -110,9 +148,9 @@ function watch_jsc() {
 exports.default = gulp.series(
     clean,
     gulp.parallel(
-        css, js, jsc,
+        css, css_lib, js, jsc, js_lib
     ),
     gulp.parallel(
-        watch_css, watch_js, watch_jsc
+        watch_css, watch_css_lib, watch_js, watch_jsc, watch_js_lib
     )
 );
