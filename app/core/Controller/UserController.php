@@ -37,6 +37,8 @@ class UserController extends BaseController
         }
         if (!$request_is_valid) {
             app()->controller('error')->prepare();
+        } else {
+            // TODO: complete user profile view
         }
         return;
     }
@@ -54,9 +56,11 @@ class UserController extends BaseController
     {
         if (app()->user()->isAuthorized()) {
             app()->user()->logout();
+            app()->router()->redirect('<previous>');
+            return true;
         }
-        app()->router()->redirect('<previous>');
-        return true;
+        app()->router()->redirect('/user');
+        return false;
     }
 
     protected function loadLoginForm(): void
