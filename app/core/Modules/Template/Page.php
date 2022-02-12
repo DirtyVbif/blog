@@ -121,13 +121,13 @@ class Page extends BaseTemplate
         return $modal;
     }
 
-    public function setHeader(PageHeader $header): self
+    public function setHeader(BaseTemplate $header): self
     {
         $this->data['page']['header'] = $header;
         return $this;
     }
 
-    public function setFooter(PageFooter $footer): self
+    public function setFooter(BaseTemplate $footer): self
     {
         $this->data['page']['footer'] = $footer;
         return $this;

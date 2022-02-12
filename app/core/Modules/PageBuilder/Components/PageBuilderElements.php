@@ -3,8 +3,6 @@
 namespace Blog\Modules\PageBuilder\Components;
 
 use Blog\Modules\Template\Element;
-use Blog\Modules\Template\PageFooter;
-use Blog\Modules\Template\PageHeader;
 use Blog\Modules\TemplateFacade\BodyText;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Image;
@@ -12,13 +10,14 @@ use Blog\Modules\TemplateFacade\Title;
 
 trait PageBuilderElements
 {
-    protected PageHeader $page_header;
-    protected PageFooter $page_footer;
+    protected Element $page_header;
+    protected Element $page_footer;
 
-    public function header(): PageHeader
+    public function header(): Element
     {
         if (!isset($this->page_header)) {
-            $this->page_header = new PageHeader;
+            $this->page_header = new Element;
+            $this->page_header->setName('page--header');
             $logo = $this->getLogo();
             $logo->setAttr('class', 'logo_header');
             $this->page_header->set('logo', $logo);
@@ -30,10 +29,11 @@ trait PageBuilderElements
         return $this->page_header;
     }
 
-    public function footer(): PageFooter
+    public function footer(): Element
     {
         if (!isset($this->page_footer)) {
-            $this->page_footer = new PageFooter;
+            $this->page_footer = new Element;
+            $this->page_footer->setName('page--footer');
             $logo = $this->getLogo();
             $logo->addClass('logo_footer');
             $this->page_footer->set(
