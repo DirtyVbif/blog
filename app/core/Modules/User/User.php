@@ -11,7 +11,7 @@ class User
     public const ACCESS_LEVEL_ALL = 2;
     public const ACCESS_LEVEL_USER = 3;
     public const ACCESS_LEVEL_ADMIN = 4;
-    public const ACCESS_LEVEL_WEBMASTER = 5;
+    public const ACCESS_LEVEL_MASTER = 5;
     public const SESSUID = 'user-session';
     public const LOGID = 'user';
     protected array $status_list = [];
