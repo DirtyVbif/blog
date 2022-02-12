@@ -24,6 +24,8 @@ class Blog
         session()->start();
         $this->loadConfig();
         $this->controller()->prepare();
+        // store last url must be placed after all main methods of building response
+        $this->router()->storeLastUrl();
     }
 
     public function controller(?string $controller_name = null): BaseController

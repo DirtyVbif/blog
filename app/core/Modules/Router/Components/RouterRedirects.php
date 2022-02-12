@@ -61,7 +61,8 @@ trait RouterRedirects
 
     public function getPreviousUrl(array $parameters = []): string
     {
-        return urldecode($_SERVER['HTTP_REFERER']);
+        // return urldecode($_SERVER['HTTP_REFERER']);
+        return session()->get('router/previous-url') ?? '/';
     }
 
     public function getCurrentOffset(array $parameters = []): string

@@ -133,4 +133,12 @@ class Router
     {
         return $this->get('scheme') . '://' . $this->get('domain');
     }
+
+    public function storeLastUrl(): void
+    {
+        if ($this->isGetRequest()) {
+            session()->set('router/previous-url', $this->url());
+        }
+        return;
+    }
 }
