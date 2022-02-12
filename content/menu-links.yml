@@ -7,3 +7,9 @@ footer: {
   items: ['front', 'blog', 'about', 'contacts', 'cookie_agreement'],
   class: 'menu menu_footer'
 }
+
+admin_bar: {
+  access_level: 4,
+  items: ['user_profile', 'user_login', 'user_logout'],
+  class: 'admin-nav'
+}

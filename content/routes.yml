@@ -18,5 +18,20 @@ contacts: {
 }
 cookie_agreement: {
   url: '/agreement-cookie',
-  label: 'cookie-файлы'
+  label: 'cookie-files'
+}
+user_profile: {
+  url: '/user',
+  label: 'profile',
+  access_level: 3
+}
+user_login: {
+  url: '/user/login',
+  label: 'sign in',
+  access_level: 1
+}
+user_logout: {
+  url: '/user/logout',
+  label: 'sign out',
+  access_level: 3
 }

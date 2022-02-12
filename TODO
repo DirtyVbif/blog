@@ -24,6 +24,7 @@
 [v] Test contact form mail sending on hosting;
 [ ] Add ajax login and contact forms support:
     - Add messages output in response;
+[v] Add admin bar;
 [ ] Add cache clear for admin;
 [ ] Add admin view for feedbacks;
 [ ] Add blog view for all blog comments;
