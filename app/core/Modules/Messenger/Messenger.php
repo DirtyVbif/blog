@@ -3,14 +3,12 @@
 namespace Blog\Modules\Messenger;
 
 use Blog\Modules\Template\Element;
-use Twig\Markup;
+use Blog\Modules\User\User;
 
 class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
 {
     public const SESSIONID = 'status-messages';
     public const SRCPATH = 'app/core/Modules/Messenger/src/';
-    public const ACCESS_LEVEL_ALL = 0;
-    public const ACCESS_LEVEL_ADMIN = 1;
 
     /**
      * @return Element $tpl
@@ -101,7 +99,7 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
             $options = [
                 'type' => 'debug',
                 'prefix' => $called_filename,
-                'access_level' => 4
+                'access_level' => User::ACCESS_LEVEL_ADMIN
             ];
             $this->set($output, $options);
         }
