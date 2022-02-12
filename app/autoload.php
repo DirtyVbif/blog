@@ -45,7 +45,7 @@ function autoload(string $class_required): void
     $vendor = array_shift($namespace);
     $classname = array_pop($namespace);
     $path = $GLOBALS['namespaces'][$vendor] ?? null;
-    if (!$path) {
+    if (is_null($path)) {
         print '<pre>';
         print_r([
             'message' => "Can't load class <i>$class_name_string</i>",
