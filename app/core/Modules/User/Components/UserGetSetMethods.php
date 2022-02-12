@@ -2,14 +2,14 @@
 
 namespace Blog\Modules\User\Components;
 
-use Blog\Modules\User\Agent;
+use Blog\Modules\User\UserAgent;
 use Blog\Modules\User\Token;
 use Blog\Modules\User\User;
 
 trait UserGetSetMethods
 {
     protected Token $token;
-    protected Agent $agent;
+    protected UserAgent $agent;
     protected ?string $utoken;
 
     public function token(): Token
@@ -20,10 +20,10 @@ trait UserGetSetMethods
         return $this->token;
     }
 
-    public function agent(): Agent
+    public function agent(): UserAgent
     {
         if (!isset($this->agent)) {
-            $this->agent = new Agent;
+            $this->agent = new UserAgent;
         }
         return $this->agent;
     }
