@@ -44,6 +44,7 @@ class Sitemap
             'cache' => false,
         ]);
         $sitemap_content = $twig->render('sitemap.html.twig', ['items' => $links]);
+        $sitemap_content = preg_replace('/[\r\n\t]+|\>\s+\</', '><', $sitemap_content);
         f('sitemap', '.', 'xml')->addContent($sitemap_content)->save();
         return;
     }
