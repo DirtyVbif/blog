@@ -12,7 +12,7 @@ class AjaxController extends BaseController
     {
         $this->prepareResponse();
         if ($this->isStatus400()) {
-            app()->controller('error')->prepare();
+            app()->controller('error')->prepare($this->status());
             return;
         }
         app()->response()->set($this->getResponse());
@@ -46,7 +46,7 @@ class AjaxController extends BaseController
             if (method_exists(app(), $module_name) && (app()->$module_name() instanceof AjaxModule)) {
                 /** @var \Blog\Components\AjaxModule $module */
                 $module = app()->$module_name();
-                $this->resposne = $module->ajaxRequest();
+                $this->response = $module->ajaxRequest();
             } else {
                 $this->response['status'] = 404;
             }
@@ -64,7 +64,7 @@ class AjaxController extends BaseController
 
     protected function status(): int
     {
-        return $this->response['status'];
+        return $this->response['status'] ?? 200;
     }
 
     protected function isStatus400(): bool
