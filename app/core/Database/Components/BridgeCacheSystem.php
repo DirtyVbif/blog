@@ -28,10 +28,7 @@ trait BridgeCacheSystem
 
     public function cache(): CacheEntity
     {
-        if (!isset($this->cache)) {
-            $this->cache = new CacheEntity('sql');
-        }
-        return $this->cache;
+        return app()->cache('sql');
     }
 
     public function bindVariables(string $raw_request, array $data): string
