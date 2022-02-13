@@ -136,7 +136,7 @@ class Router
 
     public function storeLastUrl(): void
     {
-        if ($this->isGetRequest()) {
+        if ($this->isGetRequest() && !$this->isAjaxRequest()) {
             session()->set('router/previous-url', $this->url());
         }
         return;
