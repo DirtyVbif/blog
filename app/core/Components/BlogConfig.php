@@ -20,7 +20,7 @@ trait BlogConfig
         return;
     }
 
-    public function config(?string $config_name = null): ?\stdClass
+    public function config(?string $config_name = null)
     {
         if (!$this->config_loaded) {
             $this->loadConfig();
@@ -28,7 +28,8 @@ trait BlogConfig
         if (is_null($config_name)) {
             return (object)$this->config;
         }
-        return isset($this->config[$config_name]) ? (object)$this->config[$config_name] : null;
+        $result = $this->config[$config_name] ?? null;
+        return is_array($result) ? (object)$result : $result;
     }
 
     public function env(): \stdClass
