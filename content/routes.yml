@@ -45,3 +45,9 @@ user_logout: {
   access_level: 3,
   sitemap_exclude: true
 }
+sitemap_generate: {
+  url: '/sitemap/generate',
+  label: 'gen. sitemap',
+  access_level: 5,
+  sitemap_exclude: true
+}

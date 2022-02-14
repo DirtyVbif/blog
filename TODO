@@ -25,7 +25,7 @@
 [ ] Add ajax login and contact forms support:
     - Add messages output in response;
 [v] Add admin bar;
-[ ] Add cache clear for admin;
+[v] Add cache clear for admin;
 [ ] Add admin view for feedbacks;
 [ ] Add blog view for all blog comments;
 [v] Complete ErrorController::class output;
