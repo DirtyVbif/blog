@@ -10,7 +10,9 @@ class File
     protected string $name;
     protected string $extension;
     protected string $content;
-    protected bool $created = false;
+    protected string $real_content;
+    protected bool $exists = false;
+    protected bool $rewrited = false;
     protected int $permissions = 0644;
 
     /**
@@ -30,7 +32,7 @@ class File
 
     private function checkExistingFile(): self
     {
-        $this->created = file_exists($this->filename());
+        $this->exists = file_exists($this->filename());
         return $this;
     }
 
@@ -55,7 +57,7 @@ class File
             return $this->extension ?? null;
         }
         $extension = preg_replace('/^\.+/', '', $extension);
-        if ($extension !== $this->extension() && $this->created) {
+        if ($extension !== $this->extension() && $this->exists) {
             rename($this->filename(), strSuffix($this->name(), '.' . $extension));
         }
         $this->extension = $extension;
@@ -79,14 +81,19 @@ class File
     }
 
     /**
-     * @return string|self
+     * @param string $content [optional] new content for file that can be saved via @method save()
+     * @param bool $read [optional] if content for file is not setted then will try to read content from existing file if `TRUE`
      */
-    public function content(?string $content = null)
+    public function content(?string $content = null, bool $read = true): string|self
     {
         if (is_null($content)) {
+            if ($read) {
+                $this->read();
+            }
             return $this->content ?? '';
         }
         $this->content = $content;
+        $this->rewrited = true;
         return $this;
     }
 
@@ -113,37 +120,50 @@ class File
         $file = $this->filename();
         $this->handle = fopen($file, 'w');
         if (!$this->handle) {
-            pre("Can't open/create $file file.");
+            msgr()->debug("Can't open/create \"{$file}\" file.");
         } else {
-            fwrite($this->handle, $this->content());
-            $this->created = true;
-            fclose($this->handle);
-            chmod($file, $this->permissions());
+            fwrite($this->handle, $this->content(read: false));
+            if ($this->exists = fclose($this->handle)) {
+                chmod($file, $this->permissions());
+                $this->rewrited = false;
+                $this->real_content = $this->content();
+            } else {
+                msgr()->debug("Failed to save file \"{$file}\"", $this->handle);
+            }
         }
         return $this;
     }
 
-    public function realContent()
+    public function realContent(): string
     {
-        if ($this->created) {
-            return file_get_contents($this->filename());
+        if ($this->exists) {
+            return isset($this->real_content) ? $this->real_content : $this->real_content = file_get_contents($this->filename());
+        }
+        return '';
+    }
+
+    public function read(): self
+    {
+        if ($this->rewrited || !isset($this->content)) {
+            $this->content = $this->realContent();
+            $this->rewrited = false;
+        }
+        return $this;
+    }
+
+    public function del(): bool
+    {
+        if ($this->exists) {
+            $this->exists = false;
+            $file = $this->filename();
+            return unlink($file);
         }
         return false;
     }
 
-    public function del(): void
-    {
-        if ($this->created) {
-            $this->created = false;
-            $file = $this->filename();
-            unlink($file);
-        }
-        return;
-    }
-
     public function exists(): bool
     {
-        return $this->created;
+        return $this->exists;
     }
 
     public function permissions(?int $permissions = null): self|int
@@ -153,5 +173,21 @@ class File
         }
         $this->permissions = $permissions;
         return $this;
+    }
+
+    /**
+     * Decode current content and return as array or object
+     */
+    public function json_decode(bool $associative = true): array|object
+    {
+        return json_decode($this->content(), $associative);
+    }
+
+    /**
+     * Encode current content and return result as decoded json string on success or false on failure
+     */
+    public function json_encode(): string|false
+    {
+        return json_encode($this->content());
     }
 }
