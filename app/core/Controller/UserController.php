@@ -39,6 +39,12 @@ class UserController extends BaseController
             app()->controller('error')->prepare();
         } else {
             // TODO: complete user profile view
+            // add noindex meta tag
+            // reason is that authorization only for admins
+            app()->page()->setMeta('robots', [
+                'name' => 'robots',
+                'content' => 'noindex'
+            ]);
         }
         return;
     }
