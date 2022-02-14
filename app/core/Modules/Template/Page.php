@@ -121,16 +121,16 @@ class Page extends BaseTemplate
         return $this->title ?? null;
     }
 
-    public function getModal(): ?Element
+    protected function getModal(): ?Element
     {
-        $modal = null;
-        if (!empty($this->modal)) {
-            $modal = new Element('aside');
-            $modal->addClass('container container_modal');
-            $modal->setAttr('role', 'alert');
-            $content = implode($this->modal);
-            $modal->setContent($content);
+        if (empty($this->modal)) {
+            return null;
         }
+        $modal = new Element;
+        $modal->addClass('container container_modal');
+        $modal->setAttr('role', 'alert');
+        $content = implode($this->modal);
+        $modal->setContent($content);
         return $modal;
     }
 
