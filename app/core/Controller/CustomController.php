@@ -24,7 +24,7 @@ class CustomController extends BaseController
         // // add main page elements
         // app()->page()->setAttr('class', 'page_front');
         // // use front page styles
-        // app()->page()->useCss('front.min');
+        // app()->page()->useCss('/css/front.min');
         // // add page content
         // app()->page()->addContent([
         //     // set front page banner

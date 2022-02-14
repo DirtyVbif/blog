@@ -27,7 +27,7 @@ class BlogController extends BaseController
         }
         app()->page()->addClass('page_blog');
         // use blog page styles
-        app()->page()->useCss('blog.min');
+        app()->page()->useCss('/css/blog.min');
         return;
     }
 

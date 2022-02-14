@@ -9,8 +9,9 @@ class Page extends BaseTemplate
     use Components\TemplateAttributesMethods;
 
     protected Title $title;
-    protected array $css = [
-        'style.min'
+    protected array $css_external = [];
+    protected array $css_internal = [
+        '/css/style.min.css'
     ];
     protected array $js = [];
     protected array $js_order = [];
@@ -55,11 +56,13 @@ class Page extends BaseTemplate
         return $this;
     }
 
-    public function useCss(string $name): self
+    public function useCss(string $name, bool $internal = false): self
     {
-        $name = strSuffix($name, '.css', true);
-        if (!in_array($name, $this->css)) {
-            array_push($this->css, $name);
+        $name = strPrefix(strSuffix($name, '.css'), '/');
+        if (!$internal && !in_array($name, $this->css_external)) {
+            array_push($this->css_external, $name);
+        } else if ($internal && !in_array($name, $this->css_internal)) {
+            array_push($this->css_internal, $name);
         }
         return $this;
     }
@@ -79,7 +82,8 @@ class Page extends BaseTemplate
         $this->data['meta'] = $this->meta;
         $this->data['title'] = $this->meta_title ?? null;
         $this->data['attributes'] = $this->attributes();
-        $this->data['css'] = $this->css;
+        $this->data['css'] = $this->css_external;
+        $this->data['css_internal'] = $this->css_internal;
         $this->data['js'] = $this->getJsSrc();
         $this->data['page']['title'] = $this->getTitle();
         $this->data['page']['modal'] = $this->getModal();

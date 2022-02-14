@@ -66,7 +66,7 @@ class PageBuilder
         app()->library('admin-bar')->use();
         app()->page()->set('admin_bar', $bar);
         app()->page()->addClass('is-admin');
-        app()->page()->useCss('admin.min');
+        app()->page()->useCss('/css/admin.min');
         return;
     }
 

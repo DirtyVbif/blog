@@ -19,7 +19,7 @@ class ErrorController extends BaseController
         $content = new Element;
         $content->setName("content/error--{$status}");
         app()->page()->addContent($content);
-        app()->page()->useCss('error.min');
+        app()->page()->useCss('/css/error.min');
         http_response_code($status);
         app()->page()->setMetaTitle(str_replace('#', t('Error') . ' ', $title) . ' | mublog.site');
         return;
