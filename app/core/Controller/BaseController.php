@@ -45,7 +45,7 @@ abstract class BaseController
             'href' => fullUrlTo('/manifest.json')
         ], 'link');
         app()->page()->setMeta('og:image', [
-            'protperty' => 'og:image',
+            'property' => 'og:image',
             'content' => fullUrlTo('/logo.svg')
         ]);
         app()->page()->setMeta('canonical', [

@@ -164,6 +164,12 @@ class Page extends BaseTemplate
     public function setMetaTitle(string $title): self
     {
         $this->meta_title = $title;
+        if (!$this->getMeta('og:title')) {
+            $this->setMeta('og:title', [
+                'property' => 'og:title',
+                'content' => $title
+            ]);
+        }
         return $this;
     }
 
@@ -172,6 +178,12 @@ class Page extends BaseTemplate
         $this->meta[$name] = new Element($tag);
         foreach ($attributes as $attribute => $value) {
             $this->meta[$name]->setAttr($attribute, $value);
+        }
+        if (preg_match('/^description$/', $name) && !$this->getMeta('og:description')) {
+            $this->setMeta('og:description', [
+                'property' => 'og:description',
+                'content' => $attributes['content']
+            ]);
         }
         return $this;
     }
