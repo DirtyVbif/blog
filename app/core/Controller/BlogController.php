@@ -21,8 +21,8 @@ class BlogController extends BaseController
         if (!$this->validateRequest()) {
             // if access denied
             /** @var ErrorController $err_c */
-            $err_c = app()->controller('error');
-            $err_c->prepare($this->status);
+            $conerr = app()->controller('error');
+            $conerr->prepare($this->status);
             return;
         }
         app()->page()->addClass('page_blog');
@@ -48,7 +48,7 @@ class BlogController extends BaseController
             return Blog::viewBlogArticle($argument);
         }
         // set page meta
-        app()->page()->setMetaTitle('Блог веб-разработчика | mublog.site');
+        app()->page()->setMetaTitle(strToken('Журнал веб-разработчика | :[site]'));
         app()->page()->setMeta('description', [
             'name' => 'description',
             'content' => 'Полезные и интересные материалы и статьи в персональном блоге веб-разработчика'

@@ -5,18 +5,20 @@ namespace Blog\Components;
 use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
-use Blog\Modules\Cache\CacheEntity;
-use Blog\Modules\CSRF\Token;
-use Blog\Modules\Library\AbstractLibrary;
-use Blog\Modules\Mailer\Mailer;
-use Blog\Modules\PageBuilder\PageBuilder;
-use Blog\Modules\Messenger\Messenger;
-use Blog\Modules\Response\Response;
-use Blog\Modules\Router\Router;
-use Blog\Modules\Template\Page;
-use Blog\Modules\User\User;
-use Blog\Modules\View\BaseView;
-use Blog\Modules\Cache\CacheSystem;
+use Blog\Modules\{
+    Cache\CacheEntity,
+    CSRF\Token,
+    Library\AbstractLibrary,
+    Mailer\Mailer,
+    PageBuilder\PageBuilder,
+    Messenger\Messenger,
+    Response\Response,
+    Router\Router,
+    Template\Page,
+    User\User,
+    View\BaseView,
+    Cache\CacheSystem
+};
 
 trait BlogModules
 {

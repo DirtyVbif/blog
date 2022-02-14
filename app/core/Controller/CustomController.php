@@ -75,7 +75,7 @@ class CustomController extends BaseController
     {
         $title = 'Политика использования cookie-файлов';
         app()->page()->setTitle($title);
-        app()->page()->setMetaTitle($title);
+        app()->page()->setMetaTitle($title . strToken(' | :[site]'));
         app()->page()->setMeta(
             'name',
             [

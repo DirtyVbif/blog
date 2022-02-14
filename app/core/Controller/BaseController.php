@@ -24,7 +24,7 @@ abstract class BaseController
     {
         app()->page()->setMeta('keywords', [
             'name' => 'keywords',
-            'content' => 'веб-разработка, блог, резюме, портфолио, php-разработчик, front-end, back-end, full-stack'
+            'content' => app()->manifest()->keywords
         ]);
         app()->page()->setMeta('favicon', [
             'rel' => 'icon',

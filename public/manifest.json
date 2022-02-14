@@ -3,6 +3,7 @@
     "short_name": "mublog.site",
     "tagline": "Блог веб-разработчика на php",
     "description": "Пренсональный блог веб-разработчка на php с целью демонстрации навыков и опыта",
+    "keywords": "веб-разработка, блог, резюме, портфолио, php-разработчик, front-end, back-end, full-stack, php, html, css, js",
     "icons": [
         {
             "src": "/images/icons/favicon-192x192.png",

@@ -175,3 +175,8 @@ function transliterate(string $input, string $langcode = 'ru'): string
     $output = str_replace($t[$langcode], $t['en'], $input);
     return $output;
 }
+
+function strToken(string $content): string
+{
+    return \Blog\Modules\StringToken\StringToken::parse($content);
+}
