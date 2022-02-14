@@ -1,6 +1,8 @@
 {
     "name": "Блог веб-разработчика mublog.site",
-    "short_name": "mublog",
+    "short_name": "mublog.site",
+    "tagline": "Блог веб-разработчика на php",
+    "description": "Пренсональный блог веб-разработчка на php с целью демонстрации навыков и опыта",
     "icons": [
         {
             "src": "/images/icons/favicon-192x192.png",
