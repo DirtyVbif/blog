@@ -1,22 +1,53 @@
 front: {
   url: '/',
-  label: 'main page'
+  label: 'main page',
+  sitemap_priority: 1.0,
+  sitemap_changefreq: 'daily'
 }
 blog: {
   url: '/blog',
-  label: 'blog'
+  label: 'blog',
+  sitemap_priority: 1.0,
+  sitemap_changefreq: 'daily'
 }
 about: {
   url: '#about',
   label: 'about',
-  hash_base: '/'
+  hash_base: '/',
+  sitemap_exclude: true
 }
 contacts: {
   url: '#contacts',
   label: 'contacts',
-  hash_base: '/'
+  hash_base: '/',
+  sitemap_exclude: true
 }
 cookie_agreement: {
   url: '/agreement-cookie',
-  label: 'cookie-файлы'
+  label: 'cookie-files',
+  sitemap_changefreq: 'monthly'
+}
+user_profile: {
+  url: '/user',
+  label: 'profile',
+  access_level: 3,
+  sitemap_exclude: true
+}
+user_login: {
+  url: '/user/login',
+  label: 'sign in',
+  access_level: 1,
+  sitemap_exclude: true
+}
+user_logout: {
+  url: '/user/logout',
+  label: 'sign out',
+  access_level: 3,
+  sitemap_exclude: true
+}
+sitemap_generate: {
+  url: '/sitemap/generate',
+  label: 'gen. sitemap',
+  access_level: 5,
+  sitemap_exclude: true
 }

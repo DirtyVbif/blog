@@ -1,5 +1,6 @@
 <?php
 
 return [
-    'Blog' => COREDIR
+    'Blog' => COREDIR,
+    'BlogLibrary' => LIBDIR . '@classname/'
 ];

@@ -3,14 +3,12 @@
 namespace Blog\Modules\Messenger;
 
 use Blog\Modules\Template\Element;
-use Twig\Markup;
+use Blog\Modules\User\User;
 
 class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
 {
     public const SESSIONID = 'status-messages';
     public const SRCPATH = 'app/core/Modules/Messenger/src/';
-    public const ACCESS_LEVEL_ALL = 0;
-    public const ACCESS_LEVEL_ADMIN = 1;
 
     /**
      * @return Element $tpl
@@ -58,7 +56,14 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
 
     protected function set(string $text, array $options): void
     {
-        if (app()->router()->isAjaxRequest()) {
+        $access_level = $options['access_level'] ?? null;
+        if (
+            app()->router()->isAjaxRequest()
+            || (
+                $access_level
+                && !app()->user()->verifyAccessLevel($access_level)
+            )
+        ) {
             return;
         }
         $text = strip_tags($text);
@@ -79,45 +84,59 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
         return;
     }
 
-    public function debug(string $text): void
+    public function debug(): void
     {
+        $verbouse = false;
+        $arguments = func_get_args();
+        $i = array_search('--v', $arguments, true);
+        if ($i || $i === 0) {
+            unset($arguments[$i]);
+            $verbouse = true;
+        }
         $called_filename = strTrimServDir(debugFileCalled());
-        $options = [
-            'type' => 'debug',
-            'prefix' => $called_filename
-        ];
-        $this->set($text, $options);
+        foreach ($arguments as $arg) {
+            $output = $verbouse ? debug($arg, '--v') : debug($arg);
+            $options = [
+                'type' => 'debug',
+                'prefix' => $called_filename,
+                'access_level' => User::ACCESS_LEVEL_ADMIN
+            ];
+            $this->set($output, $options);
+        }
         return;
     }
 
-    public function notice(string $text, ?array $markup = null, ?string $class = null): void
+    public function notice(string $text, ?array $markup = null, ?string $class = null, ?int $access_level = null): void
     {
         $options = [
             'type' => 'notice',
             'markup' => $markup,
-            'class' => $class
+            'class' => $class,
+            'access_level' => $access_level
         ];
         $this->set($text, $options);
         return;
     }
 
-    public function warning(string $text, ?array $markup = null, ?string $class = null): void
+    public function warning(string $text, ?array $markup = null, ?string $class = null, ?int $access_level = null): void
     {
         $options = [
             'type' => 'warning',
             'markup' => $markup,
-            'class' => $class
+            'class' => $class,
+            'access_level' => $access_level
         ];
         $this->set($text, $options);
         return;
     }
 
-    public function error(string $text, ?array $markup = null, ?string $class = null): void
+    public function error(string $text, ?array $markup = null, ?string $class = null, ?int $access_level = null): void
     {
         $options = [
             'type' => 'error',
             'markup' => $markup,
-            'class' => $class
+            'class' => $class,
+            'access_level' => $access_level
         ];
         $this->set($text, $options);
         return;

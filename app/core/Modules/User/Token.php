@@ -191,7 +191,7 @@ class Token
         } elseif ($remembered_utoken) {
             $token = $this->getTokenString($remembered_utoken);
             $this->udata = $query->where(['uses.token' => $token])
-                ->andWhere(['uses.agent_hash' => app()->user()->agent()->getHash()])
+                ->andWhere(['uses.agent_hash' => app()->user()->agent()->hash()])
                 ->first();
         }
         if (!isset($this->udata['uid'])) {
@@ -214,14 +214,14 @@ class Token
         $time = $this->getTokenTimestamp($utoken_new);
         $update_result = sql_update(table: 'users_sessions')
             ->set([
-                'agent_hash' => app()->user()->agent()->getHash(),
-                'browser' => app()->user()->agent()->getData(true)->browser,
-                'platform' => app()->user()->agent()->getData(true)->platform,
+                'agent_hash' => app()->user()->agent()->hash(),
+                'browser' => app()->user()->agent()->browser(),
+                'platform' => app()->user()->agent()->platform(),
                 'updated' => $time
             ])->where(['uid' => $this->udata['uid']])
             ->andWhere(['token' => $token]);
         if (!$update_result->update()) {
-            pre([
+            msgr()->debug([
                 'message' => 'Following SQL-request made zero changes',
                 'update-sql' => $update_result->raw(),
                 'update-sql-data' => $update_result->data(),

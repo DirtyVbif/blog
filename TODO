@@ -1,3 +1,4 @@
+[ ] Add EN/RU switcher and translations;
 [v] Add Messenger::module for outputting status messages;
 [v] Add contacts block;
 [v] Add mailer module;
@@ -21,18 +22,18 @@
 [v] Add meta;
 [v] Add blog articles edit form;
 [v] Test contact form mail sending on hosting;
-
-[ ] Add EN/RU switcher and translations;
 [ ] Add ajax login and contact forms support:
     - Add messages output in response;
-[ ] Add cache clear for admin;
+[v] Add admin bar;
+[v] Add cache clear for admin;
 [ ] Add admin view for feedbacks;
 [ ] Add blog view for all blog comments;
-[ ] Complete ErrorController::class output;
-[ ] Rebuild User\Agent::class information collecting:
+[v] Complete ErrorController::class output;
+[v] Rebuild User\Agent::class information collecting:
     - replace using of get_browser() with js tool;
-[ ] Add sitemap;
+[v] Add sitemap;
 [ ] Add text tokenizer and site info variables;
-[ ] Fix debug message output on authorization by saved in cookie user token when updating usser sesion in storage;
-[ ] Set debug messages access level for admins only;
+[v] Fix debug message output on authorization by saved in cookie user token when updating usser sesion in storage;
+[v] Set debug messages access level for admins only;
 [ ] Rebuild js classes and html elements as outside libraries;
+[ ] Add theme switcher for dark and light theme;

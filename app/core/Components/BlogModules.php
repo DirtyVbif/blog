@@ -5,7 +5,9 @@ namespace Blog\Components;
 use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
+use Blog\Modules\Cache\CacheEntity;
 use Blog\Modules\CSRF\Token;
+use Blog\Modules\Library\AbstractLibrary;
 use Blog\Modules\Mailer\Mailer;
 use Blog\Modules\PageBuilder\PageBuilder;
 use Blog\Modules\Messenger\Messenger;
@@ -14,6 +16,7 @@ use Blog\Modules\Router\Router;
 use Blog\Modules\Template\Page;
 use Blog\Modules\User\User;
 use Blog\Modules\View\BaseView;
+use Blog\Modules\Cache\CacheSystem;
 
 trait BlogModules
 {
@@ -28,6 +31,9 @@ trait BlogModules
     private Token $csrf;
     /** @var BaseView[] $views */
     private array $views;
+    /** @var AbstractLibrary[] $libraries */
+    private array $libraries;
+    private CacheSystem $cache;
 
     public function response(): Response
     {
@@ -122,5 +128,32 @@ trait BlogModules
             }
         }
         return $this->views[$view_name];
+    }
+
+    public function library(string $name): ?AbstractLibrary
+    {
+        $classname = '\\BlogLibrary\\' . pascalCase($name);
+        if (!class_exists($classname)) {
+            return null;
+        } else if (!isset($this->libraries[$classname])) {
+            $this->libraries[$classname] = new $classname;
+        }
+        return $this->libraries[$classname];
+    }
+
+    /**
+     * @param string $entity_name name of cache entity to get access skipping CacheSystem::class wrapper
+     */
+    public function cache(?string $cache_entity_name = null): CacheSystem|CacheEntity
+    {
+        if (!isset($this->cache)) {
+            $this->cache = new CacheSystem;
+        }
+        if (is_null($cache_entity_name)) {
+            /** @return CacheSystem */
+            return $this->cache;
+        }
+        /** @return CacheEntity */
+        return $this->cache->entity($cache_entity_name);
     }
 }

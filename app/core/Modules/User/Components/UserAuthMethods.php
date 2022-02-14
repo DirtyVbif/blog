@@ -44,24 +44,31 @@ trait UserAuthMethods
     {
         $utoken = $this->token()->generate();
         $token = $this->token()->getTokenString($utoken);
-        $agent = $this->agent()->getData();
-        $agent['updated'] = time();
         session()->set(User::SESSUID . '/udata', $user['data']);
         session()->set(User::SESSUID . '/status', $user['status']);
         session()->set(User::SESSUID . '/token', $utoken);
         if ($remember) {
             $this->token()->setCookieUToken($utoken);
         }
-        return $this->storeNewSession($token, $agent, $user['data']['id']);
+        return $this->storeNewSession($token, $user['data']['id']);
     }
 
-    protected function storeNewSession(string $token, array $agent, int $uid): self
+    protected function storeNewSession(string $token, int $uid): self
     {
-        $this->removePreviousSession($uid, $agent['hash']);
+        $this->removePreviousSession($uid, app()->user()->agent()->hash());
         sql_insert('users_sessions')
             ->set(
-                [$uid, $token, $agent['hash'], $agent['browser'], $agent['platform'], $agent['updated']],
-                ['uid', 'token', 'agent_hash', 'browser', 'platform', 'updated']
+                [
+                    $uid, $token,
+                    app()->user()->agent()->hash(),
+                    app()->user()->agent()->browser(),
+                    app()->user()->agent()->platform(),
+                    time()
+                ],
+                [
+                    'uid', 'token', 'agent_hash',
+                    'browser', 'platform', 'updated'
+                ]
             )->exe();
         return $this;
     }

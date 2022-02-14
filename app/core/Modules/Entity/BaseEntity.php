@@ -16,6 +16,8 @@ abstract class BaseEntity extends TemplateFacade
      * Create new entity from data
      */
     abstract public static function create(BaseRequest $data): bool;
+    abstract public static function getSitemapPriority(): float;
+    abstract public static function getSitemapChangefreq(): string;
 
     abstract public function loadById(int $id): self;
 

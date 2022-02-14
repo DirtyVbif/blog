@@ -26,13 +26,47 @@ class UserController extends BaseController
             } else {
                 $request_is_valid = false;
             }
+            $method = pascalCase("get request {$argument}");
+            if (method_exists($this, $method)) {
+                $request_is_valid = $this->$method();
+            } else {
+                $request_is_valid = false;
+            }
         } else if (!app()->user()->isAuthorized()) {
             $this->loadLoginForm();
         }
         if (!$request_is_valid) {
             app()->controller('error')->prepare();
+        } else {
+            // TODO: complete user profile view
+            // add noindex meta tag
+            // reason is that authorization only for admins
+            app()->page()->setMeta('robots', [
+                'name' => 'robots',
+                'content' => 'noindex'
+            ]);
         }
         return;
+    }
+
+    protected function getRequestLogin(): bool
+    {
+        if (app()->user()->isAuthorized()) {
+            app()->router()->redirect('/user');
+        }
+        $this->loadLoginForm();
+        return true;
+    }
+
+    protected function getRequestLogout(): bool
+    {
+        if (app()->user()->isAuthorized()) {
+            app()->user()->logout();
+            app()->router()->redirect('<previous>');
+            return true;
+        }
+        app()->router()->redirect('/user');
+        return false;
     }
 
     protected function loadLoginForm(): void

@@ -7,8 +7,12 @@ class User
     use Components\UserGetSetMethods;
     use Components\UserAuthMethods;
 
+    public const ACCESS_LEVEL_ANONYM = 1;
+    public const ACCESS_LEVEL_ALL = 2;
+    public const ACCESS_LEVEL_USER = 3;
+    public const ACCESS_LEVEL_ADMIN = 4;
+    public const ACCESS_LEVEL_MASTER = 5;
     public const SESSUID = 'user-session';
-    public const ANONID = 1;
     public const LOGID = 'user';
     protected array $status_list = [];
     protected array $access_levels = [];
@@ -57,7 +61,7 @@ class User
             $this->access_levels[$row['alid']]['allow'][$row['usid']] = $row['status'];
         }
         // get defaul user status id
-        $key = arraySearchFirstKeyByColumn($this->status_list, self::ANONID, 'id');
+        $key = arraySearchFirstKeyByColumn($this->status_list, self::ACCESS_LEVEL_ANONYM, 'id');
         // store defaul user status data
         $this->default_status = $this->status_list[$key];
         return $this;
@@ -188,7 +192,8 @@ class User
                 ->where(['token' => $this->token()->getTokenString($utoken)])
                 ->delete();
         }
-        return $this->setDefaultStatus();
+        $this->setDefaultStatus();
+        return $this;
     }
 
     public function isAuthorized(): bool

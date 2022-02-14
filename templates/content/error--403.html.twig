@@ -1,0 +1,10 @@
+{{ wrapper.addClass('error-content').open() }}
+    <figure class="error-content__banner">
+        {{ img('/images/403-you-shall-not-pass.jpg').alt('Ошибка 403. Ты не пройдёшь!') }}
+        <figcaption class="error-content__image-caption">Кадр из к/ф &laquo;Властелин колец: Братство кольца&raquo; (2001), где Гэндальф, преграждая путь демону Балрогу, выкрикивает &laquo;Ты не пройдёшь&raquo;.</figcaption>
+    </figure>
+    <div class="error-content__body">
+        <p>У Вас нет доступа к этой странице.</p>
+        <p>Если Вы считаете, что это ошибка — {{ link('contacts').label('свяжитесь со мной') }}.</p>
+    </div>
+{{ wrapper.close() }}

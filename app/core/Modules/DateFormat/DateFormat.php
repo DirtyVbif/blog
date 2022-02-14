@@ -6,6 +6,11 @@ class DateFormat
 {
     protected string $formatter;
 
+    /**
+     * @param string $format name of prepared formats:
+     * * 'default' => DD of Month YYYY (eg 20 of February 1970)
+     * * 'complete' => YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30+01:00)
+     */
     public function __construct(
         protected int $unix_timestamp,
         $format = 'default'
@@ -36,7 +41,7 @@ class DateFormat
     }
 
     /**
-     * @return string DD <month_full> YYYY
+     * @return string DD of Month YYYY (eg 20 of February 1970)
      */
     protected function getDefaultFormat(): string
     {
@@ -46,6 +51,15 @@ class DateFormat
         $date .= ' ' . t('of ' . date('F', $this->unix_timestamp));
         // set year number YYYY
         $date .= ' ' . date('Y', $this->unix_timestamp);
+        return $date;
+    }
+
+    /**
+     * @return string YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30+01:00)
+     */
+    protected function getCompleteFormat(): string
+    {
+        $date = date('Y-m-d', $this->unix_timestamp) . 'T' . date('H:i:sp', $this->unix_timestamp);
         return $date;
     }
 }

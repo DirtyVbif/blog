@@ -68,6 +68,12 @@ class Blog extends BaseView
         return;
     }
 
+    /**
+     * Loads articles data from storage as array
+     * 
+     * @return array of articles data with following keys:
+     * * `array('id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt')`
+     */
     public static function loadArticlesData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
         $sql = sql_select(
@@ -137,5 +143,12 @@ class Blog extends BaseView
             $view->items[] = new BlogArticle($data, BlogArticle::VIEW_MODE_PREVIEW);
         }
         return $view;
+    }
+
+    public static function lastUpdate(): int
+    {
+        $comments_update = sql()->query('SELECT MAX(`created`) as time FROM `comments`;')->fetch();
+        $articles_update = sql()->query('SELECT MAX(`updated`) as time FROM `articles`;')->fetch();
+        return max($comments_update['time'], $articles_update['time']);
     }
 }

@@ -1,0 +1,36 @@
+$admin_bar_height: 40px;
+
+.admin-bar {
+    background: $phantom;
+    height: $admin_bar_height;
+    font-size: 12px;
+    display: flex;
+
+    &__cache-btn {
+        text-transform: uppercase;
+        margin: 7.5px 30px;
+        color: $link;
+        border-color: $link;
+
+        &:hover {
+            color: $link_hover;
+            border-color: $link_hover;
+        }
+    }
+}
+
+.admin-nav {
+    position: inherit;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+
+    &__link {
+        display: block;
+        color: $bkgd;
+        line-height: $admin_bar_height;
+        padding: 0 10px;
+        text-transform: uppercase;
+    }
+}

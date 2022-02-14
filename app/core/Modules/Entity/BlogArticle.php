@@ -20,6 +20,8 @@ class BlogArticle extends BaseEntity
     ];
     protected const ENTITY_TABLE = 'articles';
     protected const ENTITY_COLUMNS = ['id', 'title', 'summary', 'body', 'alias', 'body', 'created', 'updated', 'preview_src', 'preview_alt', 'author', 'views'];
+    public const SITEMAP_PRIORITY = 0.25;
+    public const SITEMAP_CHANGEFREQ = 'monthly';
 
     protected string $view_mode;
     protected SQLSelect $sql;
@@ -203,10 +205,12 @@ class BlogArticle extends BaseEntity
 
     public static function create(BaseRequest $data): bool
     {
+        $time = time();
         $data->setDefaultValues([
             'author' => 'mublog.site',
             'alias' => kebabCase($data->title, true),
-            'created' => time()
+            'created' => $time,
+            'updated' => $time
         ]);
         if (self::isAliasExists($data->alias)) {
             $data->set('alias', $data->alias . '_' . self::getNewId());
@@ -214,12 +218,13 @@ class BlogArticle extends BaseEntity
         $values = [
             $data->title, $data->summary, $data->body,
             $data->alias, $data->get('created'), $data->status,
-            $data->preview_src, $data->preview_alt, $data->author
+            $data->preview_src, $data->preview_alt, $data->author,
+            $data->get('updated')
         ];
         $sql = sql_insert(self::ENTITY_TABLE);
         $sql->set(
             values: $values,
-            columns: ['title', 'summary', 'body', 'alias', 'created', 'status', 'preview_src', 'preview_alt', 'author']
+            columns: ['title', 'summary', 'body', 'alias', 'created', 'status', 'preview_src', 'preview_alt', 'author', 'updated']
         );
         $result = $sql->exe();
         return $result;
@@ -242,5 +247,15 @@ class BlogArticle extends BaseEntity
             . ' AND `TABLE_NAME` = "' . self::ENTITY_TABLE . '";');
         $result = $sql->fetch();
         return $result['AUTO_INCREMENT'];
+    }
+
+    public static function getSitemapPriority(): float
+    {
+        return self::SITEMAP_PRIORITY;
+    }
+
+    public static function getSitemapChangefreq(): string
+    {
+        return self::SITEMAP_CHANGEFREQ;
     }
 }

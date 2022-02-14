@@ -3,10 +3,11 @@
 namespace Blog\Modules\Cache;
 
 use Blog\Modules\FileSystem\File;
+use Blog\Modules\FileSystem\Folder;
 
 class CacheEntity
 {
-    protected const DIR = './cache/';
+    protected const DIR = 'cache/';
     protected const DATFILE = 'cache.module';
     protected const DEFAULT_DIR_PERMISIONS = 0755;
     protected const TEST = 'test';
@@ -16,7 +17,7 @@ class CacheEntity
     protected bool $status;
     protected array $cache_data = [];
     protected bool $initialized = false;
-    protected string $dir;
+    protected Folder $directory;
     protected File $data_file;
 
     public function __construct(protected string $name)
@@ -47,32 +48,15 @@ class CacheEntity
 
     protected function prepareCacheDir(): self
     {
-        $dir = self::DIR . strSuffix($this->name, '/');
+        $dir = app()->config('cache_directory') . strSuffix($this->name, '/');
         $this->dir($dir);
-        if (!is_dir($this->dir())) {
-            mkdir($this->dir(), self::DEFAULT_DIR_PERMISIONS, true);
-            $this->chmodToDir($this->dir());
-        }
+        $this->dir()->create();
         return $this;
-    }
-
-    protected function chmodToDir(string $dir): void
-    {
-        $parts = preg_split('/[\/\\\]+/', $dir);
-        $directory = '';
-        foreach ($parts as $part) {
-            if (!$part || preg_match('/\.+/', $part)) {
-                continue;
-            }
-            $directory .= $part . '/';
-            chmod($directory, self::DEFAULT_DIR_PERMISIONS);
-        }
-        return;
     }
 
     protected function prepareCacheDataFile(): self
     {
-        $this->cache_data['list'] = array_diff(scandir($this->dir()), ['..', '.']);
+        $this->cache_data['list'] = $this->dir()->scan();
         $this->cache_data['data'] = $this->getDataFileContent();
         return $this;
     }
@@ -115,7 +99,7 @@ class CacheEntity
     protected function dataFile(): File
     {
         if (!isset($this->data_file)) {
-            $this->data_file = f(self::DATFILE, $this->dir());
+            $this->data_file = f(self::DATFILE, $this->dir()->path());
         }
         if (!$this->data_file->exists()) {
             $content = $this->varphpstr([]);
@@ -144,13 +128,12 @@ class CacheEntity
     /**
      * @param bool|self $status
      */
-    public function dir(?string $directory = null)
+    public function dir(?string $directory = null): Folder
     {
-        if (is_null($directory)) {
-            return $this->dir ?? null;
+        if (!is_null($directory)) {
+            $this->directory = new Folder($directory);
         }
-        $this->dir = $directory;
-        return $this;
+        return $this->directory;
     }
 
     /**
@@ -164,7 +147,7 @@ class CacheEntity
         if (!$this->status() || !in_array($name, $this->cacheData()->list)) {
             return null;
         }
-        $cache_file = f($name, $this->dir());
+        $cache_file = f($name, $this->dir()->path());
         $content = include $cache_file->filename();
         $content = $this->validateCacheLifetime($content);
         if (!$content) {
@@ -199,7 +182,7 @@ class CacheEntity
         ];
         $cache_data['query'] = $query;
         $data_info['tables'] = $tbls;
-        $cache_file = f($cache_name, $this->dir());
+        $cache_file = f($cache_name, $this->dir()->path());
         $content = $this->varphpstr($cache_data);
         $cache_file->content($content)->save();
         $this->storeCacheFileData($cache_name, $data_info);
@@ -254,12 +237,12 @@ class CacheEntity
             return $this;
         } else if (empty($files)) {
             $this->dataFile()->del();
-            array_map('unlink', glob($this->dir() . '*'));
+            $this->dir()->clear();
             $this->initialize();
             return $this;
         }
         foreach ($files as $file) {
-            f($file, $this->dir())->del();
+            f($file, $this->dir()->path())->del();
             unset($this->container['data'][$file]);
         }
         $this->updateDataFile();

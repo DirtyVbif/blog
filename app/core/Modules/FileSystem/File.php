@@ -18,7 +18,7 @@ class File
      */
     protected $handle;
 
-    public function __construct(string $name, string $directory, ?string $extension = null)
+    public function __construct(string $name, string $directory = '.', ?string $extension = null)
     {
         $this
             ->name($name)
@@ -30,9 +30,7 @@ class File
 
     private function checkExistingFile(): self
     {
-        if (file_exists($this->filename())) {
-            $this->created = true;
-        }
+        $this->created = file_exists($this->filename());
         return $this;
     }
 
@@ -53,12 +51,11 @@ class File
      */
     public function extension(?string $extension = null)
     {
-        if (!$extension) {
+        if (is_null($extension)) {
             return $this->extension ?? null;
         }
-
         $extension = preg_replace('/^\.+/', '', $extension);
-        if ($extension !== $this->extension && $this->created) {
+        if ($extension !== $this->extension() && $this->created) {
             rename($this->filename(), strSuffix($this->name(), '.' . $extension));
         }
         $this->extension = $extension;
@@ -72,10 +69,11 @@ class File
      */
     public function dir(?string $directory = null)
     {
-        if (!$directory) {
+        if (is_null($directory)) {
             return $this->dir ?? null;
+        } else if (!$directory) {
+            $directory = '.';
         }
-        ffstr($directory);
         $this->dir = strSuffix($directory, '/', true);
         return $this;
     }
@@ -85,7 +83,7 @@ class File
      */
     public function content(?string $content = null)
     {
-        if (!$content) {
+        if (is_null($content)) {
             return $this->content ?? '';
         }
         $this->content = $content;
@@ -94,7 +92,11 @@ class File
 
     public function addContent(string $content): self
     {
-        $this->content .= $content;
+        if (!isset($this->content)) {
+            $this->content($content);
+        } else {
+            $this->content .= $content;
+        }
         return $this;
     }
 
@@ -116,7 +118,7 @@ class File
             fwrite($this->handle, $this->content());
             $this->created = true;
             fclose($this->handle);
-            chmod($file, self::DEFAULT_FILE_PERMISIONS);
+            chmod($file, $this->permissions());
         }
         return $this;
     }
@@ -144,10 +146,10 @@ class File
         return $this->created;
     }
 
-    public function permissions(int|null $permissions = null): self|string
+    public function permissions(?int $permissions = null): self|int
     {
         if (is_null($permissions)) {
-            return preg_replace('/(0)?(\d{3})/', '0$2', $this->permissions);
+            return $this->permissions ?? self::DEFAULT_FILE_PERMISIONS;
         }
         $this->permissions = $permissions;
         return $this;
