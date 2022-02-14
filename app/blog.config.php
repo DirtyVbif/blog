@@ -41,8 +41,8 @@ $__config['twig'] = [
         'Blog\Modules\TemplateFacade\TemplateFacade' => ['html']
     ],
     'config' => [
-        'cache' => 'cache/twig',
-        // 'cache' => false,
+        // 'cache' => 'cache/twig',
+        'cache' => false,
         'debug' => false,
         'auto_reload' => false
         // 'autoescape' => false

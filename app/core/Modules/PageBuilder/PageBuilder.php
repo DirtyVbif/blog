@@ -25,9 +25,9 @@ class PageBuilder
         app()->page()->setTitle(app()->controller()->getTitle());
         app()->page()->setHeader($this->header());
         app()->page()->setFooter($this->footer());
-        app()->page()->useJs('js/default.min');
-        app()->page()->useJs('js/classes.min');
-        app()->page()->useJs('js/script.min');
+        app()->page()->useJs('js/default.min', order: 0);
+        app()->page()->useJs('js/classes.min', order: 1);
+        app()->page()->useJs('js/script.min', order: 2);
         $this->setAdminElement();
         $this->prepared = true;
         return;
@@ -63,6 +63,7 @@ class PageBuilder
         $bar = new Element;
         $bar->setName('elements/admin-bar');
         $bar->set('menu', app()->builder()->getMenu('admin_bar'));
+        app()->library('admin-bar')->use();
         app()->page()->set('admin_bar', $bar);
         app()->page()->addClass('is-admin');
         app()->page()->useCss('admin.min');

@@ -13,6 +13,7 @@ class Page extends BaseTemplate
         'style.min'
     ];
     protected array $js = [];
+    protected array $js_order = [];
     protected array $content = [];
     protected array $modal = [];
     protected Element $content_tpl;
@@ -37,14 +38,20 @@ class Page extends BaseTemplate
         return $this;
     }
 
-    public function useJs(string $name, ?string $load_type = 'async', ?string $content = null): self
+    public function useJs(string $name, int $order = 2, ?string $load_type = 'async', ?string $content = null): self
     {
         $name = strPrefix(strSuffix($name, '.js'), '/');
+        if (!isset($this->js_order[$order])) {
+            $this->js_order[$order] = [];
+        }
         $this->js[$name] = [
             'src' => $name,
             'type' => $load_type,
             'content' => $content
         ];
+        if (!in_array($name, $this->js_order[$order])) {
+            array_push($this->js_order[$order], $name);
+        }
         return $this;
     }
 
@@ -86,12 +93,18 @@ class Page extends BaseTemplate
 
     protected function getJsSrc(): array
     {
+        $array = [];
+        foreach ($this->js_order as $stack) {
+            foreach ($stack as $name) {
+                $array[] = $this->js[$name];
+            }
+        }
         if (app()->config('development')->js) {
-            foreach ($this->js as &$js) {
+            foreach ($array as &$js) {
                 $js['src'] .= '?t=' . time();
             }
         }
-        return $this->js;
+        return $array;
     }
 
     public function setTitle(string $title_content): self
