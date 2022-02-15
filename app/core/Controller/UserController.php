@@ -6,11 +6,6 @@ use Blog\Request\LoginRequest;
 
 class UserController extends BaseController
 {
-    public function __construct()
-    {
-        $this->title = t('Admin authorization');
-    }
-
     public function prepare(): void
     {
         parent::prepare();
@@ -74,6 +69,7 @@ class UserController extends BaseController
         app()->page()->addContent(
             app()->builder()->getLoginForm()
         );
+        $this->getTitle()->set(t('Admin authorization'));
         return;
     }
 
