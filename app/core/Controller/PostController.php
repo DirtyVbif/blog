@@ -27,11 +27,6 @@ class PostController extends BaseController
         return;
     }
 
-    public function getTitle(): string
-    {
-        return '';
-    }
-
     public function feedbackRequest()
     {
         $data = new FeedbackRequest($_POST);

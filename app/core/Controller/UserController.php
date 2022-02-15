@@ -6,8 +6,6 @@ use Blog\Request\LoginRequest;
 
 class UserController extends BaseController
 {
-    protected string $title;
-
     public function __construct()
     {
         $this->title = t('Admin authorization');
@@ -34,6 +32,10 @@ class UserController extends BaseController
             }
         } else if (!app()->user()->isAuthorized()) {
             $this->loadLoginForm();
+        } else {
+            $this->getTitle()->set(
+                t('Hello, @name', ['name' => app()->user()->name()])
+            );
         }
         if (!$request_is_valid) {
             app()->controller('error')->prepare();
@@ -90,10 +92,11 @@ class UserController extends BaseController
         return;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ControlledPageTitle
     {
-        if (app()->user()->isAuthorized()) {
-            $this->title = t('Hello, @name', ['name' => app()->user()->name()]);
+        parent::getTitle();
+        if (!$this->title->isset()) {
+            $this->title->set(t('Admin authorization'));
         }
         return $this->title;
     }

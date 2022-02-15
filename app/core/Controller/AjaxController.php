@@ -19,11 +19,6 @@ class AjaxController extends BaseController
         return;
     }
 
-    public function getTitle(): string
-    {
-        return '';
-    }
-
     protected function prepareResponse(): void
     {
         $this->response = [

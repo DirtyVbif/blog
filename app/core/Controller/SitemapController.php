@@ -38,11 +38,6 @@ class SitemapController extends BaseController
         die;
     }
 
-    public function getTitle(): string
-    {
-        return '';
-    }
-
     protected function getRequestGenerate(): bool
     {
         if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_MASTER)) {

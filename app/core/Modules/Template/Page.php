@@ -111,12 +111,12 @@ class Page extends BaseTemplate
         return $array;
     }
 
-    public function setTitle(string $title_content): self
+    public function setTitle($content): self
     {
         if (!isset($this->title)) {
             $this->title = new Title;
         }
-        $this->title->set($title_content);
+        $this->title->set($content);
         return $this;
     }
 

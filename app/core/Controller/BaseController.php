@@ -4,6 +4,10 @@ namespace Blog\Controller;
 
 abstract class BaseController
 {
+    protected ControlledPageTitle $title;
+
+    abstract public function postRequest(): void;
+
     public function prepare(): void
     {
         if (!app()->builder()->prepared()) {
@@ -15,10 +19,6 @@ abstract class BaseController
         }
         return;
     }
-
-    abstract public function getTitle(): string;
-
-    abstract public function postRequest(): void;
 
     protected function setDefaultMeta(): void
     {
@@ -53,5 +53,13 @@ abstract class BaseController
             'href' => fullUrlTo(app()->router()->url())
         ], 'link');
         return;
+    }
+    
+    public function getTitle(): ControlledPageTitle
+    {
+        if (!isset($this->title)) {
+            $this->title = new ControlledPageTitle;
+        }
+        return $this->title;
     }
 }

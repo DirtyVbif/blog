@@ -3,7 +3,7 @@
 namespace Blog\Controller;
 
 class FrontController extends BaseController
-{
+{    
     public function prepare(): void
     {
         parent::prepare();
@@ -31,11 +31,6 @@ class FrontController extends BaseController
             'content' => app()->manifest()->description
         ]);
         return;
-    }
-
-    public function getTitle(): string
-    {
-        return '';
     }
 
     public function postRequest(): void

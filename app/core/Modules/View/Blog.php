@@ -43,7 +43,7 @@ class Blog extends BaseView
             'href' => fullUrlTo('blog/' . $article->id())
         ], 'link');
         // view loaded blog article
-        app()->page()->setTitle($article->title);
+        app()->controller()->getTitle()->set($article->title);
         app()->page()->addContent($article);
         $comment_form = new Form('comment', 'section');
         $comment_form->tpl()->set('article_id', $article->id);

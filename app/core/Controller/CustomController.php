@@ -60,11 +60,6 @@ class CustomController extends BaseController
         return false;
     }
 
-    public function getTitle(): string
-    {
-        return '';
-    }
-
     public function postRequest(): void
     {
         pre($_POST);
@@ -74,8 +69,9 @@ class CustomController extends BaseController
     protected function getRequestAgreementCookie(): void
     {
         $title = 'Политика использования cookie-файлов';
-        app()->page()->setTitle($title);
-        app()->page()->setMetaTitle($title . strToken(' | :[site]'));
+        $this->getTitle()->set($title);
+        // app()->page()->setTitle($title);
+        app()->page()->setMetaTitle($title . stok(' | :[site]'));
         app()->page()->setMeta(
             'name',
             [
