@@ -196,4 +196,15 @@ class Page extends BaseTemplate
     {
         return $this->meta[$name] ?? null;
     }
+
+    /**
+     * Set meta tag `robots` with specified content
+     */
+    public function metaRobots(string $content): void
+    {
+        $this->setMeta('robots', [
+            'name' => 'robots',
+            'content' => $content
+        ]);
+    }
 }

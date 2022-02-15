@@ -27,7 +27,7 @@
 [v] Add admin bar;
 [v] Add cache clear for admin;
 [ ] Add admin view for feedbacks;
-[ ] Add blog view for all blog comments;
+[v] Add blog view for all blog comments;
 [v] Complete ErrorController::class output;
 [v] Rebuild User\Agent::class information collecting:
     - replace using of get_browser() with js tool;
