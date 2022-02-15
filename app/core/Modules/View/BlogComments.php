@@ -59,8 +59,15 @@ class BlogComments extends BaseView
     /**
      * Loads comments data from storage as array
      * 
-     * @return array of articles data with following keys:
-     * * `array('id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt')`
+     * @return array of comments data with following keys:
+     * ```
+     * array(
+     *      // comment fields
+     *      'cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip',
+     *      // parent article fields
+     *      'aid', 'title', 'alias'
+     * );
+     * ```
      */
     public static function loadData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {

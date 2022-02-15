@@ -12,7 +12,6 @@ class Sitemap
 
     public static function generate(): void
     {
-        // TODO: generate sitemap
         $links = [];
         // generate main links data
         foreach (app()->builder()->getContent('routes') as $link) {
@@ -27,7 +26,7 @@ class Sitemap
             ];
         }
         $update = \Blog\Modules\View\Blog::lastUpdate();
-        $links['/']['lastmod'] = $links['/blog']['lastmod'] = new DateFormat($update, 'complete');
+        $links['/']['lastmod'] = $links['/blog']['lastmod'] = new DateFormat($update, DateFormat::COMPLETE);
         // generate blog articles data
         foreach (Blog::loadArticlesData() as $article) {
             $url = '/blog/' . $article['alias'];
@@ -35,7 +34,7 @@ class Sitemap
                 'loc' => $url,
                 'priority' => BlogArticle::getSitemapPriority(),
                 'changefreq' => BlogArticle::getSitemapChangefreq(),
-                'lastmod' => new DateFormat($article['updated'], 'complete')
+                'lastmod' => new DateFormat($article['updated'], DateFormat::COMPLETE)
             ];
         }
         // generate sitemap.xml content from template
