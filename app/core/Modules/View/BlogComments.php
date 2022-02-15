@@ -67,14 +67,15 @@ class BlogComments extends BaseView
         $columns = [
             'c' => ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'],
             'ac' => ['aid'],
-            'a' => ['aid' => 'id', 'title', 'alias']
+            'a' => ['title', 'alias']
         ];
         $sql = sql_select(from: ['c' => 'comments']);
         $sql->join(['ac' => 'article_comments'], using: 'cid');
         $sql->join(['a' => 'articles'], on: ['ac.aid', 'a.id']);
         $sql->columns($columns);
+        $sql->where(['ac.deleted' => 0]);
         if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
-            $sql->where(['c.status' => 1]);
+            $sql->andWhere(['c.status' => 1]);
         }
         $sql->limit($limit);
         if ($offset) {
