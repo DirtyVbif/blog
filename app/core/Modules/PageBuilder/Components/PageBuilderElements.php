@@ -153,6 +153,17 @@ trait PageBuilderElements
         return $block;
     }
 
+    public function getBlogCommentsPage(): Element
+    {
+        $block = new Element;
+        $block->setName('blocks/blog--comments');
+        /** @var Blog\Modules\View\BlogComments $view */
+        $view = app()->view('blog comments')->view();
+        $block->set('items', $view->items);
+        $block->set('pager', $view->pager);
+        return $block;
+    }
+
     public function getCookieModal(): Element
     {
         $chunk = new Element;

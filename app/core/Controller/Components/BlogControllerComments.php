@@ -3,11 +3,11 @@
 namespace Blog\Controller\Components;
 
 use Blog\Modules\Entity\Comment;
+use Blog\Modules\View\BlogComments;
 use Blog\Request\CommentRequest;
 
 trait BlogControllerComments
 {
-
     protected function postRequestCommentAdd(array $data): void
     {
         $request = new CommentRequest($data);
@@ -60,7 +60,9 @@ trait BlogControllerComments
             'name' => 'description',
             'content' => 'Обзор комментариев пользователей в блоге веб-разработчика'
         ]);
-        app()->controller()->getTitle()->set('Комментарии пользователей в блоге');
+        /** @var \Blog\Controller\BaseController $this */
+        $this->getTitle()->set('Комментарии пользователей в блоге');
+        BlogComments::viewCommentsPage();
         return true;
     }
 }
