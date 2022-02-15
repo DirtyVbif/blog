@@ -18,8 +18,10 @@ class TemplateWrapper extends BaseTemplateElement
     /**
      * Set new HTML tag name
      */
-    public function set(string $name) {
+    public function set(string $name): self
+    {
         $this->name = $name;
+        return $this;
     }
 
     /**
