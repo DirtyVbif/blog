@@ -51,10 +51,18 @@ class BlogArticle extends BaseEntity
         $this->setViewMode($view_mode);
     }
 
+    public static function generateUrl(?string $alias, int $id): string
+    {
+        if ($alias) {
+            return "/blog/{$alias}";
+        }
+        return "/blog/{$id}";
+    }
+
     protected function preprocessData(): void
     {
         if (!empty($this->data)) {            
-            $this->data['url'] = '/blog/' . ($this->data['alias'] ?? $this->data['id']);
+            $this->data['url'] = self::generateUrl($this->data['alias'], $this->data['id']);
             $this->data['date'] = new DateFormat($this->data['created']);
             $this->data['comments_count'] = $this->getCommentsCount();
         }
@@ -160,30 +168,16 @@ class BlogArticle extends BaseEntity
         return $this;
     }
 
-    public function loadComments(): void
-    {
-        $sql = sql_select(from: ['ac' => 'article_comments']);
-        $sql->join(['c' => 'comments'], using: 'cid');
-        $sql->columns([
-            'ac' => ['cid'],
-            'c' => ['pid', 'created', 'name', 'email', 'body', 'status', 'ip']
-        ]);
-        $sql->where(['ac.aid' => $this->id()]);
-        $comments = $sql->all();
-        pre($comments);
-        return;
-    }
-
     /**
      * @return Comment[] $comments
      */
     public function getComments(): array
     {
         if (!$this->comments_loaded && $this->comments_preloaded && !empty($this->comments)) {
-            $this->comments = Comment::loadByIds(array_keys($this->comments));
+            $this->comments = Comment::loadByIds(array_keys($this->comments), Comment::VIEW_MODE_ARTICLE);
             $this->comments_loaded = true;
         } else if (!$this->comments_loaded && !$this->comments_preloaded) {
-            $this->comments = Comment::loadByArticleId($this->id());
+            $this->comments = Comment::loadByArticleId($this->id(), Comment::VIEW_MODE_ARTICLE);
             $this->comments_loaded = true;
         }
         return $this->comments;

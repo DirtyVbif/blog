@@ -118,7 +118,7 @@ class Blog extends BaseView
     /**
      * @return BlogArticle[] $items
      */
-    public function preview(int $limit, string $view_format = BlogArticle::VIEW_MODE_TEASER)
+    public function preview(int $limit, string $view_format = BlogArticle::VIEW_MODE_TEASER): array
     {
         $items = [];
         foreach ($this->loadArticlesData($limit, true) as $data) {

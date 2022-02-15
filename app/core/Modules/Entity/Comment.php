@@ -5,6 +5,7 @@ namespace Blog\Modules\Entity;
 use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
+use Blog\Modules\User\User;
 use Blog\Request\BaseRequest;
 
 class Comment extends BaseEntity
@@ -12,10 +13,12 @@ class Comment extends BaseEntity
     protected const ENTITY_TABLE = 'comments';
     protected const ENTITY_COLUMNS = ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'];
     protected const VIEW_MODES = [
-        0 => self::VIEW_MODE_FULL
+        0 => self::VIEW_MODE_FULL,
+        1 => self::VIEW_MODE_ARTICLE
     ];
 
     public const VIEW_MODE_FULL = 'full';
+    public const VIEW_MODE_ARTICLE = 'article';
     public const SITEMAP_PRIORITY = 0.1;
     public const SITEMAP_CHANGEFREQ = 'yearly';
 
@@ -122,9 +125,11 @@ class Comment extends BaseEntity
     {
         $sql = sql_select(from: ['c' => self::ENTITY_TABLE]);
         $sql->join(table: ['ac' => 'article_comments'], using: 'cid');
+        $sql->join(table: ['a' => 'articles'], on: ['ac.aid', 'a.id']);
         $sql->columns([
             'c' => self::ENTITY_COLUMNS,
-            'ac' => ['aid', 'deleted']
+            'ac' => ['aid', 'deleted'],
+            'a' => ['title', 'alias']
         ]);
         return $sql;
     }
@@ -132,17 +137,17 @@ class Comment extends BaseEntity
     /**
      * @return Comments[] $comments
      */
-    public static function loadByIds(array $ids): array
+    public static function loadByIds(array $ids, string $view_mode = self::VIEW_MODE_FULL): array
     {
         $comments = [];
         $sql = self::sql();
         $sql->where(condition: ['c.cid' => $ids], operator: 'IN');
         $sql->andWhere(condition: ['ac.deleted' => 0]);
-        if (!app()->user()->verifyAccessLevel(4)) {
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
             $sql->andWhere(condition: ['c.status' => 1]);
         }
         foreach ($sql->all() as $comment) {
-            $comments[$comment['cid']] = new self($comment);
+            $comments[$comment['cid']] = new self($comment, $view_mode);
         }
         return $comments;
     }
@@ -150,7 +155,7 @@ class Comment extends BaseEntity
     /**
      * @return Comments[] $comments
      */
-    public static function loadByArticleId(int $aid): array
+    public static function loadByArticleId(int $aid, string $view_mode = self::VIEW_MODE_FULL): array
     {
         $comments = [];
         $sql = self::sql();
@@ -160,7 +165,7 @@ class Comment extends BaseEntity
             $sql->andWhere(condition: ['c.status' => 1]);
         }
         foreach ($sql->all() as $comment) {
-            $comments[$comment['cid']] = new self($comment);
+            $comments[$comment['cid']] = new self($comment, $view_mode);
         }
         return $comments;
     }
