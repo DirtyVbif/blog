@@ -1,0 +1,11 @@
+{{ wrapper.open() }}
+    {% for item in items %}
+        {% if items_class %}
+            <li class="{{ items_class }}">{{ item }}</li>
+        {% else %}
+            <li>{{ item }}</li>
+        {% endif %}
+    {% endfor %}
+{{ wrapper.close() }}
+
+{{ pager }}
