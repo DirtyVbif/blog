@@ -1,0 +1,37 @@
+.feedbacks {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    
+    &__item {
+        &:not(:last-child) {
+            margin-bottom: 30px;
+        }
+    }
+}
+
+// BLOCK -------------------------------------------------------------->
+.feedback {
+    @include card();
+
+    // ELEMENTS ------------------------------------------------------->
+    &.unpublished {
+        background-color: $unpublished;
+    }
+
+    &__headers {
+        font-size: 12px;
+        padding-left: 20px;
+    }
+
+    &__title {
+        font-weight: 400;
+        margin: 0;
+    }
+
+    &__body {
+        font-style: italic;
+    }
+    // ELEMENTS <-------------------------------------------------------
+}
+// BLOCK <--------------------------------------------------------------

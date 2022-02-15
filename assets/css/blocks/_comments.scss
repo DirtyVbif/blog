@@ -13,18 +13,11 @@
 
 // BLOCK -------------------------------------------------------------->
 .comment {
-    padding: 10px 30px;
-    border-radius: 4px;
-    background-color: $bkgd;
-    transition: $transition;
+    @include card();
 
     // ELEMENTS ------------------------------------------------------->
     &.unpublished {
         background-color: $unpublished;
-    }
-
-    &:hover {
-        box-shadow: $shadow;
     }
 
     &__header {

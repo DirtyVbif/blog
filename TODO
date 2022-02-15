@@ -26,7 +26,7 @@
     - Add messages output in response;
 [v] Add admin bar;
 [v] Add cache clear for admin;
-[ ] Add admin view for feedbacks;
+[v] Add admin view for feedbacks;
 [v] Add blog view for all blog comments;
 [v] Complete ErrorController::class output;
 [v] Rebuild User\Agent::class information collecting:

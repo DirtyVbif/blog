@@ -50,6 +50,12 @@ user_logout: {
   access_level: 3,
   sitemap_exclude: true
 }
+feedbacks: {
+  url: '/feedbacks',
+  label: 'feedbacks',
+  access_level: 4,
+  sitemap_exclude: true
+}
 sitemap_generate: {
   url: '/sitemap/generate',
   label: 'gen. sitemap',
