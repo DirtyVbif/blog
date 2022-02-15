@@ -10,6 +10,11 @@ blog: {
   sitemap_priority: 1.0,
   sitemap_changefreq: 'daily'
 }
+blog_comments: {
+  url: '/blog/comments',
+  label: 'Комментарии',
+  sitemap_changefreq: 'daily'
+}
 about: {
   url: '#about',
   label: 'about',

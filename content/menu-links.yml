@@ -4,7 +4,7 @@ main: {
 }
 
 footer: {
-  items: ['front', 'blog', 'about', 'contacts', 'cookie_agreement'],
+  items: ['front', 'blog', 'blog_comments', 'about', 'contacts', 'cookie_agreement'],
   class: 'menu menu_footer'
 }
 

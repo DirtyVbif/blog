@@ -25,7 +25,7 @@ class PageBuilder
         app()->page()->setTitle(app()->controller()->getTitle());
         app()->page()->setHeader($this->header());
         app()->page()->setFooter($this->footer());
-        app()->page()->useJs('js/default.min', order: 0);
+        app()->page()->useJs('js/default.min', order: 0, load_type: null);
         app()->page()->useJs('js/classes.min', order: 1);
         app()->page()->useJs('js/script.min', order: 2);
         $this->setAdminElement();

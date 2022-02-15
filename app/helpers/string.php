@@ -176,7 +176,12 @@ function transliterate(string $input, string $langcode = 'ru'): string
     return $output;
 }
 
-function strToken(string $content): string
+/**
+ * String token parser
+ * 
+ * Parse tokens `:[example|token]` and replace it with data
+ */
+function stok(string $content): string
 {
     return \Blog\Modules\StringToken\StringToken::parse($content);
 }
