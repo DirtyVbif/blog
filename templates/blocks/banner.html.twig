@@ -1,4 +1,5 @@
 {{ wrapper.open() }}
-    <h1 class="slider__title">Блог веб-разработчика</h1>
-    <p class="slider__text">Приветствую, посетитель. Данный сайт сделан {{ link('about').label('мной').addClass('js-anchor-link') }} с целью демонстрации моего опыта и навыков в веб-разработке. То есть эта страница является моим резюме и портфолио одновременно. Проект  этого сайта, разработанный мной на PHP, доступен в моём <a href="https://github.com/DirtyVbif/blog" target="_blank">репозитории на github'е</a>. Кроме того я планирую обновлять раздел {{ link('blog').label('блога') }}, добавляя разные полезные материалы и статьи.</p>
+    <h1 class="{{ classlistToString(wrapper.attributes().classList(), '', '__title') }}">Блог веб-разработчика</h1>
+    <p class="{{ classlistToString(wrapper.attributes().classList(), '', '__text') }}">Приветствую, посетитель. Данный сайт сделан {{ link('about').label('мной').addClass('js-anchor-link') }} с целью демонстрации моего опыта и навыков в веб-разработке. То есть эта страница является моим резюме и портфолио одновременно. Проект  этого сайта, разработанный мной на PHP, доступен в моём <a href="https://github.com/DirtyVbif/blog" target="_blank">репозитории на github'е</a>. Кроме того я планирую обновлять раздел {{ link('blog').label('блога') }}, добавляя разные полезные материалы и статьи.</p>
+    <div class="{{ classlistToString(wrapper.attributes().classList(), '', '__background') }}"></div>
 {{ wrapper.close() }}

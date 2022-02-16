@@ -6,19 +6,22 @@
             text-align: center;
         }
 
+        & h4 {
+            font-size: 1em;
+            font-weight: 400;
+            margin-top: 0;
+        }
+
         & p,
         & ul {
             margin-top: 0;
-        }
-        
-        & p {
-            text-align: justify;
         }
     }
 }
 
 .summary-card {
     min-height: 150px;
+    text-align: justify;
 
     & img {
         float: left;

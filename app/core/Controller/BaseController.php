@@ -27,7 +27,7 @@ abstract class BaseController
             'content' => app()->manifest()->keywords
         ]);
         app()->page()->setMeta('favicon', [
-            'rel' => 'icon',
+            'rel' => 'shortcut icon',
             'href' => fullUrlTo('/favicon.ico'),
             'sizes' => 'any'
         ], 'link');
