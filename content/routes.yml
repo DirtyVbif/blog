@@ -56,6 +56,11 @@ feedbacks: {
   access_level: 4,
   sitemap_exclude: true
 }
+sitemap: {
+  url: '/sitemap.xml',
+  label: 'sitemap',
+  sitemap_exclude: true
+}
 sitemap_generate: {
   url: '/sitemap/generate',
   label: 'gen. sitemap',

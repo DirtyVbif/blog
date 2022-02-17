@@ -8,7 +8,7 @@ use Blog\Modules\Template\Element;
 use Blog\Request\BaseRequest;
 use Twig\Markup;
 
-class BlogArticle extends BaseEntity
+class BlogArticle extends BaseEntity implements SitemapInterface
 {
     public const VIEW_MODE_FULL = 'full';
     public const VIEW_MODE_TEASER = 'teaser';
@@ -20,7 +20,7 @@ class BlogArticle extends BaseEntity
     ];
     protected const ENTITY_TABLE = 'articles';
     protected const ENTITY_COLUMNS = ['id', 'title', 'summary', 'body', 'alias', 'body', 'created', 'updated', 'preview_src', 'preview_alt', 'author', 'views'];
-    public const SITEMAP_PRIORITY = 0.25;
+    public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
 
     protected string $view_mode;
