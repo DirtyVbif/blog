@@ -7,11 +7,14 @@ class DateFormat
     public const DEFAULT = 'default';
     public const COMPLETE = 'complete';
     public const DETAILED = 'detailed';
+    public const FULL_COMPACT = 'full-compact';
 
     protected const FORMATS = [
         0 => self::DEFAULT,
         1 => self::COMPLETE,
-        2 => self::DETAILED
+        2 => self::DETAILED,
+        3 => self::FULL_COMPACT
+
     ];
 
     protected string $formatter;
@@ -21,6 +24,7 @@ class DateFormat
      * * 'default' => DD of Month YYYY (eg 01 of January 1970)
      * * 'detailed' => DD of Month YYYY hh:mm (eg 01 of January 1970 00:00)
      * * 'complete' => YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30+01:00)
+     * * 'full-compact' => YYYY-MM-DD H:i (eg 1970-01-01 00:00)
      */
     public function __construct(
         protected int $unix_timestamp,
@@ -31,7 +35,7 @@ class DateFormat
 
     public function __toString()
     {
-        return (string)$this->render();
+        return (string)$this->get();
     }
 
     public function format(string $format): self
@@ -39,12 +43,12 @@ class DateFormat
         if (!in_array($format, self::FORMATS)) {
             $format = self::DEFAULT;
         }
-        $this->formatter = 'get' . ucfirst(strtolower($format)) . 'Format';
+        $this->formatter = 'get' . pascalCase($format) . 'Format';
         $this->format = $format;
         return $this;
     }
 
-    public function render(): string
+    public function get(): string
     {
         return $this->{$this->formatter}();
     }
@@ -79,5 +83,14 @@ class DateFormat
     {
         $time = date('H:i', $this->unix_timestamp);
         return $this->getDefaultFormat() . ' ' . $time;
+    }
+
+    /**
+     * @return string YYYY-MM-DD H:i (eg 1970-01-01 00:00)
+     */
+    protected function getFullCompactFormat(): string
+    {
+        $date = date('Y-m-d H:i', $this->unix_timestamp);
+        return $date;
     }
 }
