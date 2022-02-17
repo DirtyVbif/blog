@@ -1,0 +1,19 @@
+{{ wrapper.addClass('profile-info').open() }}
+    <h4 class="profile-info__title">Your active sessions:</h3>
+    <ul class="profile-sessions">
+        <li class="profile-sessions__item profile-sessions__item_header">
+            <span>Browser</span>
+            <span>Platform</span>
+            <span>Last active</span>
+            <span>IP address</span>
+        </li>
+        {% for item in items %}
+        <li class="profile-sessions__item">
+            <span>{{ item.browser }}</span>
+            <span>{{ item.platform }}</span>
+            <span>{{ item.date }}</span>
+            <span>{{ item.ip }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+{{ wrapper.close() }}

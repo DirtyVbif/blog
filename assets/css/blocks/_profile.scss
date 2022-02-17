@@ -1,0 +1,20 @@
+.profile-sessions {
+    @include noul();
+    font-size: 14px;
+
+    &__item {
+        @include card();
+        display: grid;
+        grid-template-columns: 3fr repeat(2, 2fr) 1fr;
+        margin-bottom: 10px;
+
+        &_header {
+            background-color: transparent;
+            margin-bottom: 0;
+            
+            &:hover {
+                box-shadow: none;
+            }
+        }
+    }
+}

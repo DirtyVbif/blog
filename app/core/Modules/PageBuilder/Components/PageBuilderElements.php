@@ -3,6 +3,7 @@
 namespace Blog\Modules\PageBuilder\Components;
 
 use Blog\Modules\Template\Element;
+use Blog\Modules\TemplateFacade\BlockList;
 use Blog\Modules\TemplateFacade\BodyText;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Image;
@@ -182,5 +183,13 @@ trait PageBuilderElements
         $form = new Element;
         $form->setName('forms/login');
         return $form;
+    }
+
+    public function getUserSessions(): Element
+    {
+        $block = new Element;
+        $block->setName('blocks/user-sessions');
+        $block->set('items', user()->getOpenedSessions());
+        return $block;
     }
 }

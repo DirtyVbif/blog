@@ -42,3 +42,4 @@
 [ ] Create factory and prototype pattern classes:
     - Refactor classes to use patterns factory and prototype;
 [ ] Refactor project for SOLID princip;
+[ ] Add system log for webmaster;

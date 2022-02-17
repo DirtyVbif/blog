@@ -14,11 +14,6 @@ class UserController extends BaseController
             $request_is_valid = false;
         }
         if ($argument = app()->router()->arg(2)) {
-            if ($argument === 'login' && !app()->user()->isAuthorized()) {
-                $this->loadLoginForm();
-            } else {
-                $request_is_valid = false;
-            }
             $method = pascalCase("get request {$argument}");
             if (method_exists($this, $method)) {
                 $request_is_valid = $this->$method();
@@ -26,11 +21,9 @@ class UserController extends BaseController
                 $request_is_valid = false;
             }
         } else if (!app()->user()->isAuthorized()) {
-            $this->loadLoginForm();
+            $this->getRequestLogin();
         } else {
-            $this->getTitle()->set(
-                t('Hello, @name', ['name' => app()->user()->name()])
-            );
+            $this->getRequestProfile();
         }
         if (!$request_is_valid) {
             app()->controller('error')->prepare();
@@ -48,6 +41,7 @@ class UserController extends BaseController
         if (app()->user()->isAuthorized()) {
             app()->router()->redirect('/user');
         }
+        app()->page()->setMetaTitle(stok('User login | :[site]'));
         $this->loadLoginForm();
         return true;
     }
@@ -92,5 +86,17 @@ class UserController extends BaseController
             $this->title->set(t('Admin authorization'));
         }
         return $this->title;
+    }
+
+    protected function getRequestProfile(): void
+    {
+        $this->getTitle()->set(
+            t('Hello, @name', ['name' => app()->user()->name()])
+        );
+        app()->page()->setMetaTitle(stok('User profile | :[site]'));
+        app()->page()->addContent(
+            app()->builder()->getUserSessions()
+        );
+        app()->page()->useCss('/css/user.min');
     }
 }
