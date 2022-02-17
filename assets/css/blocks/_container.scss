@@ -10,8 +10,22 @@
         margin-top: 30px;
         padding-bottom: 15px;
 
-        @include vwMax($vwbp_m) {
-            justify-content: center;
+        @include vwMax($vwbp_xl) {
+            & .menu_footer {
+                order: 1;
+            }
+            & .menu_info {
+                order: 2;
+            }
+            & .logo {
+                order: 3;
+                flex: 1;
+            }
+            & .copyrights {
+                order: 4;
+                width: 100%;
+                justify-content: center;
+            }
         }
     }
 }

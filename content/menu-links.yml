@@ -4,7 +4,7 @@ main: {
 }
 
 footer: {
-  items: ['front', 'blog', 'blog_comments', 'about', 'contacts', 'cookie_agreement'],
+  items: ['front', 'blog', 'blog_comments', 'about', 'contacts'],
   class: 'menu menu_footer'
 }
 
@@ -12,4 +12,9 @@ admin_bar: {
   access_level: 4,
   items: ['user_profile', 'user_login', 'user_logout', 'feedbacks', 'sitemap_generate'],
   class: 'admin-nav'
+}
+
+info: {
+  items: ['contacts', 'cookie_agreement', 'sitemap'],
+  class: 'menu menu_info'
 }

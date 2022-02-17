@@ -2,9 +2,14 @@ $admin_bar_height: 40px;
 
 .admin-bar {
     background: $phantom;
+    width: 100%;
     height: $admin_bar_height;
     font-size: 12px;
     display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
 
     &__cache-btn {
         text-transform: uppercase;
@@ -20,7 +25,7 @@ $admin_bar_height: 40px;
 }
 
 .admin-nav {
-    position: inherit;
+    position: relative;
     margin: 0;
     padding: 0;
     list-style-type: none;
@@ -33,4 +38,8 @@ $admin_bar_height: 40px;
         padding: 0 10px;
         text-transform: uppercase;
     }
+}
+
+body.is-admin {
+    margin-top: $admin_bar_height;
 }

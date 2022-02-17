@@ -37,8 +37,12 @@ trait PageBuilderElements
             $logo = $this->getLogo();
             $logo->addClass('logo_footer');
             $this->page_footer->set(
-                'menu',
+                'menu_footer',
                 app()->builder()->getMenu('footer')
+            );
+            $this->page_footer->set(
+                'menu_info',
+                app()->builder()->getMenu('info')
             );
             $this->page_footer->set('logo', $logo);
             $this->page_footer->set('copyrights', $this->getCopyrights());
