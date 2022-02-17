@@ -2,9 +2,10 @@
 
 namespace Blog\Modules\User;
 
+use Blog\Modules\DateFormat\DateFormat;
+
 class User
 {
-    use Components\UserGetSetMethods;
     use Components\UserAuthMethods;
 
     public const ACCESS_LEVEL_ANONYM = 1;
@@ -14,11 +15,16 @@ class User
     public const ACCESS_LEVEL_MASTER = 5;
     public const SESSUID = 'user-session';
     public const LOGID = 'user';
+
     protected array $status_list = [];
     protected array $access_levels = [];
     protected array $default_status;
     protected bool $initialized = false;
     protected bool $authorized = false;
+    protected Token $token;
+    protected UserAgent $agent;
+    protected ?string $utoken;
+    protected array $opened_sessions;
 
     public function __construct()
     {
@@ -77,6 +83,22 @@ class User
                 'us' => ['usid', 'status', 'status_label' => 'label']
             ])->order(['als.alid', 'als.usid'])
             ->all();
+    }
+    
+    public function token(): Token
+    {
+        if (!isset($this->token)) {
+            $this->token = new Token;
+        }
+        return $this->token;
+    }
+
+    public function agent(): UserAgent
+    {
+        if (!isset($this->agent)) {
+            $this->agent = new UserAgent;
+        }
+        return $this->agent;
     }
 
     protected function status(?string $status = null): \stdClass
@@ -241,5 +263,36 @@ class User
             $result[$row['uid']] = $row['nickname'] . '_#' . $row['uid'];
         }
         return $result;
+    }
+
+    public function name(): ?string
+    {
+        return session()->get(User::SESSUID . '/udata/nickname');
+    }
+
+    public function id(): int
+    {
+        return session()->get(User::SESSUID . '/udata/id');
+    }
+
+    public function ip(): string
+    {
+        return $_SERVER['REMOTE_ADDR'];
+    }
+
+    public function getOpenedSessions(): array
+    {
+        if (!$this->id()) {
+            $this->opened_sessions = [];
+        } else if (!isset($this->opened_sessions)) {
+            $sql = sql_select(from: 'users_sessions');
+            $sql->columns(['token', 'browser', 'platform', 'updated', 'ip']);
+            $sql->where(['uid' => $this->id()]);
+            $this->opened_sessions = $sql->all();
+            foreach ($this->opened_sessions as &$s) {
+                $s['date'] = new DateFormat($s['updated'], DateFormat::FULL_COMPACT);
+            }
+        }
+        return $this->opened_sessions;
     }
 }

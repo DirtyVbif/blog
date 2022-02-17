@@ -60,3 +60,8 @@ function msgr(): \Blog\Modules\Messenger\Messenger
 {
     return app()->messenger();
 }
+
+function user(): \Blog\Modules\User\User
+{
+    return app()->user();
+}

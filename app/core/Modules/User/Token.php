@@ -2,6 +2,13 @@
 
 namespace Blog\Modules\User;
 
+/**
+ * Generate, verify and operate with authorization token.
+ * 
+ * Token hash 2 statments:
+ * * default token (called `token`) that stores in storage and matchs to `/[\w-]{32}/` pattern;
+ * * user token (called `utoken`) that stores in cookie and session and has integrated timestamp when it was generated/updated.
+ */
 class Token
 {
     public const COOKIE_USER_TOKEN = 'user-remembered-token';
@@ -15,15 +22,6 @@ class Token
         $this->prepareTokenPattern();
         $this->lifetime = (int)app()->config('user')->utoken_lifetime;
         $this->timeout = (int)app()->config('user')->utoken_timeout;
-        return $this;
-    }
-
-    public function setCookieToken(string $token): self
-    {
-        if (preg_match('/[\w-]{32}/i', $token)) {
-            $utoken = $this->setTokenTimestamp($token);
-            $this->setCookieUToken($utoken);
-        }
         return $this;
     }
 
@@ -60,12 +58,21 @@ class Token
 
     public function generate(): string
     {
-        do {
+        $token = strRand(32, true);
+        while(!$this->isTokenUnique($token)) {
             $token = strRand(32, true);
-        // } while (!empty(sql()->selectFirst("SELECT * FROM `users_sessions` WHERE `token` = '$token';")));
-        } while (!empty(sql_select(from: 'users_sessions')->where(['token' => $token])->first()));
+        }
         $utoken = $this->setTokenTimestamp($token);
         return $utoken;
+    }
+
+    protected function isTokenUnique(string $token): bool
+    {
+        return empty(
+            sql_select(from: 'users_sessions')
+                ->where(['token' => $token])
+                ->first()
+        );
     }
 
     protected function setTokenTimestamp(string $token): string
@@ -101,7 +108,7 @@ class Token
     }
 
     /**
-     * Verify and get current UserToken string from session container if it exists
+     * Verify and get current user token (called `utoken`) string from session container if it exists
      */
     public function utoken(): ?string
     {
@@ -112,6 +119,9 @@ class Token
         return $utoken;
     }
 
+    /**
+     * Get token timestamp from user token (called `utoken`)
+     */
     public function getTokenTimestamp(?string $utoken): int
     {
         if (!$this->verifyUToken($utoken)) {
@@ -121,6 +131,9 @@ class Token
         return (int)$timestamp;
     }
 
+    /**
+     * Get default token (called `token`) from user token (called `utoken`)
+     */
     public function getTokenString(string $utoken): ?string
     {
         if (!$this->verifyUToken($utoken)) {
@@ -135,7 +148,7 @@ class Token
             return false;
         }
         $time = $this->getTokenTimestamp($utoken);
-        return time() - $time < $this->lifetime;
+        return (time() - $time) < $this->lifetime;
     }
 
     public function verifySessionTokenTimeout(): bool
@@ -149,7 +162,6 @@ class Token
         $time = $this->getTokenTimestamp($utoken);
         $timeout = time() - $time;
         if ($timeout < $this->timeout) {
-            $seconds = $this->timeout - $timeout;
             return true;
         }
         return false;
@@ -161,63 +173,60 @@ class Token
         $remembered_utoken = $this->getCookieUToken();
         if (!$utoken && !$remembered_utoken) {
             return false;
-        } elseif (!$this->verifyTokenLifetime($utoken) && !$this->verifyTokenLifetime($remembered_utoken)) {
+        } else if (!$this->verifyTokenLifetime($utoken) && !$this->verifyTokenLifetime($remembered_utoken)) {
             return false;
         }
-        return $this->isSessionExists($utoken, $remembered_utoken);
+        if ($utoken) {
+            return $this->verifyPreviousSession($utoken);
+        }
+        return $this->verifyPreviousSession($remembered_utoken, true);
     }
 
     public function verifyUToken(?string $utoken): bool
     {
-        if (!$utoken) {
+        if (is_null($utoken)) {
             return false;
         }
         return preg_match($this->pattern['utoken-pattern'], $utoken);
     }
 
-    protected function isSessionExists(?string $utoken, ?string $remembered_utoken)
+    protected function verifyPreviousSession(string $utoken, bool $cookie_token = false): bool
     {
+        $token = $this->getTokenString($utoken);
         $query = sql_select(from: ['uses' => 'users_sessions'])
             ->join(table: ['u' => 'users'], using: 'uid')
             ->join(table: ['us' => 'users_statuses_list'], using: 'usid')
             ->columns([
                 'u' => ['uid', 'mail', 'nickname', 'registered'],
                 'us' => ['usid', 'status', 'status_label' => 'label'],
-                'uses' => ['browser', 'platform', 'updated']
+                'uses' => ['agent_hash', 'browser', 'platform', 'updated']
             ]);
-        if ($utoken) {
-            $token = $this->getTokenString($utoken);
-            $this->udata = $query->where(['uses.token' => $token])->first();
-        } elseif ($remembered_utoken) {
-            $token = $this->getTokenString($remembered_utoken);
-            $this->udata = $query->where(['uses.token' => $token])
-                ->andWhere(['uses.agent_hash' => app()->user()->agent()->hash()])
-                ->first();
-        }
-        if (!isset($this->udata['uid'])) {
+        $query->where(['uses.token' => $token]);
+        $this->udata = $query->first();
+        if (
+            empty($this->udata)
+            || (
+                $cookie_token
+                && !hash_equals($this->udata['agent_hash'], user()->agent()->hash())
+            )
+        ) {
             return false;
         }
-        return $this->updateUserSession();
+        return $this->updateUserSession($utoken);
     }
 
-    protected function updateUserSession(): bool
+    protected function updateUserSession(string $utoken): bool
     {
-        $utoken = $this->utoken();
-        $remembered_utoken = $this->getCookieUToken();
-        if (!$utoken && $remembered_utoken) {
-            $utoken = $remembered_utoken;
-        } elseif (!$utoken && !$remembered_utoken) {
-            return false;
-        }
         $utoken_new = $this->updateUTokenTimestamp($utoken);
         $token = $this->getTokenString($utoken);
         $time = $this->getTokenTimestamp($utoken_new);
         $update_result = sql_update(table: 'users_sessions')
             ->set([
-                'agent_hash' => app()->user()->agent()->hash(),
-                'browser' => app()->user()->agent()->browser(),
-                'platform' => app()->user()->agent()->platform(),
-                'updated' => $time
+                'agent_hash' => user()->agent()->hash(),
+                'browser' => user()->agent()->browser(),
+                'platform' => user()->agent()->platform(),
+                'updated' => $time,
+                'ip' => user()->ip()
             ])->where(['uid' => $this->udata['uid']])
             ->andWhere(['token' => $token]);
         if (!$update_result->update()) {
@@ -228,7 +237,8 @@ class Token
                 'utoken' => $this->utoken(),
                 'token' => $token,
                 'utoken_new' => $utoken_new,
-                'timestamp-new-token' => $time
+                'timestamp-new-token' => $time,
+                'storage-user-data' => $this->udata
             ]);
             return false;
         }
