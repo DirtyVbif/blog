@@ -64,7 +64,7 @@
     text-transform: uppercase;
     margin: 0 0 5px 5px;
     border-radius: 4px;
-    background-color: $grey_bright;
+    background-color: rgba($grey_bright, 0.5);
     color: $grey_hard;
 
     @include vwMax($vwbp_m) {
