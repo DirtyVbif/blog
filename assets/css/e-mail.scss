@@ -1,0 +1,22 @@
+// VARIABLES ------------------------------------>
+@import 'blocks/variables';
+// <----------------------------------------------
+
+// MIXINS --------------------------------------->
+@import 'blocks/mixins';
+// <----------------------------------------------
+
+// STYLES --------------------------------------->
+body {
+    background-color: $document;
+}
+
+.container {
+    background-color: $bkgd;
+    padding: 30px;
+    max-width: 600px;
+    min-width: 290px;
+    width: calc(100% - 60px);
+    margin: 30px auto;
+    border-radius: 4px;
+}
