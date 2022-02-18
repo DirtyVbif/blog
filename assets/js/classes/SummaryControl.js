@@ -91,9 +91,21 @@ class SummaryControl
 
     _print(event)
     {
-        const print_window = window.open('', '', 'height=600, width=600');    
+        const print_window = window.open('', '', 'height=600, width=600');
         print_window.document.write('<html>');
-        print_window.document.write('<head><style type="text/css" media="all">.summary-card{min-height:150px;}.summary-card img{float:left;margin-right:15px;width:150px;height:auto;max-width:40%;object-fit:contain;border-radius:4px;}</style></head>');
+        print_window.document.write(
+            '<head><style type="text/css" media="all">'
+            + 'body{font: 400 16px/1.4 Arial, sans-serif;}'
+            + 'article p,article ul{margin-top:0;}'
+            + '.summary-card{min-height:150px;}'
+            + '.summary-card img{float:left;margin-right:15px;'
+            + 'width:150px;height:auto;max-width:40%;object-fit:contain;border-radius:4px;}'
+            + '.summary-tags{display: flex;}'
+            + '.summary-tags__list{display:flex;flex-wrap:wrap;padding:0;list-style-type:none;}'
+            + '.summary-tag{padding:5px 12px;font-size:11px;text-transform:uppercase;'
+            + '</style></head>'
+        );
+        // print_window.document.write('<head><style type="text/css" media="screen, print">@import "/css/print.min.css";</style></head>');
         print_window.document.write('<body>');
         print_window.document.write(this.summary.innerHTML);
         print_window.document.write('</body></html>');

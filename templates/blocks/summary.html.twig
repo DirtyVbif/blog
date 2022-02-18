@@ -1,7 +1,7 @@
 {{ wrapper.open() }}
     {{ label }}
     <article class="summary-card">
-        {{ img('/images/mu-avatar.jpg').alt('Фото для резюме') }}
+        {{ img('/images/mu-avatar.webp').alt('Фото для резюме') }}
         <h3>Кратко обо мне:</h3>
         <p>&emsp;Меня зовут Михаил Успенский, мне {{ my_age }} года сейчас и я ищу постоянную работу в области веб-разработки.
             На данный момент являюсь fullstack-разработчиком на Drupal.</p>
@@ -40,8 +40,27 @@
         <h3>Портфолио:</h3>
         <ul>
             <li>
-                <p>Код этого блога доступен в моём <a href="https://github.com/DirtyVbif/blog" target="_blank">репозитории на github'e</a></p>
-                <p>Используемый стэк: PHP 8.1 (+xdebug), MySQL 8, Symfony/Twig 3, HTML5/CSS3, npm gulp (sass/js/webp), Composer, WAMPP OpenServer, SmartGit, Photoshop, Illustrator, VSCode.</p>
+                <p class="margin-bottom_small">Код этого блога доступен в моём <a href="https://github.com/DirtyVbif/blog" target="_blank">репозитории на github'e</a></p>
+                <div class="summary-tags">
+                    <p class="summary-tags__text">Стэк:</p>
+                    <ul class="summary-tags__list">
+                        <li class="summary-tag">PHP 8.1</li>
+                        <li class="summary-tag">xdebug</li>
+                        <li class="summary-tag">MySQL 8</li>
+                        <li class="summary-tag">HTML5</li>
+                        <li class="summary-tag">CSS3</li>
+                        <li class="summary-tag">Symfony/Twig 3</li>
+                        <li class="summary-tag">gulp-sass</li>
+                        <li class="summary-tag">gulp-terser</li>
+                        <li class="summary-tag">gulp-webp</li>
+                        <li class="summary-tag">composer</li>
+                        <li class="summary-tag">WAMPP OpenServer</li>
+                        <li class="summary-tag">SmartGit</li>
+                        <li class="summary-tag">Photoshop</li>
+                        <li class="summary-tag">Illustrator</li>
+                        <li class="summary-tag">VSCode</li>
+                    </ul>
+                </div>
             </li>
             <li>одностраничный сайт с <a href="https://my.mublog.site" target="_blank">сервисным мануалом для Subaru XV</a> в pdf формате;</li>
             <li>Проект на Drupal 7 - <a href="https://zaimtime.ru" target="_blank">zaimtime.ru</a></li>
@@ -54,15 +73,45 @@
         <h3>Опыт в веб-разработке:</h3>
         <ul>
             <li>
-                <p><i>2018-2021</i> Разработка и ведение проектов на Drupal 7 и 8 версий, php-разработчик на Drupal, фриланс.</p>
-                <p>Стэк: CMS Drupal 7/8, php 7/8, js, jquery, twig/html/css, composer, drush, yandex.turbo, amp technology.</p>
+                <p class="margin-bottom_small"><i>2018-2021</i> Разработка и ведение проектов на Drupal 7 и 8 версий, php-разработчик на Drupal, фриланс.</p>
+                <div class="summary-tags">
+                    <p class="summary-tags__text">Стэк:</p>
+                    <ul class="summary-tags__list">
+                        <li class="summary-tag">CMS Drupal 7</li>
+                        <li class="summary-tag">CMS Drupal 8</li>
+                        <li class="summary-tag">PHP 7</li>
+                        <li class="summary-tag">PHP 8</li>
+                        <li class="summary-tag">JS</li>
+                        <li class="summary-tag">jQuery</li>
+                        <li class="summary-tag">Symfony/Twig</li>
+                        <li class="summary-tag">HTML5</li>
+                        <li class="summary-tag">CSS3</li>
+                        <li class="summary-tag">Composer</li>
+                        <li class="summary-tag">drush</li>
+                        <li class="summary-tag">yandex.turbo</li>
+                        <li class="summary-tag">amp technology</li>
+                        <li class="summary-tag">ssh</li>
+                        <li class="summary-tag">gulp-sass</li>
+                    </ul>
+                </div>
             </li>
         </ul>            
         <h3>Другой опыт работы:</h3>
         <ul>
             <li>
-                <p><i>2014-2018</i> Проектирование складов и логистических центров в ООО &laquo;Мегастор&raquo;, проектировщик.</p>
-                <p>Стэк: Autodesk Autocad, Autodesk 3ds max 2008-2018, vray/corona render, Unity 3D, Adobe Photoshop, Adobe Illustrator;</p>
+                <p class="margin-bottom_small"><i>2014-2018</i> Проектирование складов и логистических центров в ООО &laquo;Мегастор&raquo;, проектировщик.</p>
+                <div class="summary-tags">
+                    <p class="summary-tags__text">Стэк:</p>
+                    <ul class="summary-tags__list">
+                        <li class="summary-tag">AutoCAD</li>
+                        <li class="summary-tag">3ds MAX</li>
+                        <li class="summary-tag">VRay</li>
+                        <li class="summary-tag">Corona</li>
+                        <li class="summary-tag">Unity 3D</li>
+                        <li class="summary-tag">Photoshop</li>
+                        <li class="summary-tag">Illustrator</li>
+                    </ul>
+                </div>
             </li>
             <li><i>2013-2014</i> Проектирование и планировка офисов и офисных здание в ООО &laquo;Груп Системс&raquo;, архитектор-проектировщик;</li>
             <li><i>2010-2011</i> Прохождение срочной службы в армии, в/ч 92925, оператор С300-ПМ;</li>
