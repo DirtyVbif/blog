@@ -15,6 +15,11 @@ trait StringTokenMethods
             case 'tagline':
                 $output = app()->manifest()->tagline;
                 break;
+            case 'v':
+            case 'version':
+                $output = app()->manifest()->version;
+                break;
+            case 'short_name':
             default:
                 $output = app()->manifest()->short_name;
         }

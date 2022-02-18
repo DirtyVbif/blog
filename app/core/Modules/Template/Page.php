@@ -104,9 +104,12 @@ class Page extends BaseTemplate
             }
         }
         if (app()->config('development')->js) {
-            foreach ($array as &$js) {
-                $js['src'] .= '?t=' . time();
-            }
+            $suffix = '?t=' . time();
+        } else {
+            $suffix = '?v=' . stok(':[site|v]');
+        }
+        foreach ($array as &$js) {
+            $js['src'] .= $suffix;
         }
         return $array;
     }
