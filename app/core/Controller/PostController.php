@@ -31,7 +31,7 @@ class PostController extends BaseController
     {
         $data = new FeedbackRequest($_POST);
         if ($data->isValid()) {
-            $data->sendAsMail();
+            app()->mailer()->sendFeedback($data);
             msgr()->notice('Ваше сообщение успешно отправлено и будет обработано в ближайшее время.');
         }
         return;

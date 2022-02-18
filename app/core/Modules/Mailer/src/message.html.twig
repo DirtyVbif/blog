@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style type="text/css">{{ importFileContent('/css/e-mail.min.css') }}</style>
+</head>
+<body>
+    <div class="container">
+        <ul>
+            <li>Сообщение от: {{ name }} {{ email }}</li>
+            <li>Отправлено: {{ date }}</li>
+            <li>Текст сообщения:</li>
+        </ul>
+        <p>{{ message }}</p>
+    </div>
+</body>
+</html>

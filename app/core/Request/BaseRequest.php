@@ -8,15 +8,18 @@ abstract class BaseRequest
 {
     use Components\BaseRequestFieldValidators;
 
+    protected const ACCESS_LEVEL = 1;
+    public const SESSID = 'last-request-data';
+
     protected bool $is_valid;
     protected array $errors = [];
-    protected const ACCESS_LEVEL = 1;
 
     public function __construct(
         protected array $data
     ) {
         $this->validate();
         $this->outputErrors();
+        $this->flushSession();
     }
 
     abstract protected function rules(): array;
@@ -33,7 +36,8 @@ abstract class BaseRequest
 
     protected function validate(): void
     {
-        if (!app()->user()->verifyAccessLevel(self::ACCESS_LEVEL)) {
+        $this->rememberValues();
+        if (!app()->user()->verifyAccessLevel(static::ACCESS_LEVEL)) {
             msgr()->error(t('You have no permission for that action. If you think that it\'s an error, please contact administrator.'));
             return;
         }
@@ -70,6 +74,25 @@ abstract class BaseRequest
                     $this->is_valid = false;
                 }
             }
+        }
+        return;
+    }
+
+    protected function rememberValues(): void
+    {
+        foreach ($this->data as $key => $value) {
+            session()->set(
+                self::SESSID . '/' . $key,
+                $value
+            );
+        }
+        return;
+    }
+
+    protected function flushSession(): void
+    {
+        if ($this->isValid()) {
+            session()->unset(self::SESSID);
         }
         return;
     }
