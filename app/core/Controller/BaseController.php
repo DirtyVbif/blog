@@ -22,10 +22,6 @@ abstract class BaseController
 
     protected function setDefaultMeta(): void
     {
-        app()->page()->setMeta('keywords', [
-            'name' => 'keywords',
-            'content' => app()->manifest()->keywords
-        ]);
         app()->page()->setMeta('favicon', [
             'rel' => 'shortcut icon',
             'href' => fullUrlTo('/favicon.ico'),
@@ -44,14 +40,18 @@ abstract class BaseController
             'rel' => 'manifest',
             'href' => fullUrlTo('/manifest.json')
         ], 'link');
-        app()->page()->setMeta('og:image', [
-            'property' => 'og:image',
-            'content' => fullUrlTo('/logo.svg')
+        app()->page()->setMeta('keywords', [
+            'name' => 'keywords',
+            'content' => app()->manifest()->keywords
         ]);
         app()->page()->setMeta('canonical', [
             'rel' => 'canonical',
             'href' => fullUrlTo(app()->router()->url())
         ], 'link');
+        app()->page()->setMeta('og:image', [
+            'property' => 'og:image',
+            'content' => fullUrlTo('/logo.svg')
+        ]);
         return;
     }
     
