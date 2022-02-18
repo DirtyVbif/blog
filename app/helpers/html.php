@@ -67,3 +67,15 @@ function csrf(bool $render = true)
     }
     return app()->csrf();
 }
+
+/**
+ * Get last value for field by name
+ */
+function old(string $name, bool $as_attribute = false)
+{
+    $value = session()->get(\Blog\Request\BaseRequest::SESSID . '/' . $name);
+    if ($as_attribute && $value) {
+        return new \Twig\Markup(" value=\"{$value}\"", CHARSET);
+    }
+    return $value;
+}
