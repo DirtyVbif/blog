@@ -6,8 +6,9 @@ composer.lock
 node_modules/
 vendor/
 
-# cache
+# cache and logs
 public/cache/
+*.log
 
 # Development files
 commands
