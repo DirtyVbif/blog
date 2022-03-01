@@ -240,11 +240,10 @@ class SQLSelect extends SQLAbstractStatement
     {
         $from_tables = [];
         foreach ($this->from as $table) {
-            $table_name = str_replace('`', '', $table['name']);
-            $table_alias = $table['as'] ? str_replace('`', '', $table['as']) : null;
-            $as = $table['as'] ? " AS `{$table_alias}`" : '';
-            $from_table = "`{$table_name}`" . $as;
-            array_push($from_tables, sprintf($from_table, $as));
+            array_push(
+                $from_tables,
+                $this->normalizeTableName($table['name'], $table['as'])
+            );
         }
         return implode(', ', $from_tables);
     }
@@ -252,17 +251,19 @@ class SQLSelect extends SQLAbstractStatement
     protected function currentSqlStringJoin(): string
     {
         $join_string = '';
+        $q = $this->q;
         if (!empty($this->join)) {
             foreach ($this->join as $join) {
                 $join_type = strSuffix($join['type'], ' JOIN');
-                $join_table = " `{$this->clearTableName($join['table'])}`";
-                $join_table .= $join['as'] ? " AS `{$this->clearTableName($join['as'])}`" : '';
-                $join_condition = $join['using'] ? " USING(`{$join['using']}`)" : ' ON %s';
-                if ($join['on']) {
+                if ($join['using']) {
+                    $join_condition = " USING({$q}{$join['using']}{$q})";
+                } else if ($join['on']) {
                     $on = "{$join['on'][0]} {$join['on']['op']} {$join['on'][1]}";
-                    $join_condition = sprintf($join_condition, $on);
+                    $join_condition = sprintf(' ON %s', $on);
                 }
-                $join_string_add = $join_type . $join_table . $join_condition;
+                $join_string_add = $join_type . ' '
+                    . $this->normalizeTableName($join['table'], $join['as'])
+                    . $join_condition;
                 $join_string .= "\n" . preg_replace('/\s+/', ' ', $join_string_add);
             }
         }

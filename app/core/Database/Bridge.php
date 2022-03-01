@@ -2,6 +2,7 @@
 
 namespace Blog\Database;
 
+use Exception;
 use PDO;
 use PDOStatement;
 
@@ -32,15 +33,33 @@ class Bridge
     public function connect(): PDO
     {
         if (!isset($this->connection)) {
-            $this->connection = new PDO(
-                $this->cfg('driver') . ':host=' . $this->cfg('host') . ';dbname=' . $this->cfg('name'),
-                $this->cfg('user'),
-                $this->cfg('pass'),
-                (array)app()->config('pdo')
-            );
+            $this->connection = $this->establisheConnection();
         }
         return $this->connection;
     }
+
+    private function establisheConnection(): PDO
+    {
+        $dsn = null;
+        $options = (array)app()->config('pdo');
+        switch ($this->cfg('driver')) {
+            case 'mysql':
+                $dsn = $this->cfg('driver')
+                    . ':host=' . $this->cfg('host')
+                    . ';dbname=' . $this->cfg('name');
+                break;
+            case 'pgsql':
+                $dsn = $this->cfg('driver')
+                    . ':host=' . $this->cfg('host')
+                    . ';port=' . $this->cfg('port')
+                    . ';dbname=' . $this->cfg('name');
+                break;
+            default:
+                throw new Exception("Database [{$this->cfg('driver')}] not configured", 500);
+        }
+        return new PDO($dsn, $this->cfg('user'), $this->cfg('pass'), $options);
+    }
+
     /**
      * Make raw SQL-reqquest using PDOStatement
      */

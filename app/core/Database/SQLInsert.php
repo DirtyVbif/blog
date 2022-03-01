@@ -90,7 +90,7 @@ class SQLInsert extends SQLAbstractStatement
      */
     public function currentSqlString(): string
     {
-        $insert_string = "INSERT INTO `{$this->table}`\n\t(%s)\nVALUES";
+        $insert_string = 'INSERT INTO ' . $this->normalizeTableName($this->table) . '\n\t(%s)\nVALUES';
         $columns = [];
         foreach ($this->columns as $column) {
             $columns[] = $this->normalizeColumnName($column);

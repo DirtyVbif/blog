@@ -122,6 +122,7 @@ trait SQLWhereCondition
 
     protected function parseWhereConditionPair(array $pair): array
     {
+        /** @var \Blog\Database\SQLAbstractStatement $this */
         $condition = $this->normalizeColumnName($pair[0]);
         $equal = is_string($pair[1]) ? $this->normalizeColumnName($pair[1]) : $pair[1];
         return [
