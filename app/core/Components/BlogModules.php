@@ -19,6 +19,7 @@ use Blog\Modules\{
     View\BaseView,
     Cache\CacheSystem
 };
+use Blog\Modules\Messenger\Logger;
 
 trait BlogModules
 {
@@ -36,6 +37,7 @@ trait BlogModules
     /** @var AbstractLibrary[] $libraries */
     private array $libraries;
     private CacheSystem $cache;
+    private Logger $logger;
 
     public function response(): Response
     {
@@ -157,5 +159,13 @@ trait BlogModules
         }
         /** @return CacheEntity */
         return $this->cache->entity($cache_entity_name);
+    }
+
+    public function logger(): Logger
+    {
+        if (!isset($this->logger)) {
+            $this->logger = new Logger;
+        }
+        return $this->logger;
     }
 }
