@@ -48,8 +48,8 @@ class Feedbacks extends BaseView
      */
     public static function loadData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
-        $sql = sql_select(from: 'mailer_sended_mails');
-        $sql->columns(['id', 'subject', 'message', 'timestamp', 'headers', 'status']);
+        $sql = sql_select(from: Feedback::ENTITY_TABLE);
+        $sql->columns(Feedback::ENTITY_COLUMNS);
         $sql->limit($limit);
         if ($offset) {
             $sql->limitOffset($offset);

@@ -100,14 +100,14 @@ class BlogArticle extends BaseEntity implements SitemapInterface
                 'a' => self::ENTITY_COLUMNS,
                 'ac' => ['cid', 'deleted']
             ]);
-            $this->sql->join(['ac' => 'article_comments'], on: ['a.id', 'ac.aid']);
+            $this->sql->join(['ac' => 'article_comments'], using: 'aid');
         }
         return $this->sql;
     }
 
     public function loadById(int $id): self
     {
-        $this->sql()->where(condition: ['a.id' => $id]);
+        $this->sql()->where(condition: ['a.aid' => $id]);
         $result = $this->sql()->all();
         $this->setLoadedData($result);
         return $this;
@@ -128,8 +128,9 @@ class BlogArticle extends BaseEntity implements SitemapInterface
         if (empty($data)) {
             $this->data = [];
         } else {
-            foreach (self::ENTITY_COLUMNS as $column) {
-                $this->data[$column] = $data[0][$column];
+            foreach (self::ENTITY_COLUMNS as $key => $column) {
+                $key = is_numeric($key) ? $column : $key;
+                $this->data[$key] = $data[0][$key];
             }
             $comments_count = 0;
             foreach ($data as $row) {
@@ -226,7 +227,7 @@ class BlogArticle extends BaseEntity implements SitemapInterface
 
     protected static function isAliasExists(string $alias): bool
     {
-        $sql = sql_select(['id'], self::ENTITY_TABLE);
+        $sql = sql_select(['aid'], self::ENTITY_TABLE);
         $sql->where(['alias' => $alias]);
         $result = $sql->exe();
         return !empty($result);

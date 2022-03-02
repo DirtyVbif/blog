@@ -78,7 +78,7 @@ class BlogComments extends BaseView
         ];
         $sql = sql_select(from: ['c' => 'comments']);
         $sql->join(['ac' => 'article_comments'], using: 'cid');
-        $sql->join(['a' => 'articles'], on: ['ac.aid', 'a.id']);
+        $sql->join(['a' => 'articles'], using: 'aid');
         $sql->columns($columns);
         $sql->where(['ac.deleted' => 0]);
         if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {

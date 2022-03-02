@@ -5,13 +5,12 @@ namespace Blog\Modules\Entity;
 use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
-use Blog\Modules\User\User;
 use Blog\Request\BaseRequest;
 
 class Feedback extends BaseEntity
 {
-    protected const ENTITY_TABLE = 'feedbacks';
-    protected const ENTITY_COLUMNS = ['fid' => 'id', 'subject', 'message', 'timestamp', 'headers', 'status'];
+    public const ENTITY_TABLE = 'feedbacks';
+    public const ENTITY_COLUMNS = ['id' => 'fbid', 'subject', 'message', 'timestamp', 'headers', 'result'];
     protected const VIEW_MODES = [
         0 => self::VIEW_MODE_FULL
     ];
