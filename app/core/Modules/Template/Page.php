@@ -92,6 +92,7 @@ class Page extends BaseTemplate
             $this->data['page']['content'] = $this->content();
         }
         $this->data['page']['messenger'] = msgr();
+        $this->data['system_log'] = app()->logger();
         return parent::render();
     }
 

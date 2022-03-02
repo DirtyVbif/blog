@@ -65,3 +65,9 @@ function user(): \Blog\Modules\User\User
 {
     return app()->user();
 }
+
+function systemLog(string $type, string $message): void
+{
+    app()->logger()->log($type, $message);
+    return;
+}
