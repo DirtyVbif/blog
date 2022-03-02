@@ -82,7 +82,14 @@ class SQLInsert extends SQLAbstractStatement
      */
     public function exe(): string|false
     {
-        return sql()->insert($this->raw(), $this->data());
+        $last_inserted_id = $this->isPgsql() ?
+            sprintf(
+                '%s.%s_%s_seq',
+                $this->schema,
+                $this->table,
+                table($this->table)->getPkName()
+            ) : null;
+        return sql()->insert($this->raw(), $this->data(), $last_inserted_id);
     }
 
     /**
@@ -90,7 +97,7 @@ class SQLInsert extends SQLAbstractStatement
      */
     public function currentSqlString(): string
     {
-        $insert_string = 'INSERT INTO ' . $this->normalizeTableName($this->table) . '\n\t(%s)\nVALUES';
+        $insert_string = 'INSERT INTO ' . $this->normalizeTableName($this->table) . "\n\t(%s)\nVALUES";
         $columns = [];
         foreach ($this->columns as $column) {
             $columns[] = $this->normalizeColumnName($column);

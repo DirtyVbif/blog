@@ -80,7 +80,7 @@ class SQLUpdate extends SQLAbstractStatement
     {
         $sql_string = '';
         if ($this->isUpdate()) {
-            $sql_string .= 'UPDATE ' . $this->normalizeTableName($this->table) . '\nSET';
+            $sql_string .= 'UPDATE ' . $this->normalizeTableName($this->table) . "\nSET";
             $sql_string .= $this->currentSqlStringSet();
         } else if ($this->isDelete()) {
             $sql_string .= 'DELETE FROM ' . $this->normalizeTableName($this->table);
@@ -95,7 +95,7 @@ class SQLUpdate extends SQLAbstractStatement
         foreach ($this->set as $column => $value) {
             $set[] = "{$column} = {$value}";
         }
-        return '\n\t' . implode(', ', $set);
+        return "\n\t" . implode(', ', $set);
     }
 
     protected function isUpdate(): bool
