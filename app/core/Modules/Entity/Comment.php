@@ -125,7 +125,7 @@ class Comment extends BaseEntity
     {
         $sql = sql_select(from: ['c' => self::ENTITY_TABLE]);
         $sql->join(table: ['ac' => 'article_comments'], using: 'cid');
-        $sql->join(table: ['a' => 'articles'], on: ['ac.aid', 'a.id']);
+        $sql->join(table: ['a' => 'articles'], using: 'aid');
         $sql->columns([
             'c' => self::ENTITY_COLUMNS,
             'ac' => ['aid', 'deleted'],

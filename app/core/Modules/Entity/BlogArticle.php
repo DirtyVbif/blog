@@ -19,7 +19,7 @@ class BlogArticle extends BaseEntity implements SitemapInterface
         2 => self::VIEW_MODE_PREVIEW
     ];
     protected const ENTITY_TABLE = 'articles';
-    protected const ENTITY_COLUMNS = ['id', 'title', 'summary', 'body', 'alias', 'body', 'created', 'updated', 'preview_src', 'preview_alt', 'author', 'views'];
+    public const ENTITY_COLUMNS = ['id' => 'aid', 'title', 'summary', 'body', 'alias', 'body', 'created', 'updated', 'preview_src', 'preview_alt', 'author', 'views'];
     public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
 

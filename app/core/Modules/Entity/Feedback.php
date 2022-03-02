@@ -10,8 +10,8 @@ use Blog\Request\BaseRequest;
 
 class Feedback extends BaseEntity
 {
-    protected const ENTITY_TABLE = 'mailer_sended_mails';
-    protected const ENTITY_COLUMNS = ['id', 'subject', 'message', 'timestamp', 'headers', 'status'];
+    protected const ENTITY_TABLE = 'feedbacks';
+    protected const ENTITY_COLUMNS = ['fid' => 'id', 'subject', 'message', 'timestamp', 'headers', 'status'];
     protected const VIEW_MODES = [
         0 => self::VIEW_MODE_FULL
     ];
@@ -87,7 +87,7 @@ class Feedback extends BaseEntity
     public function loadById(int $id): self
     {
         $sql = self::sql();
-        $sql->where(['id' => $id]);
+        $sql->where(['fid' => $id]);
         $this->data = $sql->first();
         $this->loaded = true;
         $this->exists = !empty($this->data);
@@ -116,7 +116,7 @@ class Feedback extends BaseEntity
     {
         $feedbacks = [];
         $sql = self::sql();
-        $sql->where(condition: ['id' => $ids], operator: 'IN');
+        $sql->where(condition: ['fid' => $ids], operator: 'IN');
         foreach ($sql->all() as $feedback) {
             $feedbacks[$feedback['id']] = new self($feedback, $view_mode);
         }

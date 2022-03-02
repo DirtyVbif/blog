@@ -15,6 +15,8 @@ class User
     public const ACCESS_LEVEL_MASTER = 5;
     public const SESSUID = 'user-session';
     public const LOGID = 'user';
+    public const TBL_STATUSES = 'users_statuses';
+    public const TBL_STATUS_ACCESS = 'user_status_access_levels';
 
     protected array $status_list = [];
     protected array $access_levels = [];
@@ -76,8 +78,8 @@ class User
     protected function getStorageData(): array
     {
         return sql_select(from: ['al' => 'access_levels'])
-            ->join(table: ['als' => 'access_levels_statuses'], using: 'alid')
-            ->join(table: ['us' => 'users_statuses_list'], using: 'usid')
+            ->join(table: ['als' => self::TBL_STATUS_ACCESS], using: 'alid')
+            ->join(table: ['us' => self::TBL_STATUSES], using: 'usid')
             ->columns([
                 'al' => ['alid', 'label'],
                 'us' => ['usid', 'status', 'status_label' => 'label']

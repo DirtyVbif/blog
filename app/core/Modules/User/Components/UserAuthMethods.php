@@ -10,7 +10,7 @@ trait UserAuthMethods
     public function authorize(LoginRequest $login_data): bool
     {
         $udata = sql_select(from: ['u' => 'users'])
-            ->join(table: ['us' => 'users_statuses_list'], using: 'usid')
+            ->join(table: ['us' => User::TBL_STATUSES], using: 'usid')
             ->join(table: ['uses' => 'users_sessions'], using: 'uid')
             ->columns([
                 'u' => ['uid', 'mail', 'pwhash', 'nickname', 'registered', 'usid'],

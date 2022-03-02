@@ -195,7 +195,7 @@ class Token
         $token = $this->getTokenString($utoken);
         $query = sql_select(from: ['uses' => 'users_sessions'])
             ->join(table: ['u' => 'users'], using: 'uid')
-            ->join(table: ['us' => 'users_statuses_list'], using: 'usid')
+            ->join(table: ['us' => User::TBL_STATUSES], using: 'usid')
             ->columns([
                 'u' => ['uid', 'mail', 'nickname', 'registered'],
                 'us' => ['usid', 'status', 'status_label' => 'label'],

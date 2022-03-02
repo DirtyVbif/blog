@@ -71,15 +71,11 @@ class Blog extends BaseView
     /**
      * Loads articles data from storage as array
      * 
-     * @return array of articles data with following keys:
-     * * `array('id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt')`
+     * @return array of articles data with keys specified in \Blog\Modules\Entity\BlogArticle::ENTITY_COLUMNS
      */
     public static function loadArticlesData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
-        $sql = sql_select(
-            ['id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt'],
-            'articles'
-        );
+        $sql = sql_select(BlogArticle::ENTITY_COLUMNS, 'articles');
         $sql->limit($limit);
         if ($offset) {
             $sql->limitOffset($offset);
@@ -107,10 +103,7 @@ class Blog extends BaseView
 
     protected static function loadArticleDataByColumn(string $column, string $search_value): array
     {
-        $sql = sql_select(
-            ['id', 'title', 'summary', 'body', 'created', 'updated', 'status', 'alias', 'preview_src', 'preview_alt', 'author'],
-            'articles'
-        );
+        $sql = sql_select(BlogArticle::ENTITY_COLUMNS, 'articles');
         $sql->where(condition: [$column => $search_value]);
         return $sql->first();
     }
