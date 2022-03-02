@@ -131,11 +131,11 @@ class Bridge
      * 
      * @return string last inserted id on success
      */
-    public function insert(string $request, array $data = []): string|false
+    public function insert(string $request, array $data = [], ?string $last_insert_id_name = null): string|false
     {
         $cache_request = $this->bindVariables($request, $data);
         $this->markupCacheToUpdate($cache_request);
         $this->query($request, $data);
-        return $this->connect()->lastInsertId();
+        return $this->connect()->lastInsertId($last_insert_id_name);
     }
 }
