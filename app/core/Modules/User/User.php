@@ -16,7 +16,7 @@ class User
     public const SESSUID = 'user-session';
     public const LOGID = 'user';
     public const TBL_STATUSES = 'users_statuses';
-    public const TBL_STATUS_ACCESS = 'user_status_access_levels';
+    public const TBL_STATUS_ACCESS = 'users_status_access_levels';
 
     protected array $status_list = [];
     protected array $access_levels = [];

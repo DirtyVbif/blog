@@ -95,7 +95,7 @@ class Feedback extends BaseEntity
 
     public function status(): bool
     {
-        $status = (int)$this->data['status'] ?? 0;
+        $status = (int)($this->data['result'] ?? 0);
         return $status;
     }
     
