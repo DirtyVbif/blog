@@ -38,10 +38,7 @@ class User
 
     protected function prepareSession(): self
     {
-        if (
-            !session()->isset(self::SESSUID)
-            || !is_array(session()->get(self::SESSUID))
-        ) {
+        if (!session()->isset(self::SESSUID)) {
             session()->set(self::SESSUID, []);
         }
 
@@ -52,11 +49,13 @@ class User
     {
         foreach ($this->getStorageData() as $row) {
             // set status list
-            $this->status_list[$row['status']] = [
-                'id' => $row['usid'],
-                'status' => $row['status'],
-                'label' => $row['status_label']
-            ];
+            if (!isset($this->status_list[$row['status']])) {
+                $this->status_list[$row['status']] = [
+                    'id' => $row['usid'],
+                    'status' => $row['status'],
+                    'label' => $row['status_label']
+                ];
+            }
             // set access level data
             if (!isset($this->access_levels[$row['alid']])) {
                 $this->access_levels[$row['alid']] = [
@@ -125,10 +124,10 @@ class User
     protected function setUserStatus(): self
     {
         if ($this->token()->utoken() || $this->token()->getCookieUToken()) {
-            // systemLog(self::LOGID, 'User token exists. Verifying User session.');
+            systemLog(self::LOGID, 'User token exists. Verifying User session.');
             $this->verifyUserSession();
         } else {
-            // systemLog(self::LOGID, 'There is no User token. Setting default User status.');
+            systemLog(self::LOGID, 'There is no User token. Setting default User status.');
             $this->setDefaultStatus();
         }
         return $this;
@@ -137,11 +136,11 @@ class User
     protected function verifyUserSession(): self
     {
         if ($this->token()->verifySessionTokenTimeout()) {
-            // systemLog(self::LOGID, 'User token verification doesn\'t timed out. Validating User status.');
+            systemLog(self::LOGID, 'User token verification doesn\'t timed out. Validating User status.');
         } else if ($this->token()->verify()) {
-            // systemLog(self::LOGID, 'User token verified successfully. Validating User status.');
+            systemLog(self::LOGID, 'User token verified successfully. Validating User status.');
         } else {
-            // systemLog(self::LOGID, 'User token verification failed. Setting default User status.');
+            systemLog(self::LOGID, 'User token verification failed. Setting default User status.');
             return $this->setDefaultStatus();
         }
         $this->verifyUserStatus();
@@ -152,7 +151,7 @@ class User
     {
         $s = session()->get(self::SESSUID . '/status');
         if (!isset($s, $s['id'], $s['status'], $s['label'])) {
-            // systemLog(self::LOGID, 'There is no valid User status. Setting default User status.');
+            systemLog(self::LOGID, 'There is no valid User status. Setting default User status.');
             return $this->setDefaultStatus();
         }
         $us = $this->status_list[$s['status']] ?? null;
@@ -162,10 +161,10 @@ class User
             || ($us['status'] ?? null) != $s['status']
             || ($us['label'] ?? null) != $s['label']
         ) {
-            // systemLog(self::LOGID, 'Invalid User status. Setting default User status.');
+            systemLog(self::LOGID, 'Invalid User status. Setting default User status.');
             return $this->setDefaultStatus();
         }
-        // systemLog(self::LOGID, 'User status is valid.');
+        systemLog(self::LOGID, 'User status is valid.');
         $this->authorized = true;
         return $this;
     }
@@ -225,7 +224,10 @@ class User
         $this->initialize();
         return $this->authorized;
     }
-
+    
+    /**
+     * Verify if users' role is administrator (not lower or higher)
+     */
     public function isAdmin(): bool
     {
         $this->initialize();
@@ -240,6 +242,14 @@ class User
             }
         }
         return $this->verifyAccessLevel($admin_level);
+    }
+
+    /**
+     * Verify if users' role is webmaster (not lower or higher)
+     */
+    public function isMaster(): bool
+    {
+        return $this->verifyAccessLevel(self::ACCESS_LEVEL_MASTER);
     }
 
     /**
