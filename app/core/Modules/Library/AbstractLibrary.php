@@ -5,6 +5,7 @@ namespace Blog\Modules\Library;
 abstract class AbstractLibrary
 {
     protected const JS_STRICT_MODE = '"use strict";';
+    protected array $src_content = [];
     
     abstract public function use(): void;
 
@@ -29,60 +30,62 @@ abstract class AbstractLibrary
         return LIBDIR . implode('/', $dir) . '/';
     }
 
-    protected function getJsSrcContent(): string
+    protected function getSrcContent(string $source_type): string
     {
-        if (!isset($this->src_content['js']) && isset($this->getSources()->js)) {
-            $this->src_content['js'] = '';
-            foreach ($this->getSources()->js['stack'] as $source) {
+        if (!isset($this->src_content[$source_type])) {
+            $this->src_content[$source_type] = '';
+            foreach ($this->getSources()?->{$source_type}['stack'] ?? [] as $source) {
                 $filename = $this->getSelfDir() . strPrefix($source, '/', true);
-                $this->src_content['js'] .= file_get_contents($filename);
+                $this->src_content[$source_type] .= file_get_contents($filename);
             }
         }
-        return (string)self::JS_STRICT_MODE . $this->src_content['js'];
+        return $this->src_content[$source_type];
+    }
+
+    protected function getJsSrcContent(): string
+    {
+        return (string)self::JS_STRICT_MODE . $this->getSrcContent('js');
+    }
+
+    protected function getCssSrcContent(): string
+    {
+        return $this->getSrcContent('css');
     }
 
     protected function checkPublicSources(): void
     {
-        if (isset($this->getSources()->js) && !$this->verifyPublicJsSource()) {
-            $this->makePublicJsSource();
+        if (isset($this->getSources()?->js) && !$this->verifyPublicSource('js')) {
+            $this->makeSourcePublic('js');
         }
-        if (isset($this->getSources()->css) && !$this->verifyPublicCssSource()) {
-            $this->makePublicCssSource();
+        if (isset($this->getSources()?->css) && !$this->verifyPublicSource('css')) {
+            $this->makeSourcePublic('css');
         }
         return;
     }
 
-    protected function verifyPublicJsSource(): bool
+    protected function verifyPublicSource(string $source_type): bool
     {
-        $public_filename = $this->getSources()->js['public'];
+        $public_filename = $this->getSources()?->{$source_type}['public'];
         $public_file = f($public_filename);
         if (!$public_file->exists()) {
             return false;
         }
+        $get_method = 'get' . ucfirst(strtolower($source_type)) . 'SrcContent';
         return hash_equals(
-            md5($this->getJsSrcContent()),
+            md5($this->$get_method()),
             md5($public_file->realContent())
         );
-    }
-
-    protected function makePublicJsSource(): void
-    {
-        if ($public_name = $this->getSources()?->js['public'] ?? null) {
-            f($public_name)
-                ->content($this->getJsSrcContent())
-                ->save();
-        }
-        return;
-    }
-
-    protected function verifyPublicCssSource(): bool
-    {
-        // TODO: complete verification of library public css
         return false;
     }
 
-    protected function makePublicCssSource(): void
+    protected function makeSourcePublic(string $source_type): void
     {
+        $get_method = 'get' . ucfirst(strtolower($source_type)) . 'SrcContent';
+        if ($public_name = $this->getSources()?->{$source_type}['public'] ?? null) {
+            f($public_name)
+                ->content($this->$get_method())
+                ->save();
+        }
         return;
     }
 }
