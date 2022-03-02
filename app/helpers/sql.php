@@ -3,6 +3,7 @@
 use Blog\Database\Bridge;
 use Blog\Database\SQLInsert;
 use Blog\Database\SQLSelect;
+use Blog\Database\SQLTable;
 use Blog\Database\SQLUpdate;
 
 function sql(): Bridge
@@ -55,4 +56,9 @@ function sql_insert(?string $table = null): SQLInsert
         $statement->into($table);
     }
     return $statement;
+}
+
+function table(string $name): SQLTable
+{
+    return new SQLTable($name);
 }
