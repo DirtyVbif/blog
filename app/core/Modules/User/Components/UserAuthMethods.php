@@ -9,15 +9,17 @@ trait UserAuthMethods
 {
     public function authorize(LoginRequest $login_data): bool
     {
-        $udata = sql_select(from: ['u' => 'users'])
-            ->join(table: ['us' => User::TBL_STATUSES], using: 'usid')
+        $sql = sql_select(from: ['u' => 'users']);
+        $sql->join(table: ['us' => User::TBL_STATUSES], using: 'usid')
             ->join(table: ['uses' => 'users_sessions'], using: 'uid')
             ->columns([
-                'u' => ['uid', 'mail', 'pwhash', 'nickname', 'registered', 'usid'],
+                'u' => ['uid', 'mail', 'pwhash', 'nickname', 'created', 'usid'],
                 'us' => ['status', 'status_label' => 'label'],
                 'uses' => ['token', 'agent_hash', 'browser', 'platform', 'updated', 'ip']
-            ])->where(['u.mail' => $login_data->mail])
-            ->all();
+            ]);
+        $sql->where(['u.mail' => $login_data->mail]);
+        $sql->useFunction('u.created', 'UNIX_TIMESTAMP', 'created');
+        $udata = $sql->all();
         if (empty($udata)) {
             return false;
         } elseif (!password_verify($login_data->password, $udata[0]['pwhash'])) {
@@ -28,7 +30,7 @@ trait UserAuthMethods
                 'id' => $udata[0]['uid'],
                 'mail' => $udata[0]['mail'],
                 'nickname' => $udata[0]['nickname'],
-                'registered' => $udata[0]['registered'],
+                'created' => $udata[0]['created'],
             ],
             'status' => [
                 'id' => $udata[0]['usid'],
@@ -58,20 +60,21 @@ trait UserAuthMethods
     protected function storeNewSession(string $token, int $uid): void
     {
         $this->removePreviousSession($uid, user()->agent()->hash());
-        sql_insert('users_sessions')
-            ->set(
-                [
-                    $uid, $token,
-                    user()->agent()->hash(),
-                    user()->agent()->browser(),
-                    user()->agent()->platform(),
-                    time(), user()->ip()
-                ],
-                [
-                    'uid', 'token', 'agent_hash',
-                    'browser', 'platform', 'updated', 'ip'
-                ]
-            )->exe();
+        $sql = sql_insert('users_sessions');
+        $sql->set(
+            [
+                $uid, $token,
+                user()->agent()->hash(),
+                user()->agent()->browser(),
+                user()->agent()->platform(),
+                time(), user()->ip()
+            ],
+            [
+                'uid', 'token', 'agent_hash',
+                'browser', 'platform', 'updated', 'ip'
+            ]
+        )->useFunction('updated', 'FROM_UNIXTIME');
+        $sql->exe();
         return;
     }
 

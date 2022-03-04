@@ -197,11 +197,14 @@ class Token
             ->join(table: ['u' => 'users'], using: 'uid')
             ->join(table: ['us' => User::TBL_STATUSES], using: 'usid')
             ->columns([
-                'u' => ['uid', 'mail', 'nickname', 'registered'],
+                'u' => ['uid', 'mail', 'nickname', 'created'],
                 'us' => ['usid', 'status', 'status_label' => 'label'],
                 'uses' => ['agent_hash', 'browser', 'platform', 'updated']
             ]);
         $query->where(['uses.token' => $token]);
+        $query
+            ->useFunction('u.created', 'UNIX_TIMESTAMP', 'created')
+            ->useFunction('uses.updated', 'UNIX_TIMESTAMP', 'updated');
         $this->udata = $query->first();
         if (
             empty($this->udata)
@@ -220,20 +223,22 @@ class Token
         $utoken_new = $this->updateUTokenTimestamp($utoken);
         $token = $this->getTokenString($utoken);
         $time = $this->getTokenTimestamp($utoken_new);
-        $update_result = sql_update(table: 'users_sessions')
-            ->set([
-                'agent_hash' => user()->agent()->hash(),
-                'browser' => user()->agent()->browser(),
-                'platform' => user()->agent()->platform(),
-                'updated' => $time,
-                'ip' => user()->ip()
-            ])->where(['uid' => $this->udata['uid']])
+        $update = sql_update(table: 'users_sessions');
+        $update->set([
+            'agent_hash' => user()->agent()->hash(),
+            'browser' => user()->agent()->browser(),
+            'platform' => user()->agent()->platform(),
+            'updated' => $time,
+            'ip' => user()->ip()
+        ]);
+        $update->where(['uid' => $this->udata['uid']])
             ->andWhere(['token' => $token]);
-        if (!$update_result->update()) {
+        $update->useFunction('updated', 'FROM_UNIXTIME');
+        if (!$update->update()) {
             msgr()->debug([
                 'message' => 'Following SQL-request made zero changes',
-                'update-sql' => $update_result->raw(),
-                'update-sql-data' => $update_result->data(),
+                'update-sql' => $update->raw(),
+                'update-sql-data' => $update->data(),
                 'utoken' => $this->utoken(),
                 'token' => $token,
                 'utoken_new' => $utoken_new,
@@ -251,7 +256,7 @@ class Token
             'id' => $this->udata['uid'],
             'mail' => $this->udata['mail'],
             'nickname' => $this->udata['nickname'],
-            'registered' => $this->udata['registered']
+            'created' => $this->udata['created']
         ]);
         session()->set(User::SESSUID . '/token', $utoken_new);
         $this->setCookieUToken($utoken_new);

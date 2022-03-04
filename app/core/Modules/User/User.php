@@ -300,6 +300,7 @@ class User
             $sql = sql_select(from: 'users_sessions');
             $sql->columns(['token', 'browser', 'platform', 'updated', 'ip']);
             $sql->where(['uid' => $this->id()]);
+            $sql->useFunction('users_sessions.updated', 'UNIX_TIMESTAMP', 'updated');
             $this->opened_sessions = $sql->all();
             foreach ($this->opened_sessions as &$s) {
                 $s['date'] = new DateFormat($s['updated'], DateFormat::FULL_COMPACT);
