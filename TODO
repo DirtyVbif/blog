@@ -44,3 +44,4 @@
 [ ] Refactor project for SOLID princip;
 [v] Add system log for webmaster;
 [ ] Refactor Database\Bridge::class for Adapter pattern
+[ ] Add events log for status messages and errors

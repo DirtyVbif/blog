@@ -40,6 +40,7 @@ trait UserAuthMethods
         ];
         $this->setAuthorizedStatus($user, $login_data->remember_me);
         $this->checkTimeoutSession($udata);
+        $login_data->complete();
         return true;
     }
 
