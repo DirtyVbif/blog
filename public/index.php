@@ -2,7 +2,7 @@
 
 define('ROOTDIR', '../');
 
-require_once ROOTDIR . 'app/autoload.php';
+require_once ROOTDIR . 'vendor/autoload.php';
 
 app()->run();
 

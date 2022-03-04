@@ -26,7 +26,7 @@ abstract class AbstractLibrary
     protected function getSelfDir(): string
     {
         $dir = explode('\\', get_called_class());
-        unset($dir[0]);
+        unset($dir[0], $dir[1]);
         return LIBDIR . implode('/', $dir) . '/';
     }
 

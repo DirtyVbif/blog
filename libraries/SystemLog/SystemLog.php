@@ -1,6 +1,6 @@
 <?php
 
-namespace BlogLibrary;
+namespace BlogLibrary\SystemLog;
 
 class SystemLog extends \Blog\Modules\Library\AbstractLibrary
 {
