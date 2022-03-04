@@ -151,9 +151,11 @@ class Bridge
         return;
     }
 
-    public function commit(): void
+    public function commit(bool $rollback = false): void
     {
-        if ($this->transaction) {
+        if ($rollback) {
+            $this->rollback();
+        } else if ($this->transaction) {
             $this->transaction = false;
             $this->query('COMMIT;');
             systemLog(self::LOGID, 'Database transaction completed;');
