@@ -108,6 +108,9 @@ class SQLInsert extends SQLAbstractStatement
             for ($i = 0; $i < count($stack); $i++) {
                 $column = $this->columns[$i];
                 $value = $this->setBindValue([$column => $stack[$i]]);
+                if ($function = $this->column_functions[$column] ?? false) {
+                    $value = "{$function}({$value})";
+                }
                 $values[] = $value;
             }
             $values_stack[] = "\n\t(" . implode(', ', $values) . ')';
@@ -115,5 +118,11 @@ class SQLInsert extends SQLAbstractStatement
         $insert_string = sprintf($insert_string, implode(', ', $columns));
         $insert_string .= implode(',', $values_stack) . ';';
         return $insert_string;
+    }
+
+    public function useFunction(string $column, string $function, ?string $column_alias = null): self
+    {
+        $this->column_functions[$column] = strtoupper($function);
+        return $this;
     }
 }

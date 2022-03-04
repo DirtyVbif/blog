@@ -29,12 +29,12 @@ trait Helpers
         return $this->clearTableName($column_name);
     }
 
-    protected function normalizeColumnName(?string $column): string
+    protected function normalizeColumnName(string $column): string
     {
         $pattern = '/((`)?(\w+)(`)?(\.))?(`)?(\w+)(`)?/';
         $skip_pattern = '/\:\w+/';
         $q = $this->q;
-        if (!is_null($column) && preg_match($pattern, $column) && !preg_match($skip_pattern, $column)) {
+        if (preg_match($pattern, $column) && !preg_match($skip_pattern, $column)) {
             $column = str_replace('`', '', $column);
             $parts = explode('.', $column);
             foreach ($parts as &$part) {

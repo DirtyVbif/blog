@@ -229,7 +229,13 @@ class SQLSelect extends SQLAbstractStatement
         foreach ($this->columns as $t => $columns) {
             foreach ($columns as $column) {
                 $as = $column['as'] ? " AS {$this->normalizeColumnName($column['as'])}" : '';
-                $col2sel = $this->normalizeColumnName("{$t}.{$column['name']}") . $as;
+                $column_name = "{$t}.{$column['name']}";
+                if ($function = $this->column_functions[$column_name] ?? null) {
+                    $as = ($function['as'] ?? false) ? " AS {$this->normalizeColumnName($function['as'])}" : $as;
+                    $col2sel = "{$function['fn']}(" . $this->normalizeColumnName($column_name) . ")$as";
+                } else {
+                    $col2sel = $this->normalizeColumnName($column_name) . $as;
+                }
                 array_push($columns_to_select, $col2sel);
             }
         }
@@ -309,6 +315,15 @@ class SQLSelect extends SQLAbstractStatement
             return $this->limit_offset ?? 0;
         }
         $this->limit_offset = max($offset, 0);
+        return $this;
+    }
+
+    public function useFunction(string $column, string $function, ?string $column_alias = null): self
+    {
+        $this->column_functions[$column] = [
+            'fn' => strtoupper($function),
+            'as' => $column_alias
+        ];
         return $this;
     }
 }

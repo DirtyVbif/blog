@@ -9,6 +9,7 @@ abstract class SQLAbstractStatement
     protected $result;
     protected string $current_sql_string;
     protected string $previous_sql_string;
+    protected array $column_functions = [];
 
     /**
      * Base method to execute currently prepared `SQL REQUEST`
@@ -21,6 +22,8 @@ abstract class SQLAbstractStatement
      * Get currently prepared `SQL REQUEST STRING`. Also has public alias @method raw()
      */
     abstract public function currentSqlString(): string;
+
+    abstract public function useFunction(string $column_name, string $function, ?string $column_alias): self;
 
     /**
      * This method is an alias and equivalent to @method currentSqlString()
