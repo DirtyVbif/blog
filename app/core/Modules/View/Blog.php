@@ -55,7 +55,6 @@ class Blog extends BaseView
         $comments->setName('blocks/article--comments');
         $comments->set('items', $article->getComments());
         app()->page()->addContent($comments);
-        // TODO: set page meta shortlink
         return true;
     }
 
