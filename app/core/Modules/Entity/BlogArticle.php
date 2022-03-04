@@ -18,8 +18,8 @@ class BlogArticle extends BaseEntity implements SitemapInterface
         1 => self::VIEW_MODE_TEASER,
         2 => self::VIEW_MODE_PREVIEW
     ];
-    protected const ENTITY_TABLE = 'articles';
-    public const ENTITY_COLUMNS = ['id' => 'aid', 'title', 'summary', 'body', 'alias', 'body', 'created', 'updated', 'preview_src', 'preview_alt', 'author', 'views'];
+    public const ENTITY_DATA_TABLE = 'entities_article_data';
+    public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'body', 'preview_src', 'preview_alt', 'author', 'views'];
     public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
 
@@ -29,6 +29,21 @@ class BlogArticle extends BaseEntity implements SitemapInterface
     protected bool $comments_loaded = false;
     protected bool $comments_preloaded;
     protected int $comments_count;
+
+    public static function getSqlTableName(): array|string
+    {
+        return ['a' => self::ENTITY_DATA_TABLE];
+    }
+
+    public static function getSqlTableColumns(): array
+    {
+        return ['a' => self::ENTITY_DATA_COLUMNS];
+    }
+
+    public static function countItems(): int
+    {
+        return sql_select(from: self::ENTITY_DATA_TABLE)->count();
+    }
 
     /**
      * @param int|array $data is an id of article that must be loaded or already loaded article data.
@@ -51,17 +66,9 @@ class BlogArticle extends BaseEntity implements SitemapInterface
         $this->setViewMode($view_mode);
     }
 
-    public static function generateUrl(?string $alias, int $id): string
-    {
-        if ($alias) {
-            return "/blog/{$alias}";
-        }
-        return "/blog/{$id}";
-    }
-
     protected function preprocessData(): void
     {
-        if (!empty($this->data)) {            
+        if (!empty($this->data)) {
             $this->data['url'] = self::generateUrl($this->data['alias'], $this->data['id']);
             $this->data['date'] = new DateFormat($this->data['created']);
             $this->data['comments_count'] = $this->getCommentsCount();
@@ -92,31 +99,20 @@ class BlogArticle extends BaseEntity implements SitemapInterface
         return parent::render();
     }
 
-    protected function sql(): SQLSelect
-    {
-        if (!isset($this->sql)) {
-            $this->sql = sql_select(from: ['a' => self::ENTITY_TABLE]);
-            $this->sql->columns([
-                'a' => self::ENTITY_COLUMNS,
-                'ac' => ['cid', 'deleted']
-            ]);
-            $this->sql->join(['ac' => 'article_comments'], using: 'aid');
-        }
-        return $this->sql;
-    }
-
     public function loadById(int $id): self
     {
-        $this->sql()->where(condition: ['a.aid' => $id]);
-        $result = $this->sql()->all();
+        $sql = self::sql();
+        $sql->where(condition: ['e.eid' => $id]);
+        $result = $sql->all();
         $this->setLoadedData($result);
         return $this;
     }
 
     public function loadByAlias(string $alias): self
     {
-        $this->sql()->where(condition: ['a.alias' => $alias]);
-        $result = $this->sql()->all();
+        $sql = self::sql();
+        $sql->where(condition: ['a.alias' => $alias]);
+        $result = $sql->all();
         $this->setLoadedData($result);
         $this->preprocessData();
         return $this;
@@ -128,7 +124,8 @@ class BlogArticle extends BaseEntity implements SitemapInterface
         if (empty($data)) {
             $this->data = [];
         } else {
-            foreach (self::ENTITY_COLUMNS as $key => $column) {
+            $columns = array_merge(self::ENTITY_COLUMNS, self::ENTITY_DATA_COLUMNS);
+            foreach ($columns as $key => $column) {
                 $key = is_numeric($key) ? $column : $key;
                 $this->data[$key] = $data[0][$key];
             }
@@ -216,7 +213,13 @@ class BlogArticle extends BaseEntity implements SitemapInterface
             $data->preview_src, $data->preview_alt, $data->author,
             $data->get('updated')
         ];
-        $sql = sql_insert(self::ENTITY_TABLE);
+        // TODO: rebuild BlogArticle::create() method for new database structure
+        pre([
+            'error' => 'rebuild BlogArticle::create() method for new database structure',
+            'values' => $values
+        ]);
+        die;
+        $sql = sql_insert(self::ENTITY_DATA_TABLE);
         $sql->set(
             values: $values,
             columns: ['title', 'summary', 'body', 'alias', 'created', 'status', 'preview_src', 'preview_alt', 'author', 'updated']
@@ -227,21 +230,10 @@ class BlogArticle extends BaseEntity implements SitemapInterface
 
     protected static function isAliasExists(string $alias): bool
     {
-        $sql = sql_select(['aid'], self::ENTITY_TABLE);
+        $sql = sql_select(['eid'], self::ENTITY_DATA_TABLE);
         $sql->where(['alias' => $alias]);
         $result = $sql->exe();
         return !empty($result);
-    }
-
-    protected static function getNewId(): int
-    {
-        $sql = sql()->query(
-            'SELECT AUTO_INCREMENT'
-            . ' FROM information_schema.TABLES'
-            . ' WHERE TABLE_SCHEMA = "' . app()->env()->DB['NAME'] . '"'
-            . ' AND `TABLE_NAME` = "' . self::ENTITY_TABLE . '";');
-        $result = $sql->fetch();
-        return $result['AUTO_INCREMENT'];
     }
 
     public static function getSitemapPriority(): float
@@ -252,5 +244,29 @@ class BlogArticle extends BaseEntity implements SitemapInterface
     public static function getSitemapChangefreq(): string
     {
         return self::SITEMAP_CHANGEFREQ;
+    }
+
+    public static function getUrl(int $id): string
+    {
+        $self = new self($id);
+        return $self->url();
+    }
+
+    public function url(): string
+    {
+        if (!$this->exists()) {
+            return '';
+        } else if ($this->alias) {
+            return "/blog/{$this->alias}";
+        }
+        return "/blog/{$this->id()}";
+    }
+
+    public function title(): string
+    {
+        if (!$this->exists()) {
+            return '';
+        }
+        return $this->title;
     }
 }

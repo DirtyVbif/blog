@@ -10,8 +10,8 @@ use Blog\Request\BaseRequest;
 
 class Comment extends BaseEntity
 {
-    protected const ENTITY_TABLE = 'comments';
-    protected const ENTITY_COLUMNS = ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'];
+    public const ENTITY_TABLE = 'comments';
+    public const ENTITY_COLUMNS = ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'];
     protected const VIEW_MODES = [
         0 => self::VIEW_MODE_FULL,
         1 => self::VIEW_MODE_ARTICLE
@@ -23,6 +23,37 @@ class Comment extends BaseEntity
     public const SITEMAP_CHANGEFREQ = 'yearly';
 
     protected SQLSelect $sql;
+
+    public static function getSqlTableName(): array|string
+    {
+        return ['c' => self::ENTITY_TABLE];
+    }
+
+    public static function getSqlTableColumns(): array
+    {
+        return ['c' => self::ENTITY_COLUMNS];
+    }
+
+    public static function countItems(): int
+    {
+        return sql_select(from: self::ENTITY_TABLE)->count();
+    }
+
+    public static function sql(): SQLSelect
+    {
+        $sql = sql_select(from: self::getSqlTableName());
+        $sql
+            ->join(table: ['ec' => 'entities_comments'], using: 'cid')
+            ->join(table: ['e' => 'entities'], using: 'eid')
+            ->join(table: ['et' => 'entities_types'], using: 'etid');
+        $sql->columns(self::getSqlTableColumns());
+        $sql->columns([
+            'ec' => ['eid', 'deleted'],
+            'et' => ['etid', 'entity_type' => 'name']
+        ]);
+        $sql->useFunction('c.created', 'UNIX_TIMESTAMP', 'created');
+        return $sql;
+    }
 
     /**
      * @param int|array $data is an id of article that must be loaded or already loaded article data.
@@ -108,30 +139,22 @@ class Comment extends BaseEntity
             [$pid, time(), $data->name, $data->email, $data->subject, 0, $_SERVER['REMOTE_ADDR']],
             ['pid', 'created', 'name', 'email', 'body', 'status', 'ip']
         );
-        $cid = (int)$sql->exe();
-        if ($cid) {
-            $sql = sql_insert('article_comments');
+        $sql->useFunction('created', 'FROM_UNIXTIME');
+        sql()->startTransation();
+        if ($cid = (int)$sql->exe()) {
+            $sql = sql_insert('entities_comments');
             $sql->set(
-                [$data->article_id, $cid],
-                ['aid', 'cid']
+                [$data->entity_id, $cid],
+                ['eid', 'cid']
             );
-            $sql->exe();
-            return true;
+            $result = $sql->exe();
+            if ($result) {
+                sql()->commit();
+                return true;
+            }
         }
+        sql()->rollback();
         return false;
-    }
-
-    public static function sql(): SQLSelect
-    {
-        $sql = sql_select(from: ['c' => self::ENTITY_TABLE]);
-        $sql->join(table: ['ac' => 'article_comments'], using: 'cid');
-        $sql->join(table: ['a' => 'articles'], using: 'aid');
-        $sql->columns([
-            'c' => self::ENTITY_COLUMNS,
-            'ac' => ['aid', 'deleted'],
-            'a' => ['title', 'alias']
-        ]);
-        return $sql;
     }
 
     /**
@@ -142,7 +165,7 @@ class Comment extends BaseEntity
         $comments = [];
         $sql = self::sql();
         $sql->where(condition: ['c.cid' => $ids], operator: 'IN');
-        $sql->andWhere(condition: ['ac.deleted' => 0]);
+        $sql->andWhere(condition: ['ec.deleted' => 0]);
         if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
             $sql->andWhere(condition: ['c.status' => 1]);
         }
@@ -159,9 +182,9 @@ class Comment extends BaseEntity
     {
         $comments = [];
         $sql = self::sql();
-        $sql->where(condition: ['ac.aid' => $aid]);
-        $sql->andWhere(condition: ['ac.deleted' => 0]);
-        if (!app()->user()->verifyAccessLevel(4)) {
+        $sql->where(condition: ['ec.eid' => $aid]);
+        $sql->andWhere(condition: ['ec.deleted' => 0]);
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
             $sql->andWhere(condition: ['c.status' => 1]);
         }
         foreach ($sql->all() as $comment) {
@@ -224,5 +247,15 @@ class Comment extends BaseEntity
     public static function getSitemapChangefreq(): string
     {
         return self::SITEMAP_CHANGEFREQ;
+    }
+
+    public function url(): string
+    {
+        return '';
+    }
+
+    public function title(): string
+    {
+        return '';
     }
 }

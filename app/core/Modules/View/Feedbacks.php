@@ -39,17 +39,18 @@ class Feedbacks extends BaseView
     }
 
     /**
-     * Loads comments data from storage as array
+     * Loads feedbacks data from storage as array
      * 
-     * @return array of comments data with following keys:
+     * @return array of feedbacks data with following keys:
      * ```
-     * array('id', 'subject', 'message', 'timestamp', 'headers', 'status');
+     * array('id', 'created', 'updated', 'etid', 'type_name', 'subject', 'message', 'headers', 'status');
      * ```
      */
     public static function loadData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
-        $sql = sql_select(from: Feedback::ENTITY_TABLE);
-        $sql->columns(Feedback::ENTITY_COLUMNS);
+        // $sql = sql_select(from: Feedback::ENTITY_TABLE);
+        // $sql->columns(Feedback::ENTITY_COLUMNS);
+        $sql = Feedback::sql();
         $sql->limit($limit);
         if ($offset) {
             $sql->limitOffset($offset);
@@ -58,7 +59,7 @@ class Feedbacks extends BaseView
         if ($order_desc) {
             $order = 'DESC';
         }
-        $sql->order('timestamp', $order);
+        $sql->order('created', $order);
         return $sql->all();
     }
 }

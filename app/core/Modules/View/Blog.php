@@ -46,7 +46,7 @@ class Blog extends BaseView
         app()->controller()->getTitle()->set($article->title);
         app()->page()->addContent($article);
         $comment_form = new Form('comment', 'section');
-        $comment_form->tpl()->set('article_id', $article->id);
+        $comment_form->tpl()->set('entity_id', $article->id());
         $comment_form->tpl()->set('parent_id', 0);
         app()->page()->addContent($comment_form);
         app()->page()->content()->addClass('container_article');
@@ -75,7 +75,8 @@ class Blog extends BaseView
      */
     public static function loadArticlesData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
-        $sql = sql_select(BlogArticle::ENTITY_COLUMNS, 'articles');
+        // $sql = sql_select(BlogArticle::ENTITY_COLUMNS, 'articles');
+        $sql = BlogArticle::sql();
         $sql->limit($limit);
         if ($offset) {
             $sql->limitOffset($offset);
@@ -103,7 +104,7 @@ class Blog extends BaseView
 
     protected static function loadArticleDataByColumn(string $column, string $search_value): array
     {
-        $sql = sql_select(BlogArticle::ENTITY_COLUMNS, 'articles');
+        $sql = BlogArticle::sql();
         $sql->where(condition: [$column => $search_value]);
         return $sql->first();
     }
@@ -127,7 +128,7 @@ class Blog extends BaseView
             'pager' => null
         ];
         $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
-        $total_items = sql_select(from: 'articles')->count();
+        $total_items = BlogArticle::countItems();
         if ($total_items > self::ITEMS_PER_PAGE) {
             $view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
         }
@@ -141,7 +142,7 @@ class Blog extends BaseView
     public static function lastUpdate(): int
     {
         $comments_update = sql()->query('SELECT MAX(`created`) as time FROM `comments`;')->fetch();
-        $articles_update = sql()->query('SELECT MAX(`updated`) as time FROM `articles`;')->fetch();
+        $articles_update = sql()->query('SELECT MAX(`updated`) as time FROM `entities` WHERE `etid` = 1;')->fetch();
         return max($comments_update['time'], $articles_update['time']);
     }
 }

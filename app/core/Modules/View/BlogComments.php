@@ -2,7 +2,7 @@
 
 namespace Blog\Modules\View;
 
-use Blog\Modules\Entity\BlogArticle;
+use Blog\Modules\Entity\BaseEntity;
 use Blog\Modules\Entity\Comment;
 use Blog\Modules\TemplateFacade\Pager;
 use Blog\Modules\User\User;
@@ -47,10 +47,9 @@ class BlogComments extends BaseView
         $offset = $current_page * self::ITEMS_PER_PAGE;
         foreach ($this->loadData(self::ITEMS_PER_PAGE, true, $offset) as $data) {
             $comment = new Comment($data, Comment::VIEW_MODE_FULL);
-            $comment->tpl()->set(
-                'url',
-                BlogArticle::generateUrl($data['alias'], $data['aid']) . "#comment-{$comment->id()}"
-            );
+            $entity = BaseEntity::load($data['eid']);
+            $comment->tpl()->set('url', $entity->url() . "#comment-{$comment->id()}");
+            $comment->tpl()->set('title', $entity->title());
             $view->items[] = $comment;
         }
         return $view;
@@ -64,23 +63,15 @@ class BlogComments extends BaseView
      * array(
      *      // comment fields
      *      'cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip',
-     *      // parent article fields
-     *      'aid', 'title', 'alias'
+     *      // parent entity fields
+     *      'eid', 'title', 'alias'
      * );
      * ```
      */
     public static function loadData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
-        $columns = [
-            'c' => ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'],
-            'ac' => ['aid'],
-            'a' => ['title', 'alias']
-        ];
-        $sql = sql_select(from: ['c' => 'comments']);
-        $sql->join(['ac' => 'article_comments'], using: 'cid');
-        $sql->join(['a' => 'articles'], using: 'aid');
-        $sql->columns($columns);
-        $sql->where(['ac.deleted' => 0]);
+        $sql = Comment::sql();
+        $sql->where(['ec.deleted' => 0]);
         if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
             $sql->andWhere(['c.status' => 1]);
         }

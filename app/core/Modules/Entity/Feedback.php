@@ -9,8 +9,8 @@ use Blog\Request\BaseRequest;
 
 class Feedback extends BaseEntity
 {
-    public const ENTITY_TABLE = 'feedbacks';
-    public const ENTITY_COLUMNS = ['id' => 'fbid', 'subject', 'message', 'timestamp', 'headers', 'result'];
+    public const ENTITY_DATA_TABLE = 'entities_feedback_data';
+    public const ENTITY_DATA_COLUMNS = ['subject', 'message', 'headers', 'result'];
     protected const VIEW_MODES = [
         0 => self::VIEW_MODE_FULL
     ];
@@ -20,6 +20,21 @@ class Feedback extends BaseEntity
     public const SITEMAP_CHANGEFREQ = 'yearly';
 
     protected SQLSelect $sql;
+
+    public static function getSqlTableName(): array|string
+    {
+        return ['f' => self::ENTITY_DATA_TABLE];
+    }
+
+    public static function getSqlTableColumns(): array
+    {
+        return ['f' => self::ENTITY_DATA_COLUMNS];
+    }
+
+    public static function countItems(): int
+    {
+        return sql_select(from: self::ENTITY_DATA_TABLE)->count();
+    }
 
     /**
      * @param int|array $data is an id of article that must be loaded or already loaded article data.
@@ -70,17 +85,10 @@ class Feedback extends BaseEntity
     protected function preprocessData(): void
     {
         if (!empty($this->data)) {
-            $this->data['date'] = new DateFormat($this->data['timestamp'], DateFormat::DETAILED);
+            $this->data['date'] = new DateFormat($this->data['created'], DateFormat::DETAILED);
             $this->data['headers'] = json_decode($this->data['headers'], true);
         }
         return;
-    }
-
-    public static function sql(): SQLSelect
-    {
-        $sql = sql_select(from: self::ENTITY_TABLE);
-        $sql->columns(self::ENTITY_COLUMNS);
-        return $sql;
     }
 
     public function loadById(int $id): self
@@ -104,6 +112,11 @@ class Feedback extends BaseEntity
      */
     public static function create(BaseRequest $data): bool
     {
+        pre([
+            'message' => 'Need to complete Entity/Feedback::create() method.',
+            'data' => $data
+        ]);
+        die;
         // TODO: complete create method
         return false;
     }
@@ -144,5 +157,15 @@ class Feedback extends BaseEntity
     public static function getSitemapChangefreq(): string
     {
         return self::SITEMAP_CHANGEFREQ;
+    }
+
+    public function url(): string
+    {
+        return '';
+    }
+
+    public function title(): string
+    {
+        return '';
     }
 }
