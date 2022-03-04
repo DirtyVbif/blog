@@ -4,52 +4,36 @@ namespace Blog\Request;
 
 class CommentRequest extends BaseRequest
 {
-    protected const FIELD_NAMES = [
-        'name' => 'Name',
-        'email' => 'E-mail',
-        'subject' => 'Comment',
-        'parent_id' => 'Parent comment id',
-        'article_id' => 'Article id'
-    ];
-    protected const ACCESS_LEVEL = 2;
-
     protected function rules(): array
     {
         return [
             'name' => [
+                '#label' => 'Name',
                 'type' => 'string',
                 'max_length' => 60,
                 'required' => true
             ],
             'email' => [
+                '#label' => 'E-mail',
                 'type' => 'string',
                 'pattern' => '/^\w+@\w+\.[a-zA-Z]{2,}$/',
                 'required' => true
             ],
             'subject' => [
+                '#label' => 'Comment',
                 'type' => 'plain_text',
                 'required' => true
             ],
             'parent_id' => [
+                '#label' => 'Parent comment id',
                 'type' => 'int',
                 'required' => true
             ],
-            'article_id' => [
+            'entity_id' => [
+                '#label' => 'Entity id',
                 'type' => 'int',
                 'required' => true
             ]
         ];
-    }
-
-    public function __get($name)
-    {
-        if (isset(self::FIELD_NAMES[$name]) && $this->isValid()) {
-            return $this->data[$name];
-        }
-    }
-
-    protected function getFieldName(string $name): string
-    {
-        return t(self::FIELD_NAMES[$name] ?? $name);
     }
 }

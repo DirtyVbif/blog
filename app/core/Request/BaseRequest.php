@@ -8,7 +8,7 @@ abstract class BaseRequest
 {
     use Components\BaseRequestFieldValidators;
 
-    protected const ACCESS_LEVEL = 1;
+    protected const ACCESS_LEVEL = 2;
     public const SESSID = 'last-request-data';
 
     protected bool $is_valid;
@@ -21,10 +21,15 @@ abstract class BaseRequest
         $this->outputErrors();
         $this->flushSession();
     }
+    
+    public function __get(string $name)
+    {
+        if (isset($this->data[$name]) && $this->isValid()) {
+            return $this->data[$name];
+        }
+    }
 
     abstract protected function rules(): array;
-
-    abstract protected function getFieldName(string $name): string;
 
     /**
      * Checks if request data is valid
@@ -60,7 +65,9 @@ abstract class BaseRequest
         $this->is_valid = true;
         // validate form fields value
         foreach ($rules as $name => $rule) {
-            if (!isset($this->data[$name]) && ($rule['required'] ?? false)) {
+            if (preg_match('/^\#\w+/', $name)) {
+                continue;
+            } else if (!isset($this->data[$name]) && ($rule['required'] ?? false)) {
                 $this->is_valid = false;
                 $this->errors[$name] = [
                     t(
@@ -163,5 +170,11 @@ abstract class BaseRequest
     public function get(string $field_name)
     {
         return $this->data[$field_name] ?? null;
+    }
+
+    protected function getFieldName(string $name): string
+    {
+        $rules = $this->rules();
+        return t($rules[$name]['#label'] ?? $name);
     }
 }
