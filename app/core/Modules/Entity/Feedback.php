@@ -4,6 +4,7 @@ namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
+use Blog\Modules\Mailer\EMail;
 use Blog\Modules\Template\Element;
 use Blog\Request\BaseRequest;
 
@@ -11,6 +12,8 @@ class Feedback extends BaseEntity
 {
     public const ENTITY_DATA_TABLE = 'entities_feedback_data';
     public const ENTITY_DATA_COLUMNS = ['subject', 'message', 'headers', 'result'];
+    /** @var int entity type id (etid) specified in entities_types table */
+    public const ENTITY_TYPE_ID = 2;
     protected const VIEW_MODES = [
         0 => self::VIEW_MODE_FULL
     ];
@@ -108,17 +111,33 @@ class Feedback extends BaseEntity
     }
     
     /**
-     * @param \Blog\Request\BaseRequest $data
+     * @param \Blog\Request\FeedbackRequest $data
      */
-    public static function create(BaseRequest $data): bool
+    public static function create(BaseRequest $request, ?array $data = null): bool
     {
-        pre([
-            'message' => 'Need to complete Entity/Feedback::create() method.',
-            'data' => $data
-        ]);
-        die;
-        // TODO: complete create method
-        return false;
+        /** @var \Blog\Modules\Mailer\EMail $email */
+        $email = $data['email'];
+        /** @var bool $status */
+        $status = $data['status'];
+        $message = "{$request->name} ({$email->getFrom()}): {$request->subject}";
+        sql()->startTransation();
+        $sql = sql_insert('entities');
+        $sql->set([self::ENTITY_TYPE_ID], ['etid']);
+        $rollback = true;
+        if ($entity_id = $sql->exe()) {
+            $sql = sql_insert(self::ENTITY_DATA_TABLE);
+            $sql->set(
+                [$entity_id, $email->getSubject(), $message, json_encode($email->getHeaders()), (int)$status, user()->ip()],
+                ['eid', 'subject', 'message', 'headers', 'result', 'ip']
+            );
+            $result = $sql->exe(true);
+            if ($result) {
+                $rollback = false;
+                $request->complete();
+            }
+        }
+        sql()->commit($rollback);
+        return !$rollback;
     }
 
     /**
