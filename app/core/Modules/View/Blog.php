@@ -2,7 +2,7 @@
 
 namespace Blog\Modules\View;
 
-use Blog\Modules\Entity\BlogArticle;
+use Blog\Modules\Entity\Article;
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Pager;
@@ -70,12 +70,12 @@ class Blog extends BaseView
     /**
      * Loads articles data from storage as array
      * 
-     * @return array of articles data with keys specified in \Blog\Modules\Entity\BlogArticle::ENTITY_COLUMNS
+     * @return array of articles data with keys specified in \Blog\Modules\Entity\Article::ENTITY_COLUMNS
      */
     public static function loadArticlesData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
-        // $sql = sql_select(BlogArticle::ENTITY_COLUMNS, 'articles');
-        $sql = BlogArticle::sql();
+        // $sql = sql_select(Article::ENTITY_COLUMNS, 'articles');
+        $sql = Article::sql();
         $sql->limit($limit);
         if ($offset) {
             $sql->limitOffset($offset);
@@ -88,34 +88,34 @@ class Blog extends BaseView
         return $sql->all();
     }
 
-    public static function getArticleById(int $id): ?BlogArticle
+    public static function getArticleById(int $id): ?Article
     {
-        $article = new BlogArticle($id);
+        $article = new Article($id);
         return $article->exists() ? $article : null;
     }
 
-    public static function getArticleByAlias(string $alias): ?BlogArticle
+    public static function getArticleByAlias(string $alias): ?Article
     {
-        $article = new BlogArticle(0);
+        $article = new Article(0);
         $article->loadByAlias($alias);
         return $article->exists() ? $article : null;
     }
 
     protected static function loadArticleDataByColumn(string $column, string $search_value): array
     {
-        $sql = BlogArticle::sql();
+        $sql = Article::sql();
         $sql->where(condition: [$column => $search_value]);
         return $sql->first();
     }
     
     /**
-     * @return BlogArticle[] $items
+     * @return Article[] $items
      */
-    public function preview(int $limit, string $view_format = BlogArticle::VIEW_MODE_TEASER): array
+    public function preview(int $limit, string $view_format = Article::VIEW_MODE_TEASER): array
     {
         $items = [];
         foreach ($this->loadArticlesData($limit, true) as $data) {
-            $items[] = new BlogArticle($data, $view_format);
+            $items[] = new Article($data, $view_format);
         }
         return $items;
     }
@@ -127,13 +127,13 @@ class Blog extends BaseView
             'pager' => null
         ];
         $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
-        $total_items = BlogArticle::countItems();
+        $total_items = Article::countItems();
         if ($total_items > self::ITEMS_PER_PAGE) {
             $view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
         foreach ($this->loadArticlesData(self::ITEMS_PER_PAGE, true, $offset) as $data) {
-            $view->items[] = new BlogArticle($data, BlogArticle::VIEW_MODE_PREVIEW);
+            $view->items[] = new Article($data, Article::VIEW_MODE_PREVIEW);
         }
         return $view;
     }

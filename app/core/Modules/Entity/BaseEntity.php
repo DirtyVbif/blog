@@ -18,7 +18,7 @@ abstract class BaseEntity extends TemplateFacade
     /**
      * Create new entity from data
      */
-    abstract public static function create(BaseRequest $data): bool;
+    abstract public static function create(BaseRequest $request, ?array $data = null): bool;
     abstract public static function getSitemapPriority(): float;
     abstract public static function getSitemapChangefreq(): string;
     abstract public static function getSqlTableName(): array|string;
@@ -113,8 +113,8 @@ abstract class BaseEntity extends TemplateFacade
     {
         switch ($type) {
             case 'article':
-                /** @var BlogArticle $entity_class */
-                return BlogArticle::getUrl($id);
+                /** @var Article $entity_class */
+                return Article::getUrl($id);
                 break;
             default:
                 return '';
@@ -135,7 +135,7 @@ abstract class BaseEntity extends TemplateFacade
     {
         switch (self::getTypeById($id)) {
             case 'article':
-                return new BlogArticle($id);
+                return new Article($id);
             case 'feedback':
                 return new Feedback($id);
             default:

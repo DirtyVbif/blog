@@ -126,35 +126,35 @@ class Comment extends BaseEntity
     }
     
     /**
-     * @param \Blog\Request\CommentRequest $data
+     * @param \Blog\Request\CommentRequest $request
      */
-    public static function create(BaseRequest $data): bool
+    public static function create(BaseRequest $request, ?array $data = null): bool
     {
-        if (!$data->isValid()) {
+        if (!$request->isValid()) {
             return false;
         }
         $sql = sql_insert('comments');
-        $pid = $data->parent_id ? $data->parent_id : null;
+        $pid = $request->parent_id ? $request->parent_id : null;
         $sql->set(
-            [$pid, time(), $data->name, $data->email, $data->subject, 0, $_SERVER['REMOTE_ADDR']],
+            [$pid, time(), $request->name, $request->email, $request->subject, 0, $_SERVER['REMOTE_ADDR']],
             ['pid', 'created', 'name', 'email', 'body', 'status', 'ip']
         );
         $sql->useFunction('created', 'FROM_UNIXTIME');
         sql()->startTransation();
+        $rollback = true;
         if ($cid = (int)$sql->exe()) {
             $sql = sql_insert('entities_comments');
             $sql->set(
-                [$data->entity_id, $cid],
+                [$request->entity_id, $cid],
                 ['eid', 'cid']
             );
-            $result = $sql->exe();
-            if ($result) {
-                sql()->commit();
-                return true;
+            if ($sql->exe(true)) {
+                $rollback = false;
+                $request->complete();
             }
         }
-        sql()->rollback();
-        return false;
+        sql()->commit($rollback);
+        return !$rollback;
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Blog\Modules\Sitemap;
 
 use Blog\Modules\DateFormat\DateFormat;
-use Blog\Modules\Entity\BlogArticle;
+use Blog\Modules\Entity\Article;
 use Blog\Modules\View\Blog;
 
 class Sitemap
@@ -32,8 +32,8 @@ class Sitemap
             $url = '/blog/' . $article['alias'];
             $links[$url] = [
                 'loc' => fullUrlTo($url),
-                'priority' => BlogArticle::getSitemapPriority(),
-                'changefreq' => BlogArticle::getSitemapChangefreq(),
+                'priority' => Article::getSitemapPriority(),
+                'changefreq' => Article::getSitemapChangefreq(),
                 'lastmod' => new DateFormat($article['updated'], DateFormat::COMPLETE)
             ];
         }

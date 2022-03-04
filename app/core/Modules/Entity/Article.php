@@ -8,7 +8,7 @@ use Blog\Modules\Template\Element;
 use Blog\Request\BaseRequest;
 use Twig\Markup;
 
-class BlogArticle extends BaseEntity implements SitemapInterface
+class Article extends BaseEntity implements SitemapInterface
 {
     public const VIEW_MODE_FULL = 'full';
     public const VIEW_MODE_TEASER = 'teaser';
@@ -69,7 +69,7 @@ class BlogArticle extends BaseEntity implements SitemapInterface
     protected function preprocessData(): void
     {
         if (!empty($this->data)) {
-            $this->data['url'] = self::generateUrl($this->data['alias'], $this->data['id']);
+            $this->data['url'] = $this->url();
             $this->data['date'] = new DateFormat($this->data['created']);
             $this->data['comments_count'] = $this->getCommentsCount();
         }
@@ -195,23 +195,26 @@ class BlogArticle extends BaseEntity implements SitemapInterface
         return $this->comments_count;
     }
 
-    public static function create(BaseRequest $data): bool
+    /**
+     * @param \Blog\Request\ArticleCreateRequest $request
+     */
+    public static function create(BaseRequest $request, ?array $data = null): bool
     {
         $time = time();
-        $data->setDefaultValues([
+        $request->setDefaultValues([
             'author' => 'mublog.site',
-            'alias' => kebabCase($data->title, true),
+            'alias' => kebabCase($request->title, true),
             'created' => $time,
             'updated' => $time
         ]);
-        if (self::isAliasExists($data->alias)) {
-            $data->set('alias', $data->alias . '_' . self::getNewId());
+        if (self::isAliasExists($request->alias)) {
+            $request->set('alias', $request->alias . '_' . self::getNewId());
         }
         $values = [
-            $data->title, $data->summary, $data->body,
-            $data->alias, $data->get('created'), $data->status,
-            $data->preview_src, $data->preview_alt, $data->author,
-            $data->get('updated')
+            $request->title, $request->summary, $request->body,
+            $request->alias, $request->get('created'), $request->status,
+            $request->preview_src, $request->preview_alt, $request->author,
+            $request->get('updated')
         ];
         // TODO: rebuild BlogArticle::create() method for new database structure
         pre([
