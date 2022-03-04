@@ -136,7 +136,8 @@ trait BlogModules
 
     public function library(string $name): ?AbstractLibrary
     {
-        $classname = '\\BlogLibrary\\' . pascalCase($name);
+        $class = pascalCase($name);
+        $classname = "\\BlogLibrary\\{$class}\\{$class}";
         if (!class_exists($classname)) {
             return null;
         } else if (!isset($this->libraries[$classname])) {
