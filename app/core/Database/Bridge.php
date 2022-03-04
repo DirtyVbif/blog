@@ -10,10 +10,12 @@ class Bridge
 {
     use Components\BridgeCacheSystem;
     
-    private object $config;
+    private const LOGID = 'sql';
 
+    private object $config;
     private PDO $connection;
     private PDOStatement $statement;
+    private bool $transaction = false;
 
     public function __construct()
     {
@@ -137,5 +139,36 @@ class Bridge
         $this->markupCacheToUpdate($cache_request);
         $this->query($request, $data);
         return $this->connect()->lastInsertId($last_insert_id_name);
+    }
+
+    public function startTransation(): void
+    {
+        if (!$this->transaction) {
+            $this->transaction = true;
+            $this->query('START TRANSACTION;');
+            systemLog(self::LOGID, 'Database transaction started;');
+        }
+        return;
+    }
+
+    public function commit(): void
+    {
+        if ($this->transaction) {
+            $this->transaction = false;
+            $this->query('COMMIT;');
+            systemLog(self::LOGID, 'Database transaction completed;');
+        }
+        return;
+    }
+
+    public function rollback(): void
+    {
+        
+        if ($this->transaction) {
+            $this->transaction = false;
+            $this->query('ROLLBACK;');
+            systemLog(self::LOGID, 'Database transaction rolled back;');
+        }
+        return;
     }
 }
