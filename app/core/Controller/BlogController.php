@@ -2,10 +2,10 @@
 
 namespace Blog\Controller;
 
-use Blog\Modules\Entity\BlogArticle;
+use Blog\Modules\Entity\Article;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\View\Blog;
-use Blog\Request\BlogArticleCreateRequest;
+use Blog\Request\ArticleCreateRequest;
 
 class BlogController extends BaseController
 {
@@ -103,9 +103,9 @@ class BlogController extends BaseController
             app()->router()->redirect('<previous>');
             return;
         }
-        $data = new BlogArticleCreateRequest($data);
+        $data = new ArticleCreateRequest($data);
         if ($data->isValid()) {
-            $result = BlogArticle::create($data);
+            $result = Article::create($data);
         } else {
             $result = null;
         }

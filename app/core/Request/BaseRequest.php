@@ -4,6 +4,12 @@ namespace Blog\Request;
 
 use Blog\Modules\CSRF\Token;
 
+/**
+ * Each object remembers all provided values into session container and values must be cleared manualy.
+ * 
+ * If request wouldn't be valid then form keeps filled values from session container.
+ * To clear remembered values must be called @method complete() manualy.
+ */
 abstract class BaseRequest
 {
     use Components\BaseRequestFieldValidators;
@@ -19,7 +25,6 @@ abstract class BaseRequest
     ) {
         $this->validate();
         $this->outputErrors();
-        $this->flushSession();
     }
     
     public function __get(string $name)
@@ -96,10 +101,13 @@ abstract class BaseRequest
         return;
     }
 
-    protected function flushSession(): void
+    /**
+     * Manual remove form remembered values from session container.
+     */
+    public function complete(): void
     {
-        if ($this->isValid()) {
-            session()->unset(self::SESSID);
+        foreach ($this->data as $key => $value) {
+            session()->unset(self::SESSID . '/' . $key);
         }
         return;
     }
