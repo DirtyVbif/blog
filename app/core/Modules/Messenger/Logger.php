@@ -20,8 +20,7 @@ class Logger extends \Blog\Modules\TemplateFacade\TemplateFacade
             $tpl = new Element;
             $tpl->setNamespace('messenger');
             $tpl->setName('log');
-            $tpl->setId('system-log')
-                ->addClass('system-log');
+            $tpl->setId('system-log');
             $this->tpl = $tpl;
         }
         return $this->tpl;
