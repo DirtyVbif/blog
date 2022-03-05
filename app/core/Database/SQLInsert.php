@@ -129,7 +129,7 @@ class SQLInsert extends SQLAbstractStatement
         if (!$this->values_binded) {
             foreach ($this->values as $i => $values) {
                 foreach ($values as $v => $value) {
-                    if (preg_match('/^\:[a-z]\w*$/i', $value)) {
+                    if (preg_match('/^\:[a-z]\w*$/i', $value ?? '')) {
                         continue;
                     }
                     $this->values[$i][$v] = $this->setBindValue([$this->columns[$v] => $value]);
