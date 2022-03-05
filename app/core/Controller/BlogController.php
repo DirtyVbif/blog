@@ -2,14 +2,13 @@
 
 namespace Blog\Controller;
 
-use Blog\Modules\Entity\Article;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\View\Blog;
-use Blog\Request\ArticleCreateRequest;
 
 class BlogController extends BaseController
 {
-    use Components\BlogControllerComments;
+    use Components\BlogControllerComments,
+        Components\BlogControllerPostRequests;
 
     protected \Blog\Modules\Template\Element $content;
 
@@ -67,19 +66,6 @@ class BlogController extends BaseController
         return $this->title;
     }
 
-    public function postRequest(): void
-    {
-        if ($type = $_POST['type'] ?? null) {
-            $method = pascalCase("post request {$type}");
-            if (method_exists($this, $method)) {
-                $this->$method($_POST);
-                return;
-            }
-        }
-        pre($_POST);
-        exit;
-    }
-
     protected function getRequestCreate(): bool
     {
         // verify user access level
@@ -92,30 +78,5 @@ class BlogController extends BaseController
         $this->getTitle()->set('Создание нового материала для блога');
         app()->page()->addContent($form);
         return true;
-    }
-
-    protected function postRequestBlogArticleCreate(array $data): void
-    {
-        // verify user access level
-        if (!app()->user()->verifyAccessLevel(4)) {
-            $this->status = 403;
-            msgr()->error('Данная операция доступна только администратору сайта.');
-            app()->router()->redirect('<previous>');
-            return;
-        }
-        $data = new ArticleCreateRequest($data);
-        if ($data->isValid()) {
-            $result = Article::create($data);
-        } else {
-            $result = null;
-        }
-        if ($result) {
-            msgr()->notice(t('Blog article "@name" published.', ['name' => $data->title]));
-            app()->router()->redirect('<current>');
-        } else {
-            msgr()->warning(t('There was an error wile creating article "@name".', ['name' => $data->title]));
-            app()->router()->redirect('<previous>');
-        }
-        exit;
     }
 }

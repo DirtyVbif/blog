@@ -4,28 +4,9 @@ namespace Blog\Controller\Components;
 
 use Blog\Modules\Entity\Comment;
 use Blog\Modules\View\Comments;
-use Blog\Request\CommentRequest;
 
 trait BlogControllerComments
 {
-    protected function postRequestCommentAdd(array $data): void
-    {
-        $request = new CommentRequest($data);
-        if ($request->isValid()) {
-            $result = Comment::create($request);
-        } else {
-            $result = null;
-        }
-        if ($result) {
-            msgr()->notice('Ваш комментарий отправлен и будет рассмотрен в ближайшее время.');
-        } else if (!is_null($result)) {
-            msgr()->error('При отправке комментария возникла ошибка. Если проблема повторяется, пожалуйста @contact_me.', ['contact_me' => '<a href="' . tpllink('contacts') . '">свяжитесь со мной</a>']);
-        }
-        $redirect = ($data['article_id'] ?? false) ? '/blog/' . $data['article_id'] : '<current>';
-        app()->router()->redirect($redirect);
-        return;
-    }
-
     protected function getRequestComment(): bool
     {
         // check requested comment id and action
