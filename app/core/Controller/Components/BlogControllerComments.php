@@ -3,7 +3,7 @@
 namespace Blog\Controller\Components;
 
 use Blog\Modules\Entity\Comment;
-use Blog\Modules\View\BlogComments;
+use Blog\Modules\View\Comments;
 use Blog\Request\CommentRequest;
 
 trait BlogControllerComments
@@ -62,7 +62,7 @@ trait BlogControllerComments
         ]);
         /** @var \Blog\Controller\BaseController $this */
         $this->getTitle()->set('Комментарии пользователей в блоге');
-        BlogComments::viewCommentsPage();
+        Comments::viewCommentsPage();
         return true;
     }
 }

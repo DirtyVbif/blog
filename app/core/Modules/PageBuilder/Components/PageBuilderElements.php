@@ -162,8 +162,8 @@ trait PageBuilderElements
     {
         $block = new Element;
         $block->setName('blocks/blog--comments');
-        /** @var Blog\Modules\View\BlogComments $view */
-        $view = app()->view('blog comments')->view();
+        /** @var Blog\Modules\View\Comments $view */
+        $view = app()->view('comments')->view();
         $block->set('items', $view->items);
         $block->set('pager', $view->pager);
         return $block;

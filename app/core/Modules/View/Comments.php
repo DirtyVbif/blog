@@ -7,7 +7,7 @@ use Blog\Modules\Entity\Comment;
 use Blog\Modules\TemplateFacade\Pager;
 use Blog\Modules\User\User;
 
-class BlogComments extends BaseView
+class Comments extends BaseView
 {
     public const ITEMS_PER_PAGE = 20;
 
