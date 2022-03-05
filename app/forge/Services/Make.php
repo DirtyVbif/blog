@@ -36,13 +36,16 @@ class Make extends ServicePrototype implements ServiceInterface
         $classname = $this->normalizeClassname($name);
         $namespace = count($classname['namespace']) ? implode('\\', $classname['namespace']) : null;
         $content = $this->generateScriptContent($classname['class'], $namespace);
-        $filename = COREDIR . implode('/', $classname['namespace']) . "/{$classname['class']}.php";
-        $file = f($filename)->content($content)->save();
+        $filename = "{$classname['class']}.php";
+        $directory = strSuffix(COREDIR . implode('/', $classname['namespace']), '/');
+        $file = f($filename, $directory);
+        $file->content($content);
+        $file->save();
         $result = $file->exists();
         if (!$result) {
-            forge()->setError("Failed to create `{$filename}` file.");
+            forge()->setError("Failed to create `{$directory}{$filename}` file.");
         } else {
-            forge()->setSuccess("File `{$filename}` created.");
+            forge()->setSuccess("File `{$directory}{$filename}` created.");
         }
         return;
     }

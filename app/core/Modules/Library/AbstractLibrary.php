@@ -82,7 +82,7 @@ abstract class AbstractLibrary
     {
         $get_method = 'get' . ucfirst(strtolower($source_type)) . 'SrcContent';
         if ($public_name = $this->getSources()?->{$source_type}['public'] ?? null) {
-            f($public_name)
+            f($public_name, PUBDIR)
                 ->content($this->$get_method())
                 ->save();
         }

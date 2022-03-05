@@ -20,7 +20,7 @@ class File
      */
     protected $handle;
 
-    public function __construct(string $name, string $directory = '.', ?string $extension = null)
+    public function __construct(string $name, string $directory = \ROOTDIR, ?string $extension = null)
     {
         $this
             ->name($name)

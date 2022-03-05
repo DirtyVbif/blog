@@ -47,7 +47,7 @@ trait BlogConfig
     public function manifest(): object
     {
         if (!isset($this->manifest_file)) {
-            $this->manifest_file = f('manifest.json');
+            $this->manifest_file = f('manifest.json', PUBDIR);
         }
         if (!isset($this->manifest)) {
             $this->manifest = $this->manifest_file->json_decode(false);

@@ -135,10 +135,12 @@ function strpws(int $count): string
 function ffstr(string &...$args): void
 {
     foreach ($args as &$arg) {
-        $arg = str_replace('\\', '/', $arg);
+        if (preg_match('/^' . strRegexQuote(ROOTDIR) . '/', $arg)) {
+            continue;
+        }
         $arg = preg_replace(
-            ['/^\/\b/', '/^\/?\.\/\b/', '/^\/{1}/'],
-            ['', '', ''],
+            ['/^(\/|\\\)+\b/', '/^(\/|\\\)*\.(\/|\\\)\b/'],
+            ['', ''],
             $arg
         );
     }
@@ -176,7 +178,7 @@ function kebabCase(string $string, bool $transliterate = false, string $langcode
  */
 function strTrimServDir(string $directory): string
 {
-    return str_replace(SERVERDIR, '', $directory);
+    return str_replace(ROOTDIR, '', $directory);
 }
 
 function transliterate(string $input, string $langcode = 'ru'): string
