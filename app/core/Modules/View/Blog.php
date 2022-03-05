@@ -140,8 +140,8 @@ class Blog extends BaseView
 
     public static function lastUpdate(): int
     {
-        $comments_update = sql()->query('SELECT MAX(`created`) as time FROM `comments`;')->fetch();
-        $articles_update = sql()->query('SELECT MAX(`updated`) as time FROM `entities` WHERE `etid` = 1;')->fetch();
+        $comments_update = sql()->query('SELECT UNIX_TIMESTAMP(MAX(`created`)) as time FROM `comments`;')->fetch();
+        $articles_update = sql()->query('SELECT UNIX_TIMESTAMP(MAX(`updated`)) as time FROM `entities` WHERE `etid` = 1;')->fetch();
         return max($comments_update['time'], $articles_update['time']);
     }
 }
