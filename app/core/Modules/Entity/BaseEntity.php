@@ -8,6 +8,7 @@ use Blog\Request\RequestPrototype;
 
 abstract class BaseEntity extends TemplateFacade
 {
+    // TODO: apply Factory::pattern and Prototype::pattern for Entity::class
     public const ENTITY_TABLE = 'entities';
     public const ENTITY_COLUMNS = ['id' => 'eid', 'created', 'updated', 'etid'];
 

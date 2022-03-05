@@ -40,7 +40,8 @@
 [v] maintain internal styles render for html doc;
 [v] Use *.webp images;
 [ ] Create factory and prototype pattern classes:
-    - Refactor Entity::module to use patterns factory and prototype;
+    - Refactor Entity::module to use Factory::pattern and Prototype::pattern;
+    v Refactor Request::class to use Factory::pattern and Prototype::pattern;
 [ ] Refactor project for SOLID princip;
 [v] Add system log for webmaster;
 [ ] Refactor Database\Bridge::class for Adapter pattern
