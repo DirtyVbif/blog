@@ -18,7 +18,8 @@ $helpers = [
     'string.php',
     'sql.php',
     'array.php',
-    'html.php'
+    'html.php',
+    'forge.php'
 ];
 
 // load project helpers and utilities
