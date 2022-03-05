@@ -15,8 +15,9 @@ commands
 .vscode/
 assets/img/
 
-# local configuration files
+# local configuration and automaticly generated files
 env
+public/sitemap.xml
 
 # some temporary files
-public/test.php
+test/
