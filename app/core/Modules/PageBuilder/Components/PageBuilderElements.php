@@ -127,6 +127,7 @@ trait PageBuilderElements
         $label->addClass('section__header section_contacts__header');
         $block->set('label', $label);
         $form = new Form('feedback');
+        $form->tpl()->useGlobals(true);
         $block->set('form', $form);
         return $block;
     }

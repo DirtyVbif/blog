@@ -79,6 +79,12 @@ class BaseTemplate
     {
         $this->set('langcode', app()->getLangcode());
         $this->set('charset', CHARSET);
+        if (user()->name()) {
+            $this->set('user_name', user()->name());
+        }
+        if (user()->mail()) {
+            $this->set('user_mail', user()->mail());
+        }
     }
 
     public function safety(?bool $is_safe = null): bool|self

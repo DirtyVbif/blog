@@ -10,7 +10,12 @@
                 name="name"
                 max-length="60"
                 class="form__input form_feedback__input"
-                required{{ old('name', true) }}>
+                required
+                {% if old('name') %}
+                    {{ old('name', true) }}
+                {% else %}
+                    {% if user_name %}value="{{ user_name }}"{% endif %}
+                {% endif %}>
         </div>
         <div class="form__field form_feedback__field">
             <label for="form-feedback--mail" class="form__field-label form_feedback__field-label">Ваш e-mail:</label>
@@ -20,7 +25,12 @@
                 name="email"
                 max-length="256"
                 class="form__input form_feedback__input"
-                required{{ old('email', true) }}>
+                required
+                {% if old('email') %}
+                    {{ old('email', true) }}
+                {% else %}
+                    {% if user_mail %}value="{{ user_mail }}"{% endif %}
+                {% endif %}>
             <span class="form__field-anno form_feedback__field-anno">Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.</span>
         </div>
         <div class="form__field form_feedback__field">

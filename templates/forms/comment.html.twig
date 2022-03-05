@@ -13,7 +13,12 @@
                 name="name"
                 max-length="60"
                 class="form__input form_comment__input"
-                required>
+                required
+                {% if old('name') %}
+                    {{ old('name', true) }}
+                {% else %}
+                    {% if user_name %}value="{{ user_name }}"{% endif %}
+                {% endif %}>
         </div>
         <div class="form__field form_comment__field">
             <label for="form-comment--mail" class="form__field-label form_comment__field-label">Ваш e-mail:</label>
@@ -23,7 +28,12 @@
                 name="email"
                 max-length="256"
                 class="form__input form_comment__input"
-                required>
+                required
+                {% if old('email') %}
+                    {{ old('email', true) }}
+                {% else %}
+                    {% if user_mail %}value="{{ user_mail }}"{% endif %}
+                {% endif %}>
             <span class="form__field-anno form_comment__field-anno">Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.</span>
         </div>
         <div class="form__field form_comment__field">
@@ -33,7 +43,7 @@
                 name="subject"
                 class="form__textarea form_comment__textarea"
                 rows="6"
-                required></textarea>
+                required>{{ old('subject') }}</textarea>
         </div>
         <div class="form__field form_comment__field">
             <input type="submit" value="Отправить" class="btn btn_transparent form__submit form_comment__submit">
