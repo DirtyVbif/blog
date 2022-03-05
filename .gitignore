@@ -17,3 +17,6 @@ assets/img/
 
 # local configuration files
 env
+
+# some temporary files
+public/test.php

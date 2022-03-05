@@ -8,7 +8,8 @@
     "autoload": {
         "psr-4": {
             "Blog\\": "app/core/",
-            "BlogLibrary\\": "libraries/"
+            "BlogLibrary\\": "libraries/",
+            "BlogForge\\": "app/forge/"
         },
         "files": ["app/autoload.php"]
     },

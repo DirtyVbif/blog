@@ -1,0 +1,10 @@
+#!usr/bin/env php
+<?php
+
+const ROOTDIR = './';
+
+require ROOTDIR . 'vendor/autoload.php';
+
+BlogForge\Forge::instance()->init();
+
+echo BlogForge\Forge::instance()->response();
