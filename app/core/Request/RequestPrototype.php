@@ -10,22 +10,19 @@ use Blog\Modules\CSRF\Token;
  * If request wouldn't be valid then form keeps filled values from session container.
  * To clear remembered values must be called @method complete() manualy.
  */
-abstract class BaseRequest
+abstract class RequestPrototype
 {
-    use Components\BaseRequestFieldValidators;
+    use Components\RequestFieldValidators;
 
     protected const ACCESS_LEVEL = 2;
     public const SESSID = 'last-request-data';
+    protected const VALID = true;
+    protected const SKIP_CSRF = false;
 
     protected bool $is_valid;
     protected array $errors = [];
-
-    public function __construct(
-        protected array $data
-    ) {
-        $this->validate();
-        $this->outputErrors();
-    }
+    protected array $data;
+    protected bool $validated;
     
     public function __get(string $name)
     {
@@ -41,53 +38,72 @@ abstract class BaseRequest
      */
     public function isValid(): bool
     {
+        if (!$this->validated()) {
+            $this->validate();
+        }
         return $this->is_valid ?? false;
     }
 
-    protected function validate(): void
+    protected function validated(): bool
     {
-        $this->rememberValues();
-        if (!app()->user()->verifyAccessLevel(static::ACCESS_LEVEL)) {
-            msgr()->error(t('You have no permission for that action. If you think that it\'s an error, please contact administrator.'));
-            return;
+        return $this->validated ?? false;
+    }
+
+    /**
+     * Validation of request data to correspondes with specified rules for request.
+     * 
+     * After validation you must use @method complete() on success to clear remembered values from session container.
+     * Reason is that provided values storing into session containers to let users not to fill form again on error.
+     * 
+     * @param array $data values that must be validated. If $data array not provided manualy then validator tries to get $_POST data.
+     */
+    public function validate(array $data = []): self
+    {
+        if ($this->validated()) {
+            return $this;
         }
-        $rules = $this->rules();
-        $csrf_skip = false;
-        if (isset($rules['csrf-token'])) {
-            $csrf_skip = $rules['csrf-token']['skip'] ?? false;
-            unset($rules['csrf-token']);
+        $this->validated = true;
+        $this->data = empty($data) ? $_POST : $data;
+        $this->rememberValues();
+        if (!static::VALID) {
+            return $this;
+        } else if (!app()->user()->verifyAccessLevel(static::ACCESS_LEVEL)) {
+            msgr()->error(t('You have no permission for that action. If you think that it\'s an error, please contact administrator.'));
+            return $this;
         }
         // validate form CSRF token
-        if (!$this->validateCsrfToken($csrf_skip)) {
-            return;
+        if (!$this->validateCsrfToken()) {
+            $this->outputErrors();
+            return $this;
         }
         // authorize valid form fields
         foreach ($this->data as $field_name => $value) {
-            if (!$this->validateFieldName($field_name)) {
+            if (!$this->validateFieldByName($field_name)) {
                 unset($this->data[$field_name]);
             }
         }
         $this->is_valid = true;
         // validate form fields value
-        foreach ($rules as $name => $rule) {
-            if (preg_match('/^\#\w+/', $name)) {
+        foreach ($this->rules() as $field => $rules) {
+            if (preg_match('/^\#\w+/', $field)) {
                 continue;
-            } else if (!isset($this->data[$name]) && ($rule['required'] ?? false)) {
+            } else if (!isset($this->data[$field]) && ($rules['required'] ?? false)) {
                 $this->is_valid = false;
-                $this->errors[$name] = [
+                $this->errors[$field] = [
                     t(
                         'Field `@field_name` is required.',
-                        ['field_name' => $this->getFieldName($name)]
+                        ['field_name' => $this->getFieldName($field)]
                     )
                 ];
             } else {
-                $this->errors[$name] = $this->validateField($name, $rule);
-                if (!empty($this->errors[$name])) {
+                $this->errors[$field] = $this->validateField($field, $rules);
+                if (!empty($this->errors[$field])) {
                     $this->is_valid = false;
                 }
             }
         }
-        return;
+        $this->outputErrors();
+        return $this;
     }
 
     protected function rememberValues(): void
@@ -112,9 +128,9 @@ abstract class BaseRequest
         return;
     }
 
-    protected function validateCsrfToken(bool $skip): bool
+    protected function validateCsrfToken(): bool
     {
-        if ($skip) {
+        if (static::SKIP_CSRF) {
             return true;
         }
         $csrf_token = $this->data[Token::FORM_ID] ?? null;
@@ -127,7 +143,7 @@ abstract class BaseRequest
         return true;
     }
 
-    protected function validateFieldName(string $field_name): bool
+    protected function validateFieldByName(string $field_name): bool
     {
         $rules = $this->rules();
         return isset($rules[$field_name]);
@@ -136,11 +152,11 @@ abstract class BaseRequest
     /**
      * @return array with errors if validation failed or empty array without errors if validation passed
      */
-    protected function validateField(string $field_name, array $rule)
+    protected function validateField(string $field_name, array $rules)
     {
-        $validator = 'validateField' . pascalCase($rule['type']);
-        unset($rule['type']);
-        return $this->$validator($field_name, $rule);
+        $validator = 'validateField' . pascalCase($rules['type']);
+        unset($rules['type']);
+        return $this->$validator($field_name, $rules);
     }
 
     protected function outputErrors(): void

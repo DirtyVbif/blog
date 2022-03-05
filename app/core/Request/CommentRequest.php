@@ -2,7 +2,7 @@
 
 namespace Blog\Request;
 
-class CommentRequest extends BaseRequest
+class CommentRequest extends RequestPrototype
 {
     protected function rules(): array
     {

@@ -2,7 +2,7 @@
 
 namespace Blog\Request;
 
-class LoginRequest extends BaseRequest
+class LoginRequest extends RequestPrototype
 {
     protected const ACCESS_LEVEL = 1;
 

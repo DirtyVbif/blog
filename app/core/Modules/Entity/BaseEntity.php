@@ -4,7 +4,7 @@ namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
 use Blog\Modules\TemplateFacade\TemplateFacade;
-use Blog\Request\BaseRequest;
+use Blog\Request\RequestPrototype;
 
 abstract class BaseEntity extends TemplateFacade
 {
@@ -18,7 +18,7 @@ abstract class BaseEntity extends TemplateFacade
     /**
      * Create new entity from data
      */
-    abstract public static function create(BaseRequest $request, ?array $data = null): bool;
+    abstract public static function create(RequestPrototype $request, ?array $data = null): bool;
     abstract public static function getSitemapPriority(): float;
     abstract public static function getSitemapChangefreq(): string;
     abstract public static function getSqlTableName(): array|string;

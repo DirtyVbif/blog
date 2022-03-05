@@ -73,7 +73,8 @@ function csrf(bool $render = true)
  */
 function old(string $name, bool $as_attribute = false)
 {
-    $value = session()->get(\Blog\Request\BaseRequest::SESSID . '/' . $name);
+    // TODO: rebuild function to get required value via RequestPrototype::class method
+    $value = session()->get(\Blog\Request\RequestPrototype::SESSID . '/' . $name);
     if ($as_attribute && $value) {
         return new \Twig\Markup(" value=\"{$value}\"", CHARSET);
     }

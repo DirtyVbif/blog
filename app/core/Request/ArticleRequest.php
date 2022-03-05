@@ -2,7 +2,7 @@
 
 namespace Blog\Request;
 
-class ArticleCreateRequest extends BaseRequest
+class ArticleRequest extends RequestPrototype
 {
     protected const ACCESS_LEVEL = 4;
 

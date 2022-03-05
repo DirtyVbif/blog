@@ -6,7 +6,7 @@ use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Modules\User\User;
-use Blog\Request\BaseRequest;
+use Blog\Request\RequestPrototype;
 
 class Comment extends BaseEntity
 {
@@ -128,16 +128,17 @@ class Comment extends BaseEntity
     /**
      * @param \Blog\Request\CommentRequest $request
      */
-    public static function create(BaseRequest $request, ?array $data = null): bool
+    public static function create(RequestPrototype $request, ?array $data = null): bool
     {
         if (!$request->isValid()) {
             return false;
         }
         $sql = sql_insert('comments');
         $pid = $request->parent_id ? $request->parent_id : null;
+        $status = (int)user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN);
         $sql->set(
-            [$pid, time(), $request->name, $request->email, $request->subject, 0, $_SERVER['REMOTE_ADDR']],
-            ['pid', 'created', 'name', 'email', 'body', 'status', 'ip']
+            [$pid, user()->id(), time(), $request->name, $request->email, $request->subject, $status, $_SERVER['REMOTE_ADDR']],
+            ['pid', 'uid', 'created', 'name', 'email', 'body', 'status', 'ip']
         );
         $sql->useFunction('created', 'FROM_UNIXTIME');
         sql()->startTransation();

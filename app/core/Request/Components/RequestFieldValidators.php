@@ -2,7 +2,7 @@
 
 namespace Blog\Request\Components;
 
-trait BaseRequestFieldValidators
+trait RequestFieldValidators
 {
     // ------------------------------------------------------------------------------>
     // VALIDATORS BY FIELD TYPE
@@ -10,12 +10,12 @@ trait BaseRequestFieldValidators
     /**
      * Validate field of type `string`
      */
-    protected function validateFieldString(string $field_name, array $rule): array
+    protected function validateFieldString(string $field_name, array $rules): array
     {
         $errors = [];
         $value = $this->data[$field_name] ?? null;
-        foreach ($rule as $name => $valid) {
-            switch ($name) {
+        foreach ($rules as $rule_name => $valid) {
+            switch ($rule_name) {
                 case 'required':
                     $this->validateRequiredValue($value, $valid, $field_name, $errors);
                     break;
@@ -33,11 +33,11 @@ trait BaseRequestFieldValidators
     /**
      * Validate field of type `plain_text`
      */
-    protected function validateFieldPlainText(string $field_name, array $rule): array
+    protected function validateFieldPlainText(string $field_name, array $rules): array
     {
         $value = $this->data[$field_name] ?? null;
         $errors = [];
-        foreach ($rule as $rule_name => $valid) {
+        foreach ($rules as $rule_name => $valid) {
             switch ($rule_name) {
                 case 'required':
                     $this->validateRequiredValue($value, $valid, $field_name, $errors);
@@ -53,11 +53,11 @@ trait BaseRequestFieldValidators
     /**
      * Validate field of type `boolean`
      */
-    protected function validateFieldBoolean(string $field_name, array $rule): array
+    protected function validateFieldBoolean(string $field_name, array $rules): array
     {
         $value = ($this->data[$field_name] ?? false) ? true : false;
         $errors = [];
-        foreach ($rule as $rule_name => $valid) {
+        foreach ($rules as $rule_name => $valid) {
             switch ($rule_name) {
                 case 'required':
                     $this->validateRequiredValue($value, $valid, $field_name, $errors);
@@ -95,11 +95,11 @@ trait BaseRequestFieldValidators
     /**
      * Validate field of type `plain_text`
      */
-    protected function validateFieldHtmlText(string $field_name, array $rule): array
+    protected function validateFieldHtmlText(string $field_name, array $rules): array
     {
         $value = $this->data[$field_name] ?? null;
         $errors = [];
-        foreach ($rule as $rule_name => $valid) {
+        foreach ($rules as $rule_name => $valid) {
             switch ($rule_name) {
                 case 'required':
                     $this->validateRequiredValue($value, $valid, $field_name, $errors);

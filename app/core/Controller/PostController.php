@@ -2,7 +2,7 @@
 
 namespace Blog\Controller;
 
-use Blog\Request\FeedbackRequest;
+use Blog\Request\RequestFactory;
 
 class PostController extends BaseController
 {
@@ -29,9 +29,9 @@ class PostController extends BaseController
 
     public function feedbackRequest()
     {
-        $data = new FeedbackRequest($_POST);
-        if ($data->isValid()) {
-            app()->mailer()->sendFeedback($data);
+        $request = RequestFactory::get('feedback');
+        if ($request->isValid()) {
+            app()->mailer()->sendFeedback($request);
             msgr()->notice('Ваше сообщение успешно отправлено и будет обработано в ближайшее время.');
         }
         return;

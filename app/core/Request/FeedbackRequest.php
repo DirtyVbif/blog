@@ -2,7 +2,7 @@
 
 namespace Blog\Request;
 
-class FeedbackRequest extends BaseRequest
+class FeedbackRequest extends RequestPrototype
 {
     protected function rules(): array
     {

@@ -5,7 +5,7 @@ namespace Blog\Modules\Entity;
 use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
-use Blog\Request\BaseRequest;
+use Blog\Request\RequestPrototype;
 use Twig\Markup;
 
 class Article extends BaseEntity implements SitemapInterface
@@ -196,9 +196,9 @@ class Article extends BaseEntity implements SitemapInterface
     }
 
     /**
-     * @param \Blog\Request\ArticleCreateRequest $request
+     * @param \Blog\Request\ArticleRequest $request
      */
-    public static function create(BaseRequest $request, ?array $data = null): bool
+    public static function create(RequestPrototype $request, ?array $data = null): bool
     {
         $time = time();
         $request->setDefaultValues([
@@ -216,9 +216,9 @@ class Article extends BaseEntity implements SitemapInterface
             $request->preview_src, $request->preview_alt, $request->author,
             $request->get('updated')
         ];
-        // TODO: rebuild BlogArticle::create() method for new database structure
+        // TODO: rebuild Article::create() method for new database structure
         pre([
-            'error' => 'rebuild BlogArticle::create() method for new database structure',
+            'error' => 'rebuild Article::create() method for new database structure',
             'values' => $values
         ]);
         die;

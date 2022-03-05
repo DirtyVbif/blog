@@ -4,9 +4,8 @@ namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
-use Blog\Modules\Mailer\EMail;
 use Blog\Modules\Template\Element;
-use Blog\Request\BaseRequest;
+use Blog\Request\RequestPrototype;
 
 class Feedback extends BaseEntity
 {
@@ -113,7 +112,7 @@ class Feedback extends BaseEntity
     /**
      * @param \Blog\Request\FeedbackRequest $data
      */
-    public static function create(BaseRequest $request, ?array $data = null): bool
+    public static function create(RequestPrototype $request, ?array $data = null): bool
     {
         /** @var \Blog\Modules\Mailer\EMail $email */
         $email = $data['email'];
