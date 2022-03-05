@@ -9,6 +9,7 @@ class Forge
     use \Blog\Components\Singletone;
     
     private array $outputs = [];
+    private Components\CommandLineInterface $cli;
 
     public function init(): void
     {
@@ -29,30 +30,33 @@ class Forge
 
     private function defaults(): void
     {
-        $this->setNotice('Output available commands:');
+        $this->setNotice('Some notice default output string lorem ipsum dolor bla bla bla');
         return;
     }
 
     public function setError(string $text): void
     {
-        $this->setOutput($text, 31);
+        $this->outputs[] = $this->cli()->outputError($text);
         return;
     }
 
     public function setNotice(string $text): void
     {
-        $this->setOutput($text);
+        $this->outputs[] = $this->cli()->outputNotice($text);
         return;
     }
 
     public function setSuccess(string $text): void
     {
-        $this->setOutput($text, 32);
+        $this->outputs[] = $this->cli()->outputSuccess($text);
         return;
     }
 
-    private function setOutput(string $text, int $code = 0): void
+    public function cli(): Components\CommandLineInterface
     {
-        $this->outputs[] = $code ? "\e[{$code}m{$text}\e[0m" : $text;
+        if (!isset($this->cli)) {
+            $this->cli = new Components\CommandLineInterface;
+        }
+        return $this->cli;
     }
 }

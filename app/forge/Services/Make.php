@@ -10,27 +10,27 @@ class Make extends ServicePrototype implements ServiceInterface
         '-i' => 'interface'
     ];
 
+    public function default(): void
+    {
+        forge()->setNotice("there is no default method for `make` action");
+    }
+
     public function run(?string $method): void
     {
-        $method = lcfirst(pascalCase($method));
+        $method = lcfirst(pascalCase($method ?? ''));
         if (!method_exists($this, $method)) {
-            $this->forge->setError("There is no available methods like `{$method}` for `make` action.");
+            forge()->setError("There is no available methods like `{$method}` for `make` action.");
             return;
         }
         $this->{$method}();
         return;
     }
 
-    public function default(): void
-    {
-        $this->forge->setNotice("there is no default method for `make` action");
-    }
-
     public function class(): void
     {
         $name = $GLOBALS['argv'][2] ?? null;
         if (!$name) {
-            $this->forge->setError("No classname provided.");
+            forge()->setError("No classname provided.");
             return;
         }
         $classname = $this->normalizeClassname($name);
@@ -40,9 +40,9 @@ class Make extends ServicePrototype implements ServiceInterface
         $file = f($filename)->content($content)->save();
         $result = $file->exists();
         if (!$result) {
-            $this->forge->setError("Failed to create `{$filename}` file.");
+            forge()->setError("Failed to create `{$filename}` file.");
         } else {
-            $this->forge->setSuccess("File `{$filename}` created.");
+            forge()->setSuccess("File `{$filename}` created.");
         }
         return;
     }

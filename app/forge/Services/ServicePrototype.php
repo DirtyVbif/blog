@@ -6,11 +6,6 @@ class ServicePrototype
 {
     protected \BlogForge\Forge $forge;
 
-    public function __construct()
-    {
-        $this->forge = \BlogForge\Forge::instance();
-    }
-
     protected function normalizeClassname(string $classname): array
     {
         $classname = preg_replace('/[\.\/\\\]+/', '\\', $classname);
