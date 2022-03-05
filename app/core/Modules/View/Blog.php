@@ -48,6 +48,7 @@ class Blog extends BaseView
         $comment_form = new Form('comment', 'section');
         $comment_form->tpl()->set('entity_id', $article->id());
         $comment_form->tpl()->set('parent_id', 0);
+        $comment_form->tpl()->useGlobals(true);
         app()->page()->addContent($comment_form);
         app()->page()->content()->addClass('container_article');
         // pre($article->getComments());
@@ -74,7 +75,6 @@ class Blog extends BaseView
      */
     public static function loadArticlesData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
     {
-        // $sql = sql_select(Article::ENTITY_COLUMNS, 'articles');
         $sql = Article::sql();
         $sql->limit($limit);
         if ($offset) {
@@ -85,7 +85,18 @@ class Blog extends BaseView
             $order = 'DESC';
         }
         $sql->order('created', $order);
-        return $sql->all();
+        $items = [];
+        foreach ($sql->all() as $row) {
+            $items[$row['id']] = $row;
+            unset($items[$row['id']]['cid']);
+            if ($row['cid']) {
+                $items[$row['id']]['comments'][$row['cid']] = [
+                    'cid' => $row['cid'],
+                    'deleted' => $row['deleted']
+                ];
+            }
+        }
+        return $items;
     }
 
     public static function getArticleById(int $id): ?Article
