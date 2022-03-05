@@ -116,6 +116,18 @@ function strrws(string $string): string
 }
 
 /**
+ * Output string contains specified number of whitespaces
+ */
+function strpws(int $count): string
+{
+    $output = '';
+    for ($i = 0; $i < max($count, 0); $i++) {
+        $output .= ' ';
+    }
+    return $output;
+}
+
+/**
  * Format File (or directory) String (ffstr). Removes leading slash `/`
  * 
  * Recieves one or more string arguments as references and removes leading slash `/` for each argument
