@@ -11,7 +11,7 @@ trait Helpers
     public function __construct()
     {
         $this->driver = app()->env()->DB['DRIVER'];
-        $this->schema = app()->env()->DB['SCHEMA'] ?? null;
+        $this->schema = app()->env()->DB['SCHEMA'] ?? app()->env()->DB['NAME'];
         switch ($this->driver) {
             case 'mysql':
                 $this->q = '`';
