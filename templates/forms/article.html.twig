@@ -10,7 +10,7 @@
                 name="title"
                 max-length="256"
                 class="form__input form_blog-article__input"
-                required>
+                required{{ old('title', true) }}>
         </div>
 
         <div class="form__field form_blog-article__field">
@@ -22,7 +22,9 @@
                     {{ id('form-blog-article--alias', true) }}
                     name="alias"
                     max-length="256"
-                    class="form__input form_blog-article__input">
+                    class="form__input form_blog-article__input"
+                    placeholder="You can specify alias manualy or it will be generated automatically"
+                    {{ old('alias', true) }}>
             </div>
         </div>
 
@@ -33,7 +35,7 @@
                 {{ id('form-blog-article--preview-src', true) }}
                 name="preview_src"
                 max-length="256"
-                class="form__input form_blog-article__input">
+                class="form__input form_blog-article__input"{{ old('preview_src', true) }}>
         </div>
 
         <div class="form__field form_blog-article__field">
@@ -43,7 +45,7 @@
                 {{ id('form-blog-article--preview-alt', true) }}
                 name="preview_alt"
                 max-length="256"
-                class="form__input form_blog-article__input">
+                class="form__input form_blog-article__input"{{ old('preview_alt', true) }}>
         </div>
         
         <div class="form__field form_blog-article__field">
@@ -54,7 +56,7 @@
                 class="form__textarea form_blog-article__textarea form_blog-article__textarea_summary"
                 rows="3"
                 max-length="512"
-                required></textarea>
+                required>{{ old('summary') }}</textarea>
         </div>
         
         <div class="form__field form_blog-article__field">
@@ -64,7 +66,7 @@
                 name="body"
                 class="form__textarea form_blog-article__textarea form_blog-article__textarea_body"
                 rows="8"
-                required></textarea>
+                required>{{ old('body') }}</textarea>
         </div>
 
         <div class="form__field form_blog-article__field">
@@ -75,6 +77,9 @@
                 name="author"
                 max-length="50"
                 class="form__input form_blog-article__input"
+                {% if old('author') %}
+                    {{ old('author', true) }}
+                {% else %}value="{{ user_name }}"{% endif %}                
                 required>
         </div>
 
