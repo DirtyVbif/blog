@@ -13,13 +13,14 @@ class Article extends BaseEntity implements SitemapInterface
     public const VIEW_MODE_FULL = 'full';
     public const VIEW_MODE_TEASER = 'teaser';
     public const VIEW_MODE_PREVIEW = 'preview';
+    public const TYPE_ID = 1;
     protected const VIEW_MODES = [
         0 => self::VIEW_MODE_FULL,
         1 => self::VIEW_MODE_TEASER,
         2 => self::VIEW_MODE_PREVIEW
     ];
     public const ENTITY_DATA_TABLE = 'entities_article_data';
-    public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'body', 'preview_src', 'preview_alt', 'author', 'views'];
+    public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'status', 'preview_src', 'preview_alt', 'author', 'views'];
     public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
 
@@ -204,31 +205,47 @@ class Article extends BaseEntity implements SitemapInterface
         $request->setDefaultValues([
             'author' => 'mublog.site',
             'alias' => kebabCase($request->title, true),
+            'updated' => $time,
             'created' => $time,
-            'updated' => $time
+            'views' => 0
         ]);
         if (self::isAliasExists($request->alias)) {
             $request->set('alias', $request->alias . '_' . self::getNewId());
         }
-        $values = [
-            $request->title, $request->summary, $request->body,
-            $request->alias, $request->get('created'), $request->status,
-            $request->preview_src, $request->preview_alt, $request->author,
-            $request->get('updated')
-        ];
-        // TODO: rebuild Article::create() method for new database structure
-        pre([
-            'error' => 'rebuild Article::create() method for new database structure',
-            'values' => $values
-        ]);
-        die;
-        $sql = sql_insert(self::ENTITY_DATA_TABLE);
+        $sql = sql_insert(self::ENTITY_TABLE);
         $sql->set(
-            values: $values,
-            columns: ['title', 'summary', 'body', 'alias', 'created', 'status', 'preview_src', 'preview_alt', 'author', 'updated']
+            [$request->get('created'), $request->get('updated'), self::TYPE_ID],
+            ['created', 'updated', 'etid']
         );
-        $result = $sql->exe();
-        return $result;
+        $sql->useFunction('created', 'FROM_UNIXTIME')
+            ->useFunction('updated', 'FROM_UNIXTIME');
+        sql()->startTransation();
+        $rollback = true;
+        if ($eid = $sql->exe()) {
+            $sql = sql_insert(self::ENTITY_DATA_TABLE);
+            $columns = self::ENTITY_DATA_COLUMNS;
+            $columns[] = 'eid';
+            $values = [
+                $request->title, $request->summary, $request->body,
+                $request->get('alias'), $request->status,
+                $request->preview_src, $request->preview_alt,
+                $request->get('author'), $request->get('views'), $eid
+            ];
+            foreach (['preview_src', 'preview_alt'] as $field) {
+                if ($request->get($field)) {
+                    continue;
+                }
+                $i = array_search($field, $columns);
+                unset($columns[$i], $values[$i]);
+            }
+            $sql->set($values, $columns);
+            if ($sql->exe(true)) {
+                $rollback = false;
+                $request->complete();
+            }
+        }
+        sql()->commit($rollback);
+        return !$rollback;
     }
 
     protected static function isAliasExists(string $alias): bool

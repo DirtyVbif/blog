@@ -10,7 +10,7 @@ footer: {
 
 admin_bar: {
   access_level: 4,
-  items: ['user_profile', 'user_login', 'user_logout', 'feedbacks', 'sitemap_generate'],
+  items: ['user_profile', 'user_login', 'user_logout', 'feedbacks', 'sitemap_generate', 'blog_article_create'],
   class: 'admin-nav'
 }
 

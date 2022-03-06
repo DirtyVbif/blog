@@ -15,6 +15,12 @@ blog_comments: {
   label: 'Комментарии',
   sitemap_changefreq: 'daily'
 }
+blog_article_create: {
+  url: '/blog/create',
+  label: '+ article',
+  access_level: 4,
+  sitemap_exclude: true
+}
 about: {
   url: '#about',
   label: 'about',
