@@ -10,17 +10,22 @@ class Forge
     
     private array $outputs = [];
     private Components\CommandLineInterface $cli;
+    private array $args;
 
     public function init(): void
     {
-        $args = $GLOBALS['argv'];
-        $argument = $args[1] ?? null;
-        if ($argument) {
-            ServiceFactory::callback($argument);
+        $this->args = $GLOBALS['argv'];
+        if ($this->arg(1)) {
+            ServiceFactory::callback($this->arg(1));
         } else {
             $this->defaults();
         }
         return;
+    }
+
+    public function arg(int $number): ?string
+    {
+        return $this->args[max(1, $number)] ?? null;
     }
 
     public function response(): string
