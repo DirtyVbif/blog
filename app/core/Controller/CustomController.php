@@ -3,6 +3,8 @@
 namespace Blog\Controller;
 
 use Blog\Modules\Template\Element;
+use Blog\Modules\TemplateFacade\BlockList;
+use Blog\Modules\User\User;
 
 class CustomController extends BaseController
 {
@@ -13,31 +15,16 @@ class CustomController extends BaseController
     {
         parent::prepare();
         $this->status = 200;
-        if (!$this->validateRequest()) {
+        if (
+            !$this->validateRequest()
+            || !$this->{$this->specified_request_method}()
+        ) {
             // if blog arguments is invalide then load error controller with status 404
-            /** @var ErrorController $err_c */
-            $err_c = app()->controller('error');
-            $err_c->prepare($this->status);
+            /** @var ErrorController $conerr */
+            $conerr = app()->controller('error');
+            $conerr->prepare($this->status);
             return;
         }
-        $this->{$this->specified_request_method}();
-        // // add main page elements
-        // app()->page()->setAttr('class', 'page_front');
-        // // use front page styles
-        // app()->page()->useCss('front.min');
-        // // add page content
-        // app()->page()->addContent([
-        //     // set front page banner
-        //     app()->builder()->getBannerBlock(),
-        //     // set front page skill box
-        //     app()->builder()->getSkillsBlock(),
-        //     // set front page summary block
-        //     app()->builder()->getSummaryBlock(),
-        //     // set front page blog preview block
-        //     app()->builder()->getBlogPreview(),
-        //     // set front page contacts block
-        //     app()->builder()->getContactsBlock()
-        // ]);
         return;
     }
 
@@ -60,22 +47,22 @@ class CustomController extends BaseController
         return false;
     }
 
-    public function getTitle(): string
-    {
-        return '';
-    }
-
     public function postRequest(): void
     {
         pre($_POST);
         exit;
     }
 
-    protected function getRequestAgreementCookie(): void
+    protected function setTitles(string $title): void
     {
-        $title = 'Политика использования cookie-файлов';
-        app()->page()->setTitle($title);
-        app()->page()->setMetaTitle($title);
+        $this->getTitle()->set($title);
+        app()->page()->setMetaTitle($title . stok(' | :[site]'));
+        return;
+    }
+
+    protected function getRequestAgreementCookie(): bool
+    {
+        $this->setTitles('Политика использования cookie-файлов');
         app()->page()->setMeta(
             'name',
             [
@@ -86,5 +73,26 @@ class CustomController extends BaseController
         $cookie_agreement->setName('content/cookie-agreement');
         $cookie_agreement->addClass('cookie-files');
         app()->page()->addContent([$cookie_agreement]);
+        return true;
+    }
+
+    protected function getRequestFeedbacks(): bool
+    {
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+            $this->status = 403;
+            return false;
+        }
+        $this->setTitles('User\'s feedbacks');
+        // set meta tag robots as noindex
+        // reason is that feedbacks page available only for admins
+        app()->page()->metaRobots('noindex');
+        app()->page()->useCss('/css/feedbacks.min');
+        $list = new BlockList(app()->view('feedbacks')->view()->items);
+        $list->set(
+            'pager',
+            app()->view('feedbacks')->view()->pager
+        )->setClasslist('feedbacks');
+        app()->page()->addContent($list);
+        return true;
     }
 }

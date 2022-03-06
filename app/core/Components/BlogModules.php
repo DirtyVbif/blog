@@ -5,18 +5,21 @@ namespace Blog\Components;
 use Blog\Client\CookiesFacade;
 use Blog\Client\SessionFacade;
 use Blog\Database\Bridge;
-use Blog\Modules\Cache\CacheEntity;
-use Blog\Modules\CSRF\Token;
-use Blog\Modules\Library\AbstractLibrary;
-use Blog\Modules\Mailer\Mailer;
-use Blog\Modules\PageBuilder\PageBuilder;
-use Blog\Modules\Messenger\Messenger;
-use Blog\Modules\Response\Response;
-use Blog\Modules\Router\Router;
-use Blog\Modules\Template\Page;
-use Blog\Modules\User\User;
-use Blog\Modules\View\BaseView;
-use Blog\Modules\Cache\CacheSystem;
+use Blog\Modules\{
+    Cache\CacheEntity,
+    CSRF\Token,
+    Library\AbstractLibrary,
+    Mailer\Mailer,
+    PageBuilder\PageBuilder,
+    Messenger\Messenger,
+    Response\Response,
+    Router\Router,
+    Template\Page,
+    User\User,
+    View\BaseView,
+    Cache\CacheSystem
+};
+use Blog\Modules\Messenger\Logger;
 
 trait BlogModules
 {
@@ -34,6 +37,7 @@ trait BlogModules
     /** @var AbstractLibrary[] $libraries */
     private array $libraries;
     private CacheSystem $cache;
+    private Logger $logger;
 
     public function response(): Response
     {
@@ -132,7 +136,8 @@ trait BlogModules
 
     public function library(string $name): ?AbstractLibrary
     {
-        $classname = '\\BlogLibrary\\' . pascalCase($name);
+        $class = pascalCase($name);
+        $classname = "\\BlogLibrary\\{$class}\\{$class}";
         if (!class_exists($classname)) {
             return null;
         } else if (!isset($this->libraries[$classname])) {
@@ -155,5 +160,13 @@ trait BlogModules
         }
         /** @return CacheEntity */
         return $this->cache->entity($cache_entity_name);
+    }
+
+    public function logger(): Logger
+    {
+        if (!isset($this->logger)) {
+            $this->logger = new Logger;
+        }
+        return $this->logger;
     }
 }

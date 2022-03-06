@@ -7,7 +7,6 @@ use Blog\Modules\FileSystem\Folder;
 
 class CacheEntity
 {
-    protected const DIR = 'cache/';
     protected const DATFILE = 'cache.module';
     protected const DEFAULT_DIR_PERMISIONS = 0755;
     protected const TEST = 'test';

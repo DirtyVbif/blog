@@ -10,6 +10,17 @@ blog: {
   sitemap_priority: 1.0,
   sitemap_changefreq: 'daily'
 }
+blog_comments: {
+  url: '/blog/comments',
+  label: 'Комментарии',
+  sitemap_changefreq: 'daily'
+}
+blog_article_create: {
+  url: '/blog/create',
+  label: '+ article',
+  access_level: 4,
+  sitemap_exclude: true
+}
 about: {
   url: '#about',
   label: 'about',
@@ -43,6 +54,17 @@ user_logout: {
   url: '/user/logout',
   label: 'sign out',
   access_level: 3,
+  sitemap_exclude: true
+}
+feedbacks: {
+  url: '/feedbacks',
+  label: 'feedbacks',
+  access_level: 4,
+  sitemap_exclude: true
+}
+sitemap: {
+  url: '/sitemap.xml',
+  label: 'sitemap',
   sitemap_exclude: true
 }
 sitemap_generate: {

@@ -1,0 +1,12 @@
+{{ wrapper.set('ul').addClass('comments').open() }}
+    {% if items|length > 0 %}
+        {% for item in items %}
+            <li class="comments__item">{{ item }}</li>
+        {% endfor %}
+    {% else %}
+        <li class="comments__item">
+            <p>Пока что никто ещё не оставил комментариев в блоге. Когда комментарии появятся, они будут отображены на этой странице.</p>
+        </li>    
+    {% endif %}
+    {{ pager }}
+{{ wrapper.close() }}

@@ -6,12 +6,18 @@ composer.lock
 node_modules/
 vendor/
 
-# cache
+# cache and logs
 public/cache/
+*.log
 
 # Development files
 commands
 .vscode/
+assets/img/
 
-# local configuration files
+# local configuration and automaticly generated files
 env
+public/sitemap.xml
+
+# some temporary files
+test/

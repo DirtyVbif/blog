@@ -6,13 +6,6 @@ use Blog\Request\LoginRequest;
 
 class UserController extends BaseController
 {
-    protected string $title;
-
-    public function __construct()
-    {
-        $this->title = t('Admin authorization');
-    }
-
     public function prepare(): void
     {
         parent::prepare();
@@ -21,11 +14,6 @@ class UserController extends BaseController
             $request_is_valid = false;
         }
         if ($argument = app()->router()->arg(2)) {
-            if ($argument === 'login' && !app()->user()->isAuthorized()) {
-                $this->loadLoginForm();
-            } else {
-                $request_is_valid = false;
-            }
             $method = pascalCase("get request {$argument}");
             if (method_exists($this, $method)) {
                 $request_is_valid = $this->$method();
@@ -33,7 +21,9 @@ class UserController extends BaseController
                 $request_is_valid = false;
             }
         } else if (!app()->user()->isAuthorized()) {
-            $this->loadLoginForm();
+            $this->getRequestLogin();
+        } else {
+            $this->getRequestProfile();
         }
         if (!$request_is_valid) {
             app()->controller('error')->prepare();
@@ -41,10 +31,7 @@ class UserController extends BaseController
             // TODO: complete user profile view
             // add noindex meta tag
             // reason is that authorization only for admins
-            app()->page()->setMeta('robots', [
-                'name' => 'robots',
-                'content' => 'noindex'
-            ]);
+            app()->page()->metaRobots('noindex');
         }
         return;
     }
@@ -54,6 +41,7 @@ class UserController extends BaseController
         if (app()->user()->isAuthorized()) {
             app()->router()->redirect('/user');
         }
+        app()->page()->setMetaTitle(stok('User login | :[site]'));
         $this->loadLoginForm();
         return true;
     }
@@ -75,6 +63,7 @@ class UserController extends BaseController
         app()->page()->addContent(
             app()->builder()->getLoginForm()
         );
+        $this->getTitle()->set(t('Admin authorization'));
         return;
     }
 
@@ -90,11 +79,24 @@ class UserController extends BaseController
         return;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ControlledPageTitle
     {
-        if (app()->user()->isAuthorized()) {
-            $this->title = t('Hello, @name', ['name' => app()->user()->name()]);
+        parent::getTitle();
+        if (!$this->title->isset()) {
+            $this->title->set(t('Admin authorization'));
         }
         return $this->title;
+    }
+
+    protected function getRequestProfile(): void
+    {
+        $this->getTitle()->set(
+            t('Hello, @name', ['name' => app()->user()->name()])
+        );
+        app()->page()->setMetaTitle(stok('User profile | :[site]'));
+        app()->page()->addContent(
+            app()->builder()->getUserSessions()
+        );
+        app()->page()->useCss('/css/user.min');
     }
 }

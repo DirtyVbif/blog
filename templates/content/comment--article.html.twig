@@ -1,0 +1,18 @@
+{{ wrapper.addClass('comment comment_article').open() }}
+    <header class="comment__header">
+        <span class="comment__author">{{ name }}</span>
+        <span class="comment__date">{{ date }}</span>        
+        {% if admin_access %}
+            <span class="comment__email">{{ email }}</span>
+        {% endif %}
+    </header>
+    <p class="comment__body">{{ body }}</p>
+    {% if admin_access %}
+        <footer class="comment__footer">
+            {% if status == 0 %}
+                {{ link('/blog/comment/' ~ cid ~ '/approve').label(t('approve')).addClass('comment__edit') }}
+            {% endif %}
+            {{ link('/blog/comment/' ~ cid ~ '/delete').label(t('delete')).addClass('comment__edit comment__edit_delete') }}
+        </footer>
+    {% endif %}
+{{ wrapper.close() }}

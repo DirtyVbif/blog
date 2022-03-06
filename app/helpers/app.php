@@ -18,8 +18,12 @@ function t(string $text, array $variables = []): string
 /**
  * Get an object of `\Blog\Modules\FileSystem\File::class`
  */
-function f(string $name, string $directory = '.', ?string $extension = null, int $permissions = 0644): \Blog\Modules\FileSystem\File
-{
+function f(
+    string $name,
+    string $directory = ROOTDIR,
+    ?string $extension = null,
+    int $permissions = 0644
+): \Blog\Modules\FileSystem\File {
     $file = new \Blog\Modules\FileSystem\File($name, $directory, $extension);
     $file->permissions($permissions);
     return $file;
@@ -59,4 +63,15 @@ function fullUrlTo(string $offset = '/'): string
 function msgr(): \Blog\Modules\Messenger\Messenger
 {
     return app()->messenger();
+}
+
+function user(): \Blog\Modules\User\User
+{
+    return app()->user();
+}
+
+function systemLog(string $type, string $message): void
+{
+    app()->logger()->log($type, $message);
+    return;
 }

@@ -9,77 +9,99 @@ trait UserAuthMethods
 {
     public function authorize(LoginRequest $login_data): bool
     {
-        $udata = sql_select(from: ['u' => 'users'])
-            ->join(table: ['us' => 'users_statuses_list'], using: 'usid')
+        $sql = sql_select(from: ['u' => 'users']);
+        $sql->join(table: ['us' => User::TBL_STATUSES], using: 'usid')
             ->join(table: ['uses' => 'users_sessions'], using: 'uid')
             ->columns([
-                'u' => ['uid', 'mail', 'pwhash', 'nickname', 'registered', 'usid'],
+                'u' => ['uid', 'mail', 'pwhash', 'nickname', 'created', 'usid'],
                 'us' => ['status', 'status_label' => 'label'],
-                'uses' => ['agent_hash', 'browser', 'platform', 'updated']
-            ])->where(['u.mail' => $login_data->mail])
-            ->first();
+                'uses' => ['token', 'agent_hash', 'browser', 'platform', 'updated', 'ip']
+            ]);
+        $sql->where(['u.mail' => $login_data->mail]);
+        $sql->useFunction('u.created', 'UNIX_TIMESTAMP', 'created');
+        $udata = $sql->all();
         if (empty($udata)) {
             return false;
-        } elseif (!password_verify($login_data->password, $udata['pwhash'])) {
+        } elseif (!password_verify($login_data->password, $udata[0]['pwhash'])) {
             return false;
         }
         $user = [
             'data' => [
-                'id' => $udata['uid'],
-                'mail' => $udata['mail'],
-                'nickname' => $udata['nickname'],
-                'registered' => $udata['registered'],
+                'id' => $udata[0]['uid'],
+                'mail' => $udata[0]['mail'],
+                'nickname' => $udata[0]['nickname'],
+                'created' => $udata[0]['created'],
             ],
             'status' => [
-                'id' => $udata['usid'],
-                'status' => $udata['status'],
-                'label' => $udata['status_label']
+                'id' => $udata[0]['usid'],
+                'status' => $udata[0]['status'],
+                'label' => $udata[0]['status_label']
             ]
         ];
         $this->setAuthorizedStatus($user, $login_data->remember_me);
+        $this->checkTimeoutSession($udata);
+        $login_data->complete();
         return true;
     }
 
-    protected function setAuthorizedStatus(array $user, bool $remember): self
+    protected function setAuthorizedStatus(array $user, bool $remember): void
     {
-        $utoken = $this->token()->generate();
-        $token = $this->token()->getTokenString($utoken);
+        $utoken = user()->token()->generate();
+        $token = user()->token()->getTokenString($utoken);
         session()->set(User::SESSUID . '/udata', $user['data']);
         session()->set(User::SESSUID . '/status', $user['status']);
         session()->set(User::SESSUID . '/token', $utoken);
         if ($remember) {
-            $this->token()->setCookieUToken($utoken);
+            user()->token()->setCookieUToken($utoken);
         }
-        return $this->storeNewSession($token, $user['data']['id']);
+        $this->storeNewSession($token, $user['data']['id']);
+        return;
     }
 
-    protected function storeNewSession(string $token, int $uid): self
+    protected function storeNewSession(string $token, int $uid): void
     {
-        $this->removePreviousSession($uid, app()->user()->agent()->hash());
-        sql_insert('users_sessions')
-            ->set(
-                [
-                    $uid, $token,
-                    app()->user()->agent()->hash(),
-                    app()->user()->agent()->browser(),
-                    app()->user()->agent()->platform(),
-                    time()
-                ],
-                [
-                    'uid', 'token', 'agent_hash',
-                    'browser', 'platform', 'updated'
-                ]
-            )->exe();
-        return $this;
+        $this->removePreviousSession($uid, user()->agent()->hash());
+        $sql = sql_insert('users_sessions');
+        $sql->set(
+            [
+                $uid, $token,
+                user()->agent()->hash(),
+                user()->agent()->browser(),
+                user()->agent()->platform(),
+                time(), user()->ip()
+            ],
+            [
+                'uid', 'token', 'agent_hash',
+                'browser', 'platform', 'updated', 'ip'
+            ]
+        )->useFunction('updated', 'FROM_UNIXTIME');
+        $sql->exe();
+        return;
     }
 
-    protected function removePreviousSession(int $uid, string $agent_hash): self
+    protected function removePreviousSession(int $uid, string $agent_hash): void
     {
         $delete = sql_update(table: 'users_sessions')
             ->where(['uid' => $uid])
             ->andWhere(['agent_hash' => $agent_hash]);
 
         $delete->delete();
-        return $this;
+        return;
+    }
+
+    protected function checkTimeoutSession(array $udata): void
+    {
+        foreach ($udata as $row) {
+            if (
+                !$row['token']
+                || (time() - $row['updated']) < app()->config('user')->utoken_lifetime
+            ) {
+                continue;
+            }
+            $delete = sql_update(table: 'users_sessions');
+            $delete->where(['token' => $row['token']]);
+            $delete->delete();
+        }
+        return;
     }
 }

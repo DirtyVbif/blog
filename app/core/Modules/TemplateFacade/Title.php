@@ -6,7 +6,7 @@ use Blog\Modules\Template\Element;
 
 class Title extends TemplateFacade
 {
-    protected string $content;
+    protected $content;
 
     public function __construct(
         protected int $size = 1
@@ -36,9 +36,9 @@ class Title extends TemplateFacade
         return parent::render();
     }
 
-    public function set(string $title_content): self
+    public function set($content): self
     {
-        $this->content = $title_content;
+        $this->content = $content;
         return $this;
     }
 

@@ -60,26 +60,24 @@
         width: 100%;
         padding: 15px 90px 60px;
         text-align: center;
-        background-image: url('/images/banner-v2.jpg');
-        background-color: $bkgd;
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-size: 100% auto;
-        font-size: 0.9em;
-        font-weight: bold;
         border-radius: 4px;
+        color: $bkgd;
+        overflow: hidden;
+        box-shadow: $shadow;
 
         @include vwMax($vwbp_s) {
-            padding: 15px 40px;
+            padding: 20px 40px 30px;
         }
         
         @include vwMax($vwbp_xs) {
             font-size: 0.85em;
-            padding: 15px 30px;
+            padding: 20px 30px 30px;
         }
 
         & h1 {
+            position: inherit;
             font-size: 60px;
+            z-index: 1;
 
             @include vwMax($vwbp_m) {
                 font-size: 40px;
@@ -88,6 +86,39 @@
             @include vwMax($vwbp_s) {
                 font-size: 24px;
             }
+        }
+
+        &__text {
+            position: inherit;
+            z-index: 1;
+            font-size: 18px;
+            text-align: justify;
+
+            @include vwMax($vwbp_s) {
+                font-size: 14px;
+            }
+
+            & a {
+                color: $link_hover;
+
+                &:hover {
+                    color: adjust-color($color: $link_hover, $hue: 7, $saturation: 25%, $lightness: 15%);
+                }
+            }
+        }
+        
+        &__background {
+            width: calc(100% + 8px);
+            height: calc(100% + 8px);
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            background: url('/images/keyboard.webp') opacify($color: $phantom, $amount: 0.5);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-blend-mode: multiply;
+            filter: blur(4px);
+            z-index: 0;
         }
     }
 

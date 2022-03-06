@@ -120,7 +120,8 @@ trait BridgeCacheSystem
         if ($names = $this->parsed_tables[$request] ?? false) {
             return $names;
         }
-        switch ($this->getRequestType($request)) {
+        $type = $this->getRequestType($request);
+        switch ($type) {
             case 'select':
                 $this->parsed_tables[$request] = $this->getTblNamesFromSelect($request);
                 break;
@@ -134,16 +135,17 @@ trait BridgeCacheSystem
                 $this->parsed_tables[$request] = $this->getTblNamesFromDelete($request);
                 break;
             default:
-                pre(
-                    'Can\'t recognize sql request type from SQL request string:'
-                        . '<br><pre>' . $request . '</pre>'
-                );
+                pre([
+                    'error' => "Can't recognize sql request type from SQL request string:",
+                    'request' => $request,
+                    'type' => $type
+                ]);
         }
         if (empty($this->parsed_tables[$request] ?? null)) {
-            pre(
-                'Can\'t get table names from SQL request string:'
-                    . '<br><pre>' . $request . '</pre>'
-            );
+            pre([
+                'error' => 'Can\'t get table names from SQL request string:',
+                'request' => $request
+            ]);
         }
         return $this->parsed_tables[$request];
     }

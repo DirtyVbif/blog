@@ -1,0 +1,14 @@
+{{ wrapper.addClass('container system-log').open() }}
+    <code>
+    {% for section, stack in items %}
+        <div class="system-log__stack">
+            <p class="system-log__label">Log stack for '{{ section }}':</p>
+            <ul class="system-log__list">
+                {% for output in stack %}
+                    <li class="'system-log__item'">{{- output -}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+    </code>
+{{ wrapper.close() }}

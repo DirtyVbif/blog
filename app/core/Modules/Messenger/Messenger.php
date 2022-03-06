@@ -57,6 +57,7 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
     protected function set(string $text, array $options): void
     {
         $access_level = $options['access_level'] ?? null;
+        // TODO: add all messages into events log
         if (
             app()->router()->isAjaxRequest()
             || (

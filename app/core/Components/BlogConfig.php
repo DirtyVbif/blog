@@ -2,6 +2,7 @@
 
 namespace Blog\Components;
 
+use Blog\Modules\FileSystem\File;
 use Symfony\Component\Yaml\Yaml;
 
 trait BlogConfig
@@ -9,6 +10,8 @@ trait BlogConfig
     private array $config;
     private bool $config_loaded = false;
     private bool $env_loaded = false;
+    private object $manifest;
+    private File $manifest_file;
     private array $env;
 
     private function loadConfig(): void
@@ -39,5 +42,16 @@ trait BlogConfig
             $this->env_loaded = true;
         }
         return (object)$this->env;
+    }
+
+    public function manifest(): object
+    {
+        if (!isset($this->manifest_file)) {
+            $this->manifest_file = f('manifest.json', PUBDIR);
+        }
+        if (!isset($this->manifest)) {
+            $this->manifest = $this->manifest_file->json_decode(false);
+        }
+        return $this->manifest;
     }
 }

@@ -31,7 +31,7 @@ class SQLUpdate extends SQLAbstractStatement
             if (!is_string($column)) {
                 continue;
             }
-            $column = $this->normalizeColumnName($column);
+            $column = $this->clearColumnName($column);
             $value = $this->setBindValue([$column => $value]);
             $this->set[$column] = $value;
         }
@@ -80,10 +80,10 @@ class SQLUpdate extends SQLAbstractStatement
     {
         $sql_string = '';
         if ($this->isUpdate()) {
-            $sql_string .= "UPDATE `{$this->table}`\nSET";
+            $sql_string .= 'UPDATE ' . $this->normalizeTableName($this->table) . "\nSET";
             $sql_string .= $this->currentSqlStringSet();
         } else if ($this->isDelete()) {
-            $sql_string .= "DELETE FROM `{$this->table}`";
+            $sql_string .= 'DELETE FROM ' . $this->normalizeTableName($this->table);
         }
         $sql_string .= $this->currentSqlStringWhereCondition() . ';';
         return $sql_string;
@@ -93,7 +93,10 @@ class SQLUpdate extends SQLAbstractStatement
     {
         $set = [];
         foreach ($this->set as $column => $value) {
-            $set[] = "{$column} = {$value}";
+            if ($function = $this->column_functions[$column] ?? false) {
+                $value = "{$function}({$value})";
+            }
+            $set[] = $this->normalizeColumnName($column) . " = {$value}";
         }
         return "\n\t" . implode(', ', $set);
     }
@@ -123,6 +126,12 @@ class SQLUpdate extends SQLAbstractStatement
     public function setDel(): self
     {
         $this->statement = 'delete';
+        return $this;
+    }
+
+    public function useFunction(string $column, string $function, ?string $column_alias = null): self
+    {
+        $this->column_functions[$column] = strtoupper($function);
         return $this;
     }
 }

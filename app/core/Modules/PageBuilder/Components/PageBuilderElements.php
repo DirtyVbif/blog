@@ -3,6 +3,7 @@
 namespace Blog\Modules\PageBuilder\Components;
 
 use Blog\Modules\Template\Element;
+use Blog\Modules\TemplateFacade\BlockList;
 use Blog\Modules\TemplateFacade\BodyText;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Image;
@@ -37,8 +38,12 @@ trait PageBuilderElements
             $logo = $this->getLogo();
             $logo->addClass('logo_footer');
             $this->page_footer->set(
-                'menu',
+                'menu_footer',
                 app()->builder()->getMenu('footer')
+            );
+            $this->page_footer->set(
+                'menu_info',
+                app()->builder()->getMenu('info')
             );
             $this->page_footer->set('logo', $logo);
             $this->page_footer->set('copyrights', $this->getCopyrights());
@@ -122,6 +127,7 @@ trait PageBuilderElements
         $label->addClass('section__header section_contacts__header');
         $block->set('label', $label);
         $form = new Form('feedback');
+        $form->tpl()->useGlobals(true);
         $block->set('form', $form);
         return $block;
     }
@@ -153,6 +159,17 @@ trait PageBuilderElements
         return $block;
     }
 
+    public function getBlogCommentsPage(): Element
+    {
+        $block = new Element;
+        $block->setName('blocks/blog--comments');
+        /** @var Blog\Modules\View\Comments $view */
+        $view = app()->view('comments')->view();
+        $block->set('items', $view->items);
+        $block->set('pager', $view->pager);
+        return $block;
+    }
+
     public function getCookieModal(): Element
     {
         $chunk = new Element;
@@ -167,5 +184,13 @@ trait PageBuilderElements
         $form = new Element;
         $form->setName('forms/login');
         return $form;
+    }
+
+    public function getUserSessions(): Element
+    {
+        $block = new Element;
+        $block->setName('blocks/user-sessions');
+        $block->set('items', user()->getOpenedSessions());
+        return $block;
     }
 }

@@ -1,10 +1,15 @@
 {{ wrapper.addClass('comment comment_full').open() }}
-    <header class="comment__header">
-        <span class="comment__author">{{ name }}</span>
-        <span class="comment__date">{{ date }}</span>        
-        {% if admin_access %}
-            <span class="comment__email">{{ email }}</span>
-        {% endif %}
+    <header class="comment__header comment_full__header">
+        <h4 class="comment__title">
+            <a href="{{ url }}">{{ title }}</a>
+        </h4>
+        <div class="comment__info">
+            <span class="comment__author">{{ name }}</span>
+            <span class="comment__date">{{ date }}</span>        
+            {% if admin_access %}
+                <span class="comment__email">{{ email }}</span>
+            {% endif %}
+        </div>
     </header>
     <p class="comment__body">{{ body }}</p>
     {% if admin_access %}

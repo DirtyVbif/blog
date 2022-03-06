@@ -2,6 +2,7 @@
 
 namespace Blog\Database;
 
+use Exception;
 use PDO;
 use PDOStatement;
 
@@ -9,10 +10,12 @@ class Bridge
 {
     use Components\BridgeCacheSystem;
     
-    private object $config;
+    private const LOGID = 'sql';
 
+    private object $config;
     private PDO $connection;
     private PDOStatement $statement;
+    private bool $transaction = false;
 
     public function __construct()
     {
@@ -32,15 +35,33 @@ class Bridge
     public function connect(): PDO
     {
         if (!isset($this->connection)) {
-            $this->connection = new PDO(
-                $this->cfg('driver') . ':host=' . $this->cfg('host') . ';dbname=' . $this->cfg('name'),
-                $this->cfg('user'),
-                $this->cfg('pass'),
-                (array)app()->config('pdo')
-            );
+            $this->connection = $this->establisheConnection();
         }
         return $this->connection;
     }
+
+    private function establisheConnection(): PDO
+    {
+        $dsn = null;
+        $options = (array)app()->config('pdo');
+        switch ($this->cfg('driver')) {
+            case 'mysql':
+                $dsn = $this->cfg('driver')
+                    . ':host=' . $this->cfg('host')
+                    . ';dbname=' . $this->cfg('name');
+                break;
+            case 'pgsql':
+                $dsn = $this->cfg('driver')
+                    . ':host=' . $this->cfg('host')
+                    . ';port=' . $this->cfg('port')
+                    . ';dbname=' . $this->cfg('name');
+                break;
+            default:
+                throw new Exception("Database [{$this->cfg('driver')}] not configured", 500);
+        }
+        return new PDO($dsn, $this->cfg('user'), $this->cfg('pass'), $options);
+    }
+
     /**
      * Make raw SQL-reqquest using PDOStatement
      */
@@ -112,11 +133,44 @@ class Bridge
      * 
      * @return string last inserted id on success
      */
-    public function insert(string $request, array $data = []): string|false
+    public function insert(string $request, array $data = [], ?string $last_insert_id_name = null): string|false
     {
         $cache_request = $this->bindVariables($request, $data);
         $this->markupCacheToUpdate($cache_request);
         $this->query($request, $data);
-        return $this->connect()->lastInsertId();
+        return $this->connect()->lastInsertId($last_insert_id_name);
+    }
+
+    public function startTransation(): void
+    {
+        if (!$this->transaction) {
+            $this->transaction = true;
+            $this->query('START TRANSACTION;');
+            systemLog(self::LOGID, 'Database transaction started;');
+        }
+        return;
+    }
+
+    public function commit(bool $rollback = false): void
+    {
+        if ($rollback) {
+            $this->rollback();
+        } else if ($this->transaction) {
+            $this->transaction = false;
+            $this->query('COMMIT;');
+            systemLog(self::LOGID, 'Database transaction completed;');
+        }
+        return;
+    }
+
+    public function rollback(): void
+    {
+        
+        if ($this->transaction) {
+            $this->transaction = false;
+            $this->query('ROLLBACK;');
+            systemLog(self::LOGID, 'Database transaction rolled back;');
+        }
+        return;
     }
 }

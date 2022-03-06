@@ -133,4 +133,24 @@
             }
         }
     }
+
+    &_info {
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 12px;
+        margin: 10px 15px;
+        text-transform: uppercase;
+        
+        &__item {
+            padding: 5px 0;
+        }
+
+        &__link {
+            color: $btn_blue;
+
+            &:hover {
+                color: $btn_blue_hover;
+            }
+        }
+    }
 }

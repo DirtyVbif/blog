@@ -8,7 +8,7 @@
                 type="email"
                 {{ id('form-login--mail', true) }}
                 name="mail"
-                max="255"
+                max-length="256"
                 class="form__input form_login__input"
                 required>
         </div>
@@ -18,7 +18,8 @@
                 type="password"
                 {{ id('form-login--password', true) }}
                 name="password"
-                max="40"
+                min-length="8"
+                max-length="40"
                 class="form__input form_login__input"
                 required>
         </div>

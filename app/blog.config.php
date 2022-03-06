@@ -41,13 +41,13 @@ $__config['twig'] = [
         'Blog\Modules\TemplateFacade\TemplateFacade' => ['html']
     ],
     'config' => [
-        // 'cache' => 'cache/twig',
+        // 'cache' => PUBDIR . 'cache/twig',
         'cache' => false,
         'debug' => false,
         'auto_reload' => false
         // 'autoescape' => false
     ],
-    'templates' => 'templates'
+    'templates' => ROOTDIR . 'templates'
 ];
 
 /**
@@ -62,7 +62,7 @@ $__config['pdo'] = [
 /**
  * Application cache configurations
  */
-$__config['cache_directory'] = 'cache/';
+$__config['cache_directory'] = PUBDIR . 'cache/';
 $__config['cache'] = [
     'sql' => [
         'status' => true,

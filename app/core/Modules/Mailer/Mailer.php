@@ -2,25 +2,39 @@
 
 namespace Blog\Modules\Mailer;
 
-class Mailer
+use Blog\Components\AbstractModule;
+use Blog\Components\ModuleInterface;
+use Blog\Modules\Entity\Feedback;
+use Blog\Modules\User\User;
+use Blog\Request\FeedbackRequest;
+
+class Mailer extends AbstractModule implements ModuleInterface
 {
-    public function send(string $to, string $subject, string $message, array $headers = []): void
+    public function send(string $to, string $subject, string $message, array $headers): bool
     {
-        $headers['X-Mailer'] = 'PHP/' . phpversion();
-        $result = mail($to, $subject, $message, $headers);
-        $headers['Timestamp'] = time();
-        $this->storeSendMail($to, $subject, $message, $headers, $result);
-        return;
+        if (function_exists('mail')) {
+            return mail($to, $subject, $message, $headers);
+        }
+        msgr()->error('Function `mail` doesn\'t exists or disabled in php.ini.', access_level: User::ACCESS_LEVEL_ADMIN);
+        return false;
     }
 
-    protected function storeSendMail(string $to, string $subject, string $message, array $headers, bool $result): void
+    public function sendFeedback(FeedbackRequest $request): void
     {
-        $sql = sql_insert('mailer_sended_mails');
-        $sql->set(
-            [$subject, $message, json_encode($headers), $headers['Timestamp'], (int)$result],
-            ['subject', 'message', 'headers', 'timestamp', 'result']
-        );
-        $sql->exe();
+        $timestamp = time();
+        $to = app()->manifest()->webmaster->email;
+        $from = $request->email;
+        $subject = 'Сообщение с сайта от пользователя ' . date('m.d H:i', $timestamp);
+        $data = [
+            'name' => $request->name,
+            'email' => $from,
+            'date' => date('Y-m-d H:i:s', $timestamp),
+            'message' => $request->subject
+        ];
+        $email = new EMail($to, $from, $subject);
+        $email->setData($data);
+        $result = $this->send($to, $subject, $email->getHtmlBody(), $email->getHeaders());
+        Feedback::create($request, ['email' => $email, 'status' => $result]);
         return;
     }
 }

@@ -116,6 +116,18 @@ function strrws(string $string): string
 }
 
 /**
+ * Output string contains specified number of whitespaces
+ */
+function strpws(int $count): string
+{
+    $output = '';
+    for ($i = 0; $i < max($count, 0); $i++) {
+        $output .= ' ';
+    }
+    return $output;
+}
+
+/**
  * Format File (or directory) String (ffstr). Removes leading slash `/`
  * 
  * Recieves one or more string arguments as references and removes leading slash `/` for each argument
@@ -123,10 +135,12 @@ function strrws(string $string): string
 function ffstr(string &...$args): void
 {
     foreach ($args as &$arg) {
-        $arg = str_replace('\\', '/', $arg);
+        if (preg_match('/^' . strRegexQuote(ROOTDIR) . '/', $arg)) {
+            continue;
+        }
         $arg = preg_replace(
-            ['/^\/\b/', '/^\/?\.\/\b/', '/^\/{1}/'],
-            ['', '', ''],
+            ['/^(\/|\\\)+\b/', '/^(\/|\\\)*\.(\/|\\\)\b/'],
+            ['', ''],
             $arg
         );
     }
@@ -164,7 +178,7 @@ function kebabCase(string $string, bool $transliterate = false, string $langcode
  */
 function strTrimServDir(string $directory): string
 {
-    return str_replace(SERVERDIR, '', $directory);
+    return str_replace(ROOTDIR, '', $directory);
 }
 
 function transliterate(string $input, string $langcode = 'ru'): string
@@ -174,4 +188,14 @@ function transliterate(string $input, string $langcode = 'ru'): string
     $t = Yaml::parseFile($source);
     $output = str_replace($t[$langcode], $t['en'], $input);
     return $output;
+}
+
+/**
+ * String token parser
+ * 
+ * Parse tokens `:[example|token]` and replace it with data
+ */
+function stok(string $content): string
+{
+    return \Blog\Modules\StringToken\StringToken::parse($content);
 }

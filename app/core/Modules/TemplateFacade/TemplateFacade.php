@@ -21,9 +21,9 @@ abstract class TemplateFacade
         return $this->renderable ? $this->tpl()->render() : '';
     }
 
-    public function setAttr(string $attr_name, string $value): self
+    public function setAttr(string $name, ?string $value = null): self
     {
-        $this->tpl()->setAttr($attr_name, $value);
+        $this->tpl()->setAttr($name, $value);
         return $this;
     }
 

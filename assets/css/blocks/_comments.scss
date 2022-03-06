@@ -1,3 +1,4 @@
+.comments,
 .article-comments {
     padding: 0;
     list-style-type: none;
@@ -10,23 +11,23 @@
     }
 }
 
+// BLOCK -------------------------------------------------------------->
 .comment {
-    padding: 10px 30px;
-    border-radius: 4px;
-    background-color: $bkgd;
-    transition: $transition;
+    @include card();
 
+    // ELEMENTS ------------------------------------------------------->
     &.unpublished {
         background-color: $unpublished;
-    }
-
-    &:hover {
-        box-shadow: $shadow;
     }
 
     &__header {
         display: flex;
         font-size: .9em;
+    }
+
+    &__title {
+        margin: 0 0 8px;
+        font-weight: 400;
     }
 
     &__author {
@@ -74,4 +75,16 @@
             }
         }
     }
+    // ELEMENTS <-------------------------------------------------------
+
+    // MODIFICATORS --------------------------------------------------->
+    &_full {
+        // MODIFICATOR ELEMENTS --------------------------------------->
+        &__header {
+            flex-direction: column;
+        }
+        // MODIFICATOR ELEMENTS <---------------------------------------
+    }
+    // MODIFICATORS <---------------------------------------------------
 }
+// BLOCK <--------------------------------------------------------------

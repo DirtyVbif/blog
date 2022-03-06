@@ -91,7 +91,7 @@ class Image extends TemplateFacade
     public function alt(?string $alt = null): self|string
     {
         if (is_null($alt)) {
-            return $this->alt ?? 'image' . $this->source_path;
+            return $this->alt ?? 'image ' . $this->src();
         }
         $this->alt = htmlspecialchars($alt);
         return $this;
@@ -120,7 +120,7 @@ class Image extends TemplateFacade
         } else {
             $this->tpl()->tag('div');
             $this->tpl()->setContent(
-                "Can't render file '" . SERVERDIR . $this->source_path . "' as image."
+                "Can't render file '" . PUBDIR . $this->source_path . "' as image."
             );
         }
         return parent::render();

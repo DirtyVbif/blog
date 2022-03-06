@@ -67,3 +67,16 @@ function csrf(bool $render = true)
     }
     return app()->csrf();
 }
+
+/**
+ * Get last value for field by name
+ */
+function old(string $name, bool $as_attribute = false)
+{
+    // TODO: rebuild function to get required value via RequestPrototype::class method
+    $value = session()->get(\Blog\Request\RequestPrototype::SESSID . '/' . $name);
+    if ($as_attribute && $value) {
+        return new \Twig\Markup(" value=\"{$value}\"", CHARSET);
+    }
+    return $value;
+}

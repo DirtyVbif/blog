@@ -78,6 +78,10 @@
         &:focus {
             border-color: $link_hover;
         }
+
+        &::placeholder {
+            color: $grey_light;
+        }
     }
 
     &__input {

@@ -15,19 +15,23 @@ class ErrorController extends BaseController
     {
         $title = t(self::ERROR_STATUS_TITLES[$status] ?? self::ERROR_STATUS_TITLES[404]);
         parent::prepare();
-        app()->page()->setTitle($title);
+        $this->getTitle()->set($title);
         $content = new Element;
         $content->setName("content/error--{$status}");
         app()->page()->addContent($content);
-        app()->page()->useCss('error.min');
+        app()->page()->useCss('/css/error.min');
         http_response_code($status);
         app()->page()->setMetaTitle(str_replace('#', t('Error') . ' ', $title) . ' | mublog.site');
         return;
     }
-
-    public function getTitle(): string
+    
+    public function getTitle(): ControlledPageTitle
     {
-        return t('Error 404. Page not found.');
+        parent::getTitle();
+        if (!$this->title->isset()) {
+            $this->title->set(t(self::ERROR_STATUS_TITLES[404]));
+        }
+        return $this->title;
     }
 
     public function postRequest(): void

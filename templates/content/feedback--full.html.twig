@@ -1,0 +1,11 @@
+{{ wrapper.addClass('feedback').open() }}
+    <header class="feedback__header">
+        <ul class="feedback__headers">
+            {% for key, item in headers %}
+                <li>{{ key }}: {{ item }}</li>
+            {% endfor %}
+        </ul>
+        <h4 class="feedback__title">{{ subject }}</h4>
+    </header>
+    <p class="feedback__body">{{ message }}</p>
+{{ wrapper.close() }}

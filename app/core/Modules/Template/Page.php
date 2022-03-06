@@ -9,8 +9,9 @@ class Page extends BaseTemplate
     use Components\TemplateAttributesMethods;
 
     protected Title $title;
-    protected array $css = [
-        'style.min'
+    protected array $css_external = [];
+    protected array $css_internal = [
+        '/css/style.min.css'
     ];
     protected array $js = [];
     protected array $js_order = [];
@@ -55,11 +56,13 @@ class Page extends BaseTemplate
         return $this;
     }
 
-    public function useCss(string $name): self
+    public function useCss(string $name, bool $internal = false): self
     {
-        $name = strSuffix($name, '.css', true);
-        if (!in_array($name, $this->css)) {
-            array_push($this->css, $name);
+        $name = strPrefix(strSuffix($name, '.css'), '/');
+        if (!$internal && !in_array($name, $this->css_external)) {
+            array_push($this->css_external, $name);
+        } else if ($internal && !in_array($name, $this->css_internal)) {
+            array_push($this->css_internal, $name);
         }
         return $this;
     }
@@ -79,7 +82,8 @@ class Page extends BaseTemplate
         $this->data['meta'] = $this->meta;
         $this->data['title'] = $this->meta_title ?? null;
         $this->data['attributes'] = $this->attributes();
-        $this->data['css'] = $this->css;
+        $this->data['css'] = $this->css_external;
+        $this->data['css_internal'] = $this->css_internal;
         $this->data['js'] = $this->getJsSrc();
         $this->data['page']['title'] = $this->getTitle();
         $this->data['page']['modal'] = $this->getModal();
@@ -88,6 +92,7 @@ class Page extends BaseTemplate
             $this->data['page']['content'] = $this->content();
         }
         $this->data['page']['messenger'] = msgr();
+        $this->data['system_log'] = app()->logger();
         return parent::render();
     }
 
@@ -100,19 +105,22 @@ class Page extends BaseTemplate
             }
         }
         if (app()->config('development')->js) {
-            foreach ($array as &$js) {
-                $js['src'] .= '?t=' . time();
-            }
+            $suffix = '?t=' . time();
+        } else {
+            $suffix = '?v=' . stok(':[site|v]');
+        }
+        foreach ($array as &$js) {
+            $js['src'] .= $suffix;
         }
         return $array;
     }
 
-    public function setTitle(string $title_content): self
+    public function setTitle($content): self
     {
         if (!isset($this->title)) {
             $this->title = new Title;
         }
-        $this->title->set($title_content);
+        $this->title->set($content);
         return $this;
     }
 
@@ -121,16 +129,16 @@ class Page extends BaseTemplate
         return $this->title ?? null;
     }
 
-    public function getModal(): ?Element
+    protected function getModal(): ?Element
     {
-        $modal = null;
-        if (!empty($this->modal)) {
-            $modal = new Element('aside');
-            $modal->addClass('container container_modal');
-            $modal->setAttr('role', 'alert');
-            $content = implode($this->modal);
-            $modal->setContent($content);
+        if (empty($this->modal)) {
+            return null;
         }
+        $modal = new Element;
+        $modal->addClass('container container_modal');
+        $modal->setAttr('role', 'alert');
+        $content = implode($this->modal);
+        $modal->setContent($content);
         return $modal;
     }
 
@@ -164,6 +172,12 @@ class Page extends BaseTemplate
     public function setMetaTitle(string $title): self
     {
         $this->meta_title = $title;
+        if (!$this->getMeta('og:title')) {
+            $this->setMeta('og:title', [
+                'property' => 'og:title',
+                'content' => $title
+            ]);
+        }
         return $this;
     }
 
@@ -173,11 +187,28 @@ class Page extends BaseTemplate
         foreach ($attributes as $attribute => $value) {
             $this->meta[$name]->setAttr($attribute, $value);
         }
+        if (preg_match('/^description$/', $name) && !$this->getMeta('og:description')) {
+            $this->setMeta('og:description', [
+                'property' => 'og:description',
+                'content' => $attributes['content']
+            ]);
+        }
         return $this;
     }
 
     public function getMeta(string $name): ?Element
     {
         return $this->meta[$name] ?? null;
+    }
+
+    /**
+     * Set meta tag `robots` with specified content
+     */
+    public function metaRobots(string $content): void
+    {
+        $this->setMeta('robots', [
+            'name' => 'robots',
+            'content' => $content
+        ]);
     }
 }

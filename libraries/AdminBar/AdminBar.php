@@ -1,6 +1,6 @@
 <?php
 
-namespace BlogLibrary;
+namespace BlogLibrary\AdminBar;
 
 class AdminBar extends \Blog\Modules\Library\AbstractLibrary
 {

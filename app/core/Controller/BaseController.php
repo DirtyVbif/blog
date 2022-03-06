@@ -4,6 +4,10 @@ namespace Blog\Controller;
 
 abstract class BaseController
 {
+    protected ControlledPageTitle $title;
+
+    abstract public function postRequest(): void;
+
     public function prepare(): void
     {
         if (!app()->builder()->prepared()) {
@@ -16,18 +20,10 @@ abstract class BaseController
         return;
     }
 
-    abstract public function getTitle(): string;
-
-    abstract public function postRequest(): void;
-
     protected function setDefaultMeta(): void
     {
-        app()->page()->setMeta('keywords', [
-            'name' => 'keywords',
-            'content' => 'веб-разработка, блог, резюме, портфолио, php-разработчик, front-end, back-end, full-stack'
-        ]);
         app()->page()->setMeta('favicon', [
-            'rel' => 'icon',
+            'rel' => 'shortcut icon',
             'href' => fullUrlTo('/favicon.ico'),
             'sizes' => 'any'
         ], 'link');
@@ -44,14 +40,26 @@ abstract class BaseController
             'rel' => 'manifest',
             'href' => fullUrlTo('/manifest.json')
         ], 'link');
-        app()->page()->setMeta('og:image', [
-            'protperty' => 'og:image',
-            'content' => fullUrlTo('/logo.svg')
+        app()->page()->setMeta('keywords', [
+            'name' => 'keywords',
+            'content' => app()->manifest()->keywords
         ]);
         app()->page()->setMeta('canonical', [
             'rel' => 'canonical',
             'href' => fullUrlTo(app()->router()->url())
         ], 'link');
+        app()->page()->setMeta('og:image', [
+            'property' => 'og:image',
+            'content' => fullUrlTo('/logo.svg')
+        ]);
         return;
+    }
+    
+    public function getTitle(): ControlledPageTitle
+    {
+        if (!isset($this->title)) {
+            $this->title = new ControlledPageTitle;
+        }
+        return $this->title;
     }
 }

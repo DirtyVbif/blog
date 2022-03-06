@@ -6,10 +6,14 @@ const src = {
         js: 'assets/js/*.js',
         jsc: 'assets/js/classes/**/*.js',
         lib_js: 'assets/libraries/**/js/*.js',
-        lib_css: 'assets/libraries/**/css/**/*.+(scss|sass)'
+        lib_css: 'assets/libraries/**/css/**/*.+(scss|sass)',
+        img: 'assets/img/**/*.+(png|jpg|webp|tiff)'
     },
-    dest: 'public/',
-    dest_lib: 'libraries/'
+    dest: {
+        pub: 'public/',
+        lib: 'libraries/',
+        img: 'public/images/'
+    }
 },
 opt = {
     css: {
@@ -27,6 +31,10 @@ opt = {
     lib: {
         base: 'assets/libraries/',
         sourcemap: true
+    },
+    img: {
+        base: 'assets/img/',
+        sourcemap: true
     }
 },
 // =====================================================================
@@ -39,15 +47,16 @@ rename = require('gulp-rename'),                        // rename outputs files
 delFiles = require('del'),                              // files delete
 cssMin = require('gulp-csso');                          // minification css
 concat = require('gulp-concat'),                        // implode files into one
-addHeader = require('gulp-header');                     // add first line into file
+addHeader = require('gulp-header'),                     // add first line into file
 // addFooter = require('gulp-footer');                  // add lasst line into file
+webp = require('gulp-webp');                            // converting images into *.webp format
 
 // =====================================================================
 //clean target directories
 function clean() {
     return delFiles([
-        src.dest + 'css/',
-        src.dest + 'js/'
+        src.dest.pub + 'css/',
+        src.dest.pub + 'js/'
     ], {
         force: true
     });
@@ -65,7 +74,7 @@ function css() {
         .pipe(rename({
             suffix: '.min'
         }))
-        .pipe(gulp.dest(src.dest));
+        .pipe(gulp.dest(src.dest.pub));
 }
 
 function css_lib() {
@@ -78,7 +87,7 @@ function css_lib() {
         .pipe(rename({
             suffix: '.min'
         }))
-        .pipe(gulp.dest(src.dest_lib));
+        .pipe(gulp.dest(src.dest.lib));
 }
 
 // =====================================================================
@@ -99,7 +108,7 @@ function js() {
         .pipe(minifyJS())
         .pipe(
             rename({ suffix: '.min' })
-        ).pipe(gulp.dest(src.dest + '/'));
+        ).pipe(gulp.dest(src.dest.pub));
 }
 
 function jsc() {
@@ -109,7 +118,7 @@ function jsc() {
         .pipe(minifyJS())
         .pipe(
             rename({ suffix: '.min' })
-        ).pipe(gulp.dest(src.dest + 'js/'));
+        ).pipe(gulp.dest(src.dest.pub + 'js/'));
 }
 
 function js_lib() {
@@ -119,7 +128,7 @@ function js_lib() {
         .pipe(minifyJS())
         .pipe(
             rename({ suffix: '.min' })
-        ).pipe(gulp.dest(src.dest_lib));
+        ).pipe(gulp.dest(src.dest.lib));
 }
 
 // =====================================================================
@@ -137,6 +146,21 @@ function watch_js_lib() {
 }
 
 // =====================================================================
+// converting images into webp
+function img() {
+    return gulp.src(src.assets.img, opt.img)
+        .pipe(webp({
+            quality: 100,
+            method: 6
+        }))
+        .pipe(gulp.dest(src.dest.img));
+}
+
+function watch_img() {
+    return gulp.watch(src.assets.img, img);
+}
+
+// =====================================================================
 // output jQuery lib
 // gulp.task('js_lib', () => {
 //     return gulp.src(src.lib.js)
@@ -148,9 +172,9 @@ function watch_js_lib() {
 exports.default = gulp.series(
     clean,
     gulp.parallel(
-        css, css_lib, js, jsc, js_lib
+        css, css_lib, js, jsc, js_lib, img
     ),
     gulp.parallel(
-        watch_css, watch_css_lib, watch_js, watch_jsc, watch_js_lib
+        watch_css, watch_css_lib, watch_js, watch_jsc, watch_js_lib, watch_img
     )
 );
