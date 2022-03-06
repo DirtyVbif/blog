@@ -5,13 +5,11 @@ namespace Blog\Request;
 class ArticleRequest extends RequestPrototype
 {
     protected const ACCESS_LEVEL = 4;
+    protected const SKIP_CSRF = true;
 
     protected function rules(): array
     {
         return [
-            'csrf-token' => [
-                'skip' => true,
-            ],
             'title' => [
                 '#label' => 'Article title',
                 'type' => 'string',

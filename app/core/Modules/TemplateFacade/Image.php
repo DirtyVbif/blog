@@ -120,7 +120,7 @@ class Image extends TemplateFacade
         } else {
             $this->tpl()->tag('div');
             $this->tpl()->setContent(
-                "Can't render file '" . SERVERDIR . $this->source_path . "' as image."
+                "Can't render file '" . PUBDIR . $this->source_path . "' as image."
             );
         }
         return parent::render();

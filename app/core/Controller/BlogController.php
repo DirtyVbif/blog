@@ -73,7 +73,8 @@ class BlogController extends BaseController
             $this->status = 403;
             return false;
         }
-        $form = new Form('blog-article');
+        $form = new Form('article');
+        $form->tpl()->useGlobals(true);
         // app()->page()->setTitle('Создание нового материала для блога');
         $this->getTitle()->set('Создание нового материала для блога');
         app()->page()->addContent($form);

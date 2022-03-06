@@ -191,7 +191,20 @@ abstract class RequestPrototype
         return;
     }
 
+    /**
+     * Get raw value by field by name.
+     * An alias for @method raw()
+     */
     public function get(string $field_name)
+    {
+        return $this->raw($field_name);
+    }
+
+    /**
+     * Get raw value by field by name
+     * An alias for @method get()
+     */
+    public function raw(string $field_name): ?string
     {
         return $this->data[$field_name] ?? null;
     }

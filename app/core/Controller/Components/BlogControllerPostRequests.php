@@ -4,6 +4,7 @@ namespace Blog\Controller\Components;
 
 use Blog\Modules\Entity\Article;
 use Blog\Modules\Entity\Comment;
+use Blog\Modules\User\User;
 use Blog\Request\RequestFactory;
 
 trait BlogControllerPostRequests
@@ -44,7 +45,7 @@ trait BlogControllerPostRequests
     protected function postRequestBlogArticleCreate(): void
     {
         // verify user access level
-        if (!app()->user()->verifyAccessLevel(4)) {
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
             $this->status = 403;
             msgr()->error('Данная операция доступна только администратору сайта.');
             app()->router()->redirect('<previous>');
@@ -60,7 +61,7 @@ trait BlogControllerPostRequests
             msgr()->notice(t('Blog article "@name" published.', ['name' => $request->title]));
             app()->router()->redirect('<current>');
         } else {
-            msgr()->warning(t('There was an error wile creating article "@name".', ['name' => $request->title]));
+            msgr()->warning(t('There was an error wile creating article "@name".', ['name' => $request->raw('title')]));
             app()->router()->redirect('<previous>');
         }
         exit;
