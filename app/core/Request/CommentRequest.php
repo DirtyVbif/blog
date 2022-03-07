@@ -4,36 +4,31 @@ namespace Blog\Request;
 
 class CommentRequest extends RequestPrototype
 {
-    protected function rules(): array
-    {
-        return [
-            'name' => [
-                '#label' => 'Name',
-                'type' => 'string',
-                'max_length' => 60,
-                'required' => true
-            ],
-            'email' => [
-                '#label' => 'E-mail',
-                'type' => 'string',
-                'pattern' => '/^\w+@\w+\.[a-zA-Z]{2,}$/',
-                'required' => true
-            ],
-            'subject' => [
-                '#label' => 'Comment',
-                'type' => 'plain_text',
-                'required' => true
-            ],
-            'parent_id' => [
-                '#label' => 'Parent comment id',
-                'type' => 'int',
-                'required' => true
-            ],
-            'entity_id' => [
-                '#label' => 'Entity id',
-                'type' => 'int',
-                'required' => true
-            ]
-        ];
-    }
+    #[RequestPropertyLabelAttribute('Name')]
+    #[Validators\Type('string')]
+    #[Validators\StringLength(60)]
+    #[Validators\Required(true)]
+    protected string $name;
+    
+    #[RequestPropertyLabelAttribute('E-mail')]
+    #[Validators\Type('string')]
+    #[Validators\Pattern('/^[\w\-\.]+@[\w\-^_]+\.[a-z]{2,}$/i')]
+    #[Validators\Required(true)]
+    protected string $email;
+
+    #[RequestPropertyLabelAttribute('Comment')]
+    #[Validators\Type('string')]
+    #[Validators\Required(true)]
+    #[Formatters\HtmlText(Formatters\HtmlText::STRATEGY_BASIC)]
+    protected string $subject;
+
+    #[RequestPropertyLabelAttribute('Parent comment id')]
+    #[Validators\Type('int')]
+    #[Validators\Required(true)]
+    protected string $parent_id;
+
+    #[RequestPropertyLabelAttribute('Entity id')]
+    #[Validators\Type('int')]
+    #[Validators\Required(true)]
+    protected string $entity_id;
 }

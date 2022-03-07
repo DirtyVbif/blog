@@ -3,6 +3,9 @@
 namespace Blog\Request;
 
 use Blog\Modules\CSRF\Token;
+use Blog\Modules\User\User;
+use ReflectionClass;
+use ReflectionProperty;
 
 /**
  * Each object remembers all provided values into session container and values must be cleared manualy.
@@ -10,28 +13,54 @@ use Blog\Modules\CSRF\Token;
  * If request wouldn't be valid then form keeps filled values from session container.
  * To clear remembered values must be called @method complete() manualy.
  */
-abstract class RequestPrototype
+class RequestPrototype
 {
-    use Components\RequestFieldValidators;
-
-    protected const ACCESS_LEVEL = 2;
     public const SESSID = 'last-request-data';
-    protected const VALID = true;
-    protected const SKIP_CSRF = false;
+    public const EMAIL_PATTERN = '/^[\w\-\.]+@[\w\-^_]+\.[a-z]{2,}$/i';
+    protected const ACCESS_LEVEL = 2;
+    protected const CSRF_SKIP = false;
 
-    protected bool $is_valid;
-    protected array $errors = [];
-    protected array $data;
-    protected bool $validated;
+    protected bool $_is_valid;
+    protected array $_errors = [];
+    protected array $_validated_fields;
+    protected bool $_validated;
+    protected ReflectionClass $_reflection;
+    /** @var ReflectionProperty[] $_reflection_properties */
+    protected array $_reflection_properties;
     
-    public function __get(string $name)
-    {
-        if (isset($this->data[$name]) && $this->isValid()) {
-            return $this->data[$name];
-        }
+    public function __construct(
+        protected array $_data = []
+    ) {
+        $this->_data = empty($data) ? $_POST : $data;
     }
 
-    abstract protected function rules(): array;
+    /**
+     * An alias for @method get(string $field_name)
+     */
+    public function __get(string $field_name)
+    {
+        return $this->get($field_name);
+    }
+
+    /**
+     * Get validated field value by field name.
+     * 
+     * > It's an alias for magic @method __get(string $field_name).
+     * > You can call $this->{$field_name} instead of $this->get($field_name).
+     * > [optional] get raw value on null if second argument provided
+     * 
+     * @param bool $raw_on_null [optional] of TRUE @method get() will return raw value on null
+     * @return mixed validated value or null
+     */
+    public function get(string $field_name, bool $raw_on_null = false)
+    {
+        if ($this->isValid() && isset($this->_validated_fields[$field_name])) {
+            return $this->{$field_name};
+        } else if ($raw_on_null) {
+            return $this->_data[$field_name] ?? null;
+        }
+        return null;
+    }
 
     /**
      * Checks if request data is valid
@@ -41,12 +70,29 @@ abstract class RequestPrototype
         if (!$this->validated()) {
             $this->validate();
         }
-        return $this->is_valid ?? false;
+        return $this->_is_valid ?? false;
     }
 
     protected function validated(): bool
     {
-        return $this->validated ?? false;
+        return $this->_validated ?? false;
+    }
+
+    /**
+     * Get raw field value by field name
+     */
+    public function raw(string $field_name): ?string
+    {
+        return $this->_data[$field_name] ?? null;
+    }
+
+    /**
+     * Set new raw value by field name
+     */
+    public function set(string $field_name, $value): void
+    {
+        $this->_data[$field_name] = $value;
+        return;
     }
 
     /**
@@ -54,61 +100,170 @@ abstract class RequestPrototype
      * 
      * After validation you must use @method complete() on success to clear remembered values from session container.
      * Reason is that provided values storing into session containers to let users not to fill form again on error.
-     * 
-     * @param array $data values that must be validated. If $data array not provided manualy then validator tries to get $_POST data.
      */
-    public function validate(array $data = []): self
+    public function validate(): self
     {
         if ($this->validated()) {
             return $this;
         }
-        $this->validated = true;
-        $this->data = empty($data) ? $_POST : $data;
+        // set request as validated
+        $this->_validated = true;
+        // remember filled values for case if validation failed
         $this->rememberValues();
-        if (!static::VALID) {
-            return $this;
-        } else if (!app()->user()->verifyAccessLevel(static::ACCESS_LEVEL)) {
+        if (!app()->user()->verifyAccessLevel(static::ACCESS_LEVEL)) {
             msgr()->error(t('You have no permission for that action. If you think that it\'s an error, please contact administrator.'));
             return $this;
         }
-        // validate form CSRF token
-        if (!$this->validateCsrfToken()) {
-            $this->outputErrors();
-            return $this;
+        // set pre-validations status as TRUE
+        // if validation will be failed status will be changed to FALSE
+        $this->_is_valid = true;
+        // validate request CSRF-token
+        if ($this->validateCsrfToken()) {
+            // preproccess request data values
+            $this->preproccess();
+            // validate request data value
+            $this->validateAttributes();
+            // format request validated values
+            $this->postFormattersAttributes();
         }
-        // authorize valid form fields
-        foreach ($this->data as $field_name => $value) {
-            if (!$this->validateFieldByName($field_name)) {
-                unset($this->data[$field_name]);
-            }
-        }
-        $this->is_valid = true;
-        // validate form fields value
-        foreach ($this->rules() as $field => $rules) {
-            if (preg_match('/^\#\w+/', $field)) {
-                continue;
-            } else if (!isset($this->data[$field]) && ($rules['required'] ?? false)) {
-                $this->is_valid = false;
-                $this->errors[$field] = [
-                    t(
-                        'Field `@field_name` is required.',
-                        ['field_name' => $this->getFieldName($field)]
-                    )
-                ];
-            } else {
-                $this->errors[$field] = $this->validateField($field, $rules);
-                if (!empty($this->errors[$field])) {
-                    $this->is_valid = false;
-                }
-            }
-        }
+        // output validation errors
         $this->outputErrors();
         return $this;
     }
 
+    protected function validateCsrfToken(): bool
+    {
+        if (static::CSRF_SKIP || user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+            return true;
+        } else if (
+            !isset($this->_data[Token::FORM_ID])
+            || !app()->csrf()->validate($this->_data[Token::FORM_ID])
+        ) {
+            $this->_errors[Token::FORM_ID] = [
+                t('CSRF-token is invalid. Please try again or contact administrator.')
+            ];
+            return $this->_is_valid = false;
+        }
+        unset($this->_data[Token::FORM_ID]);
+        return true;
+    }
+
+    protected function preproccess(): void
+    {
+        foreach ($this->reflectionProperties() as $field_name => $property) {
+            $attributes = $property->getAttributes(
+                Preproccessors\PreproccessorInterface::class,
+                \ReflectionAttribute::IS_INSTANCEOF
+            );
+            foreach ($attributes as $attribute) {
+                /** @var Preproccessors\PreproccessorInterface $preproccessor */
+                $preproccessor = $attribute->newInstance();
+                $preproccessor->format($field_name, $this);
+            }
+        }
+        return;
+    }
+
+    protected function validateAttributes(): void
+    {
+        foreach ($this->reflectionProperties() as $field_name => $property) {
+            $attributes = $property->getAttributes(
+                Validators\ValidatorInterface::class,
+                \ReflectionAttribute::IS_INSTANCEOF
+            );
+            if (empty($attributes)) {
+                continue;
+            }
+            $value = $this->raw($field_name);
+            foreach ($attributes as $attribute) {
+                /** @var Validators\ValidatorInterface $validator */
+                $validator = $attribute->newInstance();
+                $this->_errors[$field_name] = $validator->validate($value);
+            }
+            if (empty($this->_errors[$field_name])) {
+                $this->{$field_name} = $value;
+                $this->_validated_fields[$field_name] = $field_name;
+            } else {
+                $this->_is_valid = false;
+            }
+        }
+        return;
+    }
+
+    protected function postFormattersAttributes(): void
+    {
+        if (!$this->isValid()) {
+            return;
+        }
+        foreach ($this->reflectionProperties() as $field_name => $property) {
+            $attributes = $property->getAttributes(
+                Formatters\FormatterInterface::class,
+                \ReflectionAttribute::IS_INSTANCEOF
+            );
+            foreach ($attributes as $attribute) {
+                /** @var Formatters\FormatterInterface */
+                $formatter = $attribute->newInstance();
+                $this->{$field_name} = $formatter->format($this->{$field_name});
+            }
+        }
+        return;
+    }
+
+    protected function outputErrors(): void
+    {
+        foreach ($this->_errors as $field_name => $field_errors) {
+            foreach ($field_errors ?? [] as $error) {
+                msgr()->error(
+                    t(
+                        $error,
+                        ['field_name' => $this->getFieldName($field_name)]
+                    )
+                );
+            }
+        }
+        return;
+    }
+
+    protected function getFieldName(string $name)
+    {
+        if (!isset($this->{$name})) {
+            return $name;
+        }
+        $field = $this->reflection()->getProperty($name);
+        $attributes = $field->getAttributes(RequestPropertyLabelAttribute::class);
+        /** @var ?RequestPropertyLabelAttribute $label_attribute */
+        $label_attribute = ($attributes[0] ?? null)?->newInstance();
+        return $label_attribute?->get() ?? $name;
+    }
+
+    protected function reflection(): ReflectionClass
+    {
+        if (!isset($this->_reflection)) {
+            $this->_reflection = new ReflectionClass(static::class);
+        }
+        return $this->_reflection;
+    }
+
+    /**
+     * @return ReflectionProperty[]
+     */
+    protected function reflectionProperties(): array
+    {
+        if (!isset($this->_reflection_properties)) {
+            foreach ($this->reflection()->getProperties() as $property) {
+                if (empty($property->getAttributes())) {
+                    continue;
+                }
+                $field_name = $property->getName();
+                $this->_reflection_properties[$field_name] = $property;
+            }
+        }
+        return $this->_reflection_properties;
+    }
+
     protected function rememberValues(): void
     {
-        foreach ($this->data as $key => $value) {
+        foreach ($this->_data as $key => $value) {
             session()->set(
                 self::SESSID . '/' . $key,
                 $value
@@ -122,96 +277,9 @@ abstract class RequestPrototype
      */
     public function complete(): void
     {
-        foreach ($this->data as $key => $value) {
+        foreach ($this->_data as $key => $value) {
             session()->unset(self::SESSID . '/' . $key);
         }
         return;
-    }
-
-    protected function validateCsrfToken(): bool
-    {
-        if (static::SKIP_CSRF) {
-            return true;
-        }
-        $csrf_token = $this->data[Token::FORM_ID] ?? null;
-        if (!$csrf_token || !app()->csrf()->validate($csrf_token)) {
-            $this->is_valid = false;
-            $this->errors[Token::FORM_ID] = [t('Form token is invalid or timed out. Please try again or contact administrator.')];
-            return false;
-        }
-        unset($this->data[Token::FORM_ID]);
-        return true;
-    }
-
-    protected function validateFieldByName(string $field_name): bool
-    {
-        $rules = $this->rules();
-        return isset($rules[$field_name]);
-    }
-
-    /**
-     * @return array with errors if validation failed or empty array without errors if validation passed
-     */
-    protected function validateField(string $field_name, array $rules)
-    {
-        $validator = 'validateField' . pascalCase($rules['type']);
-        unset($rules['type']);
-        return $this->$validator($field_name, $rules);
-    }
-
-    protected function outputErrors(): void
-    {
-        foreach ($this->errors as $field_errors) {
-            foreach ($field_errors as $error) {
-                msgr()->error($error);
-            }
-        }
-        return;
-    }
-
-    /**
-     * Set default values on emtpy fields
-     * 
-     * @param array $defaults with `field_name => value` pairs of default values for fields by field name as array key.
-     */
-    public function setDefaultValues(array $defaults): void
-    {
-        foreach ($defaults as $field_name => $value) {
-            if ($this->data[$field_name] ?? false) {
-                continue;
-            }
-            $this->data[$field_name] = $value;
-        }
-        return;
-    }
-
-    public function set(string $field_name, $value): void
-    {
-        $this->data[$field_name] = $value;
-        return;
-    }
-
-    /**
-     * Get raw value by field by name.
-     * An alias for @method raw()
-     */
-    public function get(string $field_name)
-    {
-        return $this->raw($field_name);
-    }
-
-    /**
-     * Get raw value by field by name
-     * An alias for @method get()
-     */
-    public function raw(string $field_name): ?string
-    {
-        return $this->data[$field_name] ?? null;
-    }
-
-    protected function getFieldName(string $name): string
-    {
-        $rules = $this->rules();
-        return t($rules[$name]['#label'] ?? $name);
     }
 }
