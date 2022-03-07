@@ -2,6 +2,8 @@
 
 namespace BlogForge\Services;
 
+use Blog\Modules\FileSystem\Folder;
+
 class Make extends ServicePrototype implements ServiceInterface
 {
     protected const OPTIONS = [
@@ -38,7 +40,15 @@ class Make extends ServicePrototype implements ServiceInterface
         $content = $this->generateScriptContent($classname['class'], $namespace);
         $filename = "{$classname['class']}.php";
         $directory = strSuffix(COREDIR . implode('/', $classname['namespace']), '/');
-        $file = f($filename, $directory);
+        $folder = new Folder($directory);
+        $folder->create();
+        if (!$folder->exists()) {
+            forge()->setError("Failed to create `{$directory}` directory.");
+            return;
+        } else {
+            Folder::chmod($folder->path(), true);
+        }
+        $file = f($filename, $folder->path());
         $file->content($content);
         $file->save();
         $result = $file->exists();
