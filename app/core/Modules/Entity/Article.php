@@ -33,6 +33,7 @@ class Article extends BaseEntity implements SitemapInterface
     protected bool $comments_loaded = false;
     protected bool $comments_preloaded;
     protected int $comments_count;
+    protected bool $has_alias;
 
     public static function getSqlTableName(): array|string
     {
@@ -268,11 +269,23 @@ class Article extends BaseEntity implements SitemapInterface
         return "/blog/{$this->id()}";
     }
 
+    public function hasAlias(): bool
+    {
+        return (bool)$this->alias;
+    }
+
     public function title(): string
     {
         if (!$this->exists()) {
             return '';
         }
         return $this->title;
+    }
+
+    public static function delete(int $id): bool
+    {
+        $sql = sql_delete(self::ENTITY_TABLE);
+        $sql->where(['eid' => $id]);
+        return (bool)$sql->delete();
     }
 }

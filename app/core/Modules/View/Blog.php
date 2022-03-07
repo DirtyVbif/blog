@@ -14,17 +14,24 @@ class Blog extends BaseView
 
     public static function viewBlogArticle(string|int $argument): bool
     {
+        $article = null;
         // check argument for matching with blog article
-        if (is_numeric($argument) && $article = self::getArticleById($argument)) {
-            // if argument is numeric and equals to blog article id then redirect to named url alias of that article
-            app()->router()->redirect($article->url);
-            return true;
-        } else if (is_numeric($argument)) {
-            // if argument is numeric and there is no blog article with such id then url is unexisting
-            return false;
+        if (is_numeric($argument)) {
+            // try to load article by article id
+            $article = self::getArticleById($argument);
+            // check if article has an alias
+            if ($article?->hasAlias()) {
+                app()->router()->redirect($article->url);
+                return true;
+            } else if (!$article?->exists()) {
+                // if argument is numeric and there is no blog article with provided id then url is unexisting
+                return false;
+            }
+        } else {
+            // try to load article by url alias
+            $article = self::getArticleByAlias($argument);
         }
-        // try to load article by url alias
-        $article = self::getArticleByAlias($argument);
+        $article ??= self::getArticleByAlias($argument);
         if (!$article) {
             return false;
         }
@@ -44,6 +51,8 @@ class Blog extends BaseView
         ], 'link');
         // view loaded blog article
         app()->controller()->getTitle()->set($article->title);
+        $article_menu = app()->builder()->getMenu('article_edit', ['id' => $article->id()]);
+        app()->page()->addContent($article_menu);
         app()->page()->addContent($article);
         $comment_form = new Form('comment', 'section');
         $comment_form->tpl()->set('entity_id', $article->id());
