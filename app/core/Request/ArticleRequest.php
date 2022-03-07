@@ -44,7 +44,10 @@ class ArticleRequest extends RequestPrototype
     #[RequestPropertyLabelAttribute('Article body')]
     #[Validators\Type('string')]
     #[Validators\Required(true)]
-    #[Formatters\HtmlText(Formatters\HtmlText::STRATEGY_FULL)]
+    #[Formatters\HtmlText(
+        html_strategy: Formatters\HtmlText::STRATEGY_FULL,
+        allow_attributes: true
+    )]
     protected string $body;
 
     #[RequestPropertyLabelAttribute('Author')]

@@ -22,6 +22,7 @@ class HtmlText implements FormatterInterface
             self::STRATEGY_CUSTOM
         ])]
         protected string $html_strategy,
+        protected bool $allow_attributes = false,
         protected array|string $custom_allowed_tags = []
     ) {
         
@@ -46,7 +47,9 @@ class HtmlText implements FormatterInterface
             default:
                 $value = strip_tags($value);
         }
-        $value = htmlspecialchars($value);
+        if (!$this->allow_attributes) {
+            $value = strip_attributes($value);
+        }
         return $value;
     }
 }

@@ -13,7 +13,7 @@ class Article extends BaseEntity implements SitemapInterface
     public const VIEW_MODE_FULL = 'full';
     public const VIEW_MODE_TEASER = 'teaser';
     public const VIEW_MODE_PREVIEW = 'preview';
-    public const TYPE_ID = 1;
+    public const TYPE_ID = 1;                       # Entity type id `article` = 1
     protected const VIEW_MODES = [
         0 => self::VIEW_MODE_FULL,
         1 => self::VIEW_MODE_TEASER,
@@ -97,7 +97,7 @@ class Article extends BaseEntity implements SitemapInterface
         $this->tpl()->setName('content/article--' . $this->view_mode);
         foreach ($this->data as $key => $value) {
             if ($key === 'body') {
-                $value = new Markup(htmlspecialchars_decode($value), CHARSET);
+                $value = new Markup($value, CHARSET);
             }
             $this->tpl()->set($key, $value);
         }

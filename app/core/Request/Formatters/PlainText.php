@@ -13,7 +13,6 @@ class PlainText implements FormatterInterface
     public function format($value): mixed
     {
         $value = strip_tags($value);
-        $value = htmlspecialchars($value);
         return $value;
     }
 }
