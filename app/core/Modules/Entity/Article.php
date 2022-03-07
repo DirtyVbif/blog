@@ -23,7 +23,7 @@ class Article extends BaseEntity implements SitemapInterface
     public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'status', 'preview_src', 'preview_alt', 'author', 'views'];
     public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
-    public const DEFAULT_PREVIEW_SRC = '/images/article-preview-default.png';
+    public const DEFAULT_PREVIEW_SRC = '/images/article-preview-default.webp';
     public const DEFAULT_PREVIEW_ALT = 'Article preview image';
     public const DEFAULT_AUTHOR = 'mublog.site';
 

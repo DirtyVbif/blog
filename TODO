@@ -50,3 +50,4 @@
 [ ] Rebuild Database\Brige::transactions to use PDO::transactions;
 [ ] Add rating for articles;
 [ ] Add views for articles;
+[ ] Add image entity and use it in article;
