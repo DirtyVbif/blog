@@ -8,13 +8,12 @@ use Blog\Request\RequestPrototype;
 #[\Attribute]
 class ArticleAlias implements PreproccessorInterface
 {
-    public function format(string $field_name, RequestPrototype $request): void
+    public function format(string $field_name, RequestPrototype $request): string
     {
-        $alias = $request->raw($field_name) ?? kebabCase($request->raw('title'), true);
+        $alias = $request->raw($field_name) ? $request->raw($field_name) : kebabCase($request->raw('title'), true);
         if (Article::isAliasExists($alias)) {
             $alias .= '_' . Article::getNewId();
         }
-        $request->set($field_name, $alias);
-        return;
+        return $alias;
     }
 }

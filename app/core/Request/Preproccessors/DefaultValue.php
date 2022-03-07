@@ -13,11 +13,8 @@ class DefaultValue implements PreproccessorInterface
         
     }
 
-    public function format(string $field_name, RequestPrototype $request): void
+    public function format(string $field_name, RequestPrototype $request): string
     {
-        if (!$request->raw($field_name)) {
-            $request->set($field_name, $this->default_value);
-        }
-        return;
+        return $request->raw($field_name) ? $request->raw($field_name) : $this->default_value;
     }
 }

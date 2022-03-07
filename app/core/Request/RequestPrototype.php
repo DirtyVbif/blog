@@ -158,7 +158,7 @@ class RequestPrototype
             foreach ($attributes as $attribute) {
                 /** @var Preproccessors\PreproccessorInterface $preproccessor */
                 $preproccessor = $attribute->newInstance();
-                $preproccessor->format($field_name, $this);
+                $this->_data[$field_name] = $preproccessor->format($field_name, $this);
             }
         }
         return;
