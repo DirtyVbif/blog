@@ -23,6 +23,9 @@ class Article extends BaseEntity implements SitemapInterface
     public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'status', 'preview_src', 'preview_alt', 'author', 'views'];
     public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
+    public const DEFAULT_PREVIEW_SRC = '/images/article-preview-default.png';
+    public const DEFAULT_PREVIEW_ALT = 'Article preview image';
+    public const DEFAULT_AUTHOR = 'mublog.site';
 
     protected string $view_mode;
     protected SQLSelect $sql;
@@ -202,19 +205,9 @@ class Article extends BaseEntity implements SitemapInterface
     public static function create(RequestPrototype $request, ?array $data = null): bool
     {
         $time = time();
-        $request->setDefaultValues([
-            'author' => 'mublog.site',
-            'alias' => kebabCase($request->title, true),
-            'updated' => $time,
-            'created' => $time,
-            'views' => 0
-        ]);
-        if (self::isAliasExists($request->alias)) {
-            $request->set('alias', $request->alias . '_' . self::getNewId());
-        }
         $sql = sql_insert(self::ENTITY_TABLE);
         $sql->set(
-            [$request->get('created'), $request->get('updated'), self::TYPE_ID],
+            [$time, $time, self::TYPE_ID],
             ['created', 'updated', 'etid']
         );
         $sql->useFunction('created', 'FROM_UNIXTIME')
@@ -226,18 +219,11 @@ class Article extends BaseEntity implements SitemapInterface
             $columns = self::ENTITY_DATA_COLUMNS;
             $columns[] = 'eid';
             $values = [
-                $request->title, $request->summary, $request->body,
-                $request->get('alias'), $request->status,
+                $request->title, $request->summary,
+                $request->body, $request->alias, $request->status,
                 $request->preview_src, $request->preview_alt,
-                $request->get('author'), $request->get('views'), $eid
+                $request->author, 0, $eid
             ];
-            foreach (['preview_src', 'preview_alt'] as $field) {
-                if ($request->get($field)) {
-                    continue;
-                }
-                $i = array_search($field, $columns);
-                unset($columns[$i], $values[$i]);
-            }
             $sql->set($values, $columns);
             if ($sql->exe(true)) {
                 $rollback = false;
@@ -248,7 +234,7 @@ class Article extends BaseEntity implements SitemapInterface
         return !$rollback;
     }
 
-    protected static function isAliasExists(string $alias): bool
+    public static function isAliasExists(string $alias): bool
     {
         $sql = sql_select(['eid'], self::ENTITY_DATA_TABLE);
         $sql->where(['alias' => $alias]);

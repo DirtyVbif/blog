@@ -110,7 +110,7 @@ class Feedback extends BaseEntity
     }
     
     /**
-     * @param \Blog\Request\FeedbackRequest $data
+     * @param \Blog\Request\FeedbackRequest $request
      */
     public static function create(RequestPrototype $request, ?array $data = null): bool
     {

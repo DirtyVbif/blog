@@ -80,7 +80,7 @@ abstract class BaseEntity extends TemplateFacade
         return $this->id();
     }
 
-    protected static function getNewId(): int
+    public static function getNewId(): int
     {
         $sql = sql()->query(
             'SELECT AUTO_INCREMENT'
