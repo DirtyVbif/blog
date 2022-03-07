@@ -2,7 +2,9 @@
 
 namespace Blog\Controller;
 
+use Blog\Modules\Entity\Article;
 use Blog\Modules\TemplateFacade\Form;
+use Blog\Modules\User\User;
 use Blog\Modules\View\Blog;
 
 class BlogController extends BaseController
@@ -44,7 +46,11 @@ class BlogController extends BaseController
                 $this->status = 404;
                 return false;
             }
-            return Blog::viewBlogArticle($argument);
+            if (Blog::viewBlogArticle($argument)) {
+                return true;
+            }
+            $this->status = 404;
+            return false;
         }
         // if no arguments passed to blog controller then render blog articles list
         // set page meta
@@ -69,7 +75,7 @@ class BlogController extends BaseController
     protected function getRequestCreate(): bool
     {
         // verify user access level
-        if (!app()->user()->verifyAccessLevel(4)) {
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
             $this->status = 403;
             return false;
         }
@@ -78,6 +84,44 @@ class BlogController extends BaseController
         // app()->page()->setTitle('Создание нового материала для блога');
         $this->getTitle()->set('Создание нового материала для блога');
         app()->page()->addContent($form);
+        return true;
+    }
+
+    protected function getRequestEdit(): bool
+    {
+        // verify user access level
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+            $this->status = 403;
+            return false;
+        }
+        $id = app()->router()->arg(3);
+        if (!$id || !settype($id, 'int')) {
+            $this->status = 404;
+            return false;
+        }
+        // TODO: complete article edit method
+        pre('method `Entity\Article::edit($id)` is incompleted.');
+        return true;
+    }
+
+    protected function getRequestDelete(): bool
+    {
+        // verify user access level
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+            $this->status = 403;
+            return false;
+        }
+        $id = app()->router()->arg(3);
+        if (!$id || !settype($id, 'int')) {
+            $this->status = 404;
+            return false;
+        }
+        if (Article::delete($id)) {
+            msgr()->notice("Article #{$id} was successfully deleted.");
+        } else {
+            msgr()->error("There is an error occurred while deleting article #{$id}.");
+        }
+        app()->router()->redirect('/blog');
         return true;
     }
 }

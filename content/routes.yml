@@ -21,6 +21,18 @@ blog_article_create: {
   access_level: 4,
   sitemap_exclude: true
 }
+blog_article_edit: {
+  url: '/blog/edit/{$id}',
+  label: 'edit',
+  access_level: 4,
+  sitemap_exclude: true
+}
+blog_article_delete: {
+  url: '/blog/delete/{$id}',
+  label: 'delete',
+  access_level: 4,
+  sitemap_exclude: true
+}
 about: {
   url: '#about',
   label: 'about',

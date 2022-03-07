@@ -49,10 +49,12 @@ class Blog extends BaseView
             'rel' => 'shortlink',
             'href' => fullUrlTo('blog/' . $article->id())
         ], 'link');
-        // view loaded blog article
+        // set page title
         app()->controller()->getTitle()->set($article->title);
+        // view article edit menu
         $article_menu = app()->builder()->getMenu('article_edit', ['id' => $article->id()]);
         app()->page()->addContent($article_menu);
+        // view loaded blog article
         app()->page()->addContent($article);
         $comment_form = new Form('comment', 'section');
         $comment_form->tpl()->set('entity_id', $article->id());

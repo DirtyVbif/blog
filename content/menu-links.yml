@@ -18,3 +18,9 @@ info: {
   items: ['contacts', 'cookie_agreement', 'sitemap'],
   class: 'menu menu_info'
 }
+
+article_edit: {
+  access_level: 4,
+  items: ['blog_article_edit', 'blog_article_delete'],
+  class: 'article-menu'
+}
