@@ -164,6 +164,9 @@ class Comment extends BaseEntity
     public static function loadByIds(array $ids, string $view_mode = self::VIEW_MODE_FULL): array
     {
         $comments = [];
+        if (empty($ids)) {
+            return $comments;
+        }
         $sql = self::sql();
         $sql->where(condition: ['c.cid' => $ids], operator: 'IN');
         $sql->andWhere(condition: ['ec.deleted' => 0]);

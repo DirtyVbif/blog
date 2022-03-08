@@ -51,3 +51,4 @@
 [ ] Add rating for articles;
 [ ] Add views for articles;
 [ ] Add image entity and use it in article;
+[ ] Add ability to close opened sessions for users;
