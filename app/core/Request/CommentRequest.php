@@ -24,7 +24,6 @@ class CommentRequest extends RequestPrototype
 
     #[RequestPropertyLabelAttribute('Parent comment id')]
     #[Validators\Type('int')]
-    #[Validators\Required(true)]
     protected string $parent_id;
 
     #[RequestPropertyLabelAttribute('Entity id')]

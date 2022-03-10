@@ -173,12 +173,16 @@ class RequestPrototype
             );
             if (empty($attributes)) {
                 continue;
+            } else if (!isset($this->_errors[$field_name])) {
+                $this->_errors[$field_name] = [];
             }
             $value = $this->raw($field_name);
             foreach ($attributes as $attribute) {
                 /** @var Validators\ValidatorInterface $validator */
                 $validator = $attribute->newInstance();
-                $this->_errors[$field_name] = $validator->validate($value);
+                if ($error = $validator->validate($value)) {
+                    $this->_errors[$field_name][] = $error;
+                }
             }
             if (empty($this->_errors[$field_name])) {
                 $this->{$field_name} = $value;
