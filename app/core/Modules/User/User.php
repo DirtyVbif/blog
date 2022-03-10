@@ -3,6 +3,7 @@
 namespace Blog\Modules\User;
 
 use Blog\Modules\DateFormat\DateFormat;
+use JetBrains\PhpStorm\ExpectedValues;
 
 class User
 {
@@ -194,8 +195,15 @@ class User
         return (object)session()->get(self::SESSUID . '/status');
     }
 
-    public function verifyAccessLevel(int $level): bool
-    {
+    public function verifyAccessLevel(
+        #[ExpectedValues(
+            self::ACCESS_LEVEL_ANONYM,
+            self::ACCESS_LEVEL_ALL,
+            self::ACCESS_LEVEL_USER,
+            self::ACCESS_LEVEL_ADMIN,
+            self::ACCESS_LEVEL_MASTER
+        )] int $level
+    ): bool {
         $this->initialize();
         if (!isset($this->access_levels[$level])) {
             return false;
@@ -282,7 +290,7 @@ class User
         return session()->get(User::SESSUID . '/udata/nickname');
     }
 
-    public function id(): int
+    public function id(): ?int
     {
         return session()->get(User::SESSUID . '/udata/id');
     }

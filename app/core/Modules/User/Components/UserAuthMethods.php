@@ -18,7 +18,8 @@ trait UserAuthMethods
                 'uses' => ['token', 'agent_hash', 'browser', 'platform', 'updated', 'ip']
             ]);
         $sql->where(['u.mail' => $login_data->mail]);
-        $sql->useFunction('u.created', 'UNIX_TIMESTAMP', 'created');
+        $sql->useFunction('u.created', 'UNIX_TIMESTAMP', 'created')
+            ->useFunction('uses.updated', 'UNIX_TIMESTAMP', 'updated');
         $udata = $sql->all();
         if (empty($udata)) {
             return false;
