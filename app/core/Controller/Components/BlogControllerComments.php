@@ -2,13 +2,19 @@
 
 namespace Blog\Controller\Components;
 
-use Blog\Modules\Entity\Comment;
+use Blog\Modules\Entity\CommentPrototype;
+use Blog\Modules\User\User;
 use Blog\Modules\View\Comments;
 
 trait BlogControllerComments
 {
     protected function getRequestComment(): bool
     {
+        // verify user access level
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+            $this->status = 403;
+            return false;
+        }
         // check requested comment id and action
         $cid = app()->router()->arg(3);
         $action = app()->router()->arg(4);
@@ -16,19 +22,14 @@ trait BlogControllerComments
             $this->status = 404;
             return false;
         }
-        // verify user access level
-        if (!app()->user()->verifyAccessLevel(4)) {
-            $this->status = 403;
-            return false;
-        }
         $action = pascalCase($action);
-        $comment = new Comment($cid);
-        if (!$comment->exists() || !method_exists($comment, $action)) {
+        if (
+            !method_exists(CommentPrototype::class, $action)
+            || !CommentPrototype::$action($cid)
+        ) {
             $this->status = 404;
             return false;
         }
-        // comment delete or approve actions
-        $comment->$action();
         app()->router()->redirect('<previous>');
         return true;
     }

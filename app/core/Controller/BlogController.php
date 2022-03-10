@@ -2,7 +2,7 @@
 
 namespace Blog\Controller;
 
-use Blog\Modules\Entity\Article;
+use Blog\Modules\Entity\ArticlePrototype;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\User\User;
 use Blog\Modules\View\Blog;
@@ -116,7 +116,7 @@ class BlogController extends BaseController
             $this->status = 404;
             return false;
         }
-        if (Article::delete($id)) {
+        if (ArticlePrototype::delete($id)) {
             msgr()->notice("Article #{$id} was successfully deleted.");
         } else {
             msgr()->error("There is an error occurred while deleting article #{$id}.");

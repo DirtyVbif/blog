@@ -9,13 +9,18 @@ use Blog\Request\RequestPrototype;
 use JetBrains\PhpStorm\ExpectedValues;
 use Twig\Markup;
 
-class Article extends EntityPrototype implements SitemapInterface
+class ArticlePrototype extends EntityPrototype implements SitemapInterface
 {
     public const VIEW_MODE_FULL = 'full';
     public const VIEW_MODE_TEASER = 'teaser';
     public const VIEW_MODE_PREVIEW = 'preview';
-
     public const URL_MASK = '/blog/%s';
+    public const ENTITY_COMMENTS_FIELDS = [
+        'c_pid' => 'pid', 'c_created' => 'created',
+        'c_name' => 'name', 'c_email' => 'email',
+        'c_body' => 'body', 'c_status' => 'status',
+        'c_ip' => 'ip'
+    ];
     
     /**
      * Article entity type id is 1
@@ -49,9 +54,11 @@ class Article extends EntityPrototype implements SitemapInterface
 
     protected string $view_mode;
     protected SQLSelect $sql;
+    /** @var CommentPrototype[] $comments */
     protected array $comments;
-    protected bool $comments_loaded = false;
-    protected bool $comments_ids_loaded = false;
+    protected array $comments_data;
+    protected bool $loaded_with_comments;
+    /** @var int $comments_count count of comments with published status for loaded article */
     protected int $comments_count;
     protected bool $has_alias;
 
@@ -105,7 +112,7 @@ class Article extends EntityPrototype implements SitemapInterface
         $time = time();
         $sql = sql_insert(self::ENTITY_TABLE);
         $sql->set(
-            [$time, $time, self::TYPE_ID],
+            [$time, $time, self::ENTITY_TYPE_ID],
             ['created', 'updated', 'etid']
         );
         $sql->useFunction('created', 'FROM_UNIXTIME')
@@ -133,6 +140,49 @@ class Article extends EntityPrototype implements SitemapInterface
     }
 
     /**
+     * @param array $options recieves SQL QUERY SELECT options:
+     * * array key @var int 'limit'
+     * * array key @var int 'offset'
+     * * array key @var string 'order' => ASC or DESC
+     * * array key @var string 'view_mode'
+     * * array key @var bool 'load_with_comments' => load article with or without comments data
+     * @return ArticlePrototype[]
+     */
+    public static function loadList(array $options = []): array
+    {
+        $sql = sql_select(columns: ['eid'], from: self::ENTITY_TABLE);
+        $sql->limit($options['limit'] ?? null);
+        $sql->limitOffset($options['offset'] ?? null);
+        $sql->order('created', ($options['order'] ?? 'ASC'));
+        $sql->where(['etid' => self::ENTITY_TYPE_ID]);
+        $articles = [];
+        foreach ($sql->all() as $row) {
+            if (isset($options['load_with_comments'])) {
+                $article = new self(0);
+                $article->load($row['eid'], $options['load_with_comments']);
+            } else {
+                $article = new self($row['eid'], ($options['view_mode'] ?? self::VIEW_MODE_FULL));
+            }
+            $articles[$row['eid']] = $article;
+        }
+        return $articles;
+    }
+
+    public static function sqlJoinComments(): SQLSelect
+    {
+        $sql = static::sql();        
+        $sql->join(table: ['ec' => 'entities_comments'], using: 'eid')
+            ->join(table: ['c' => 'comments'], using: 'cid');
+        $sql->columns([
+            'ec' => ['cid'],
+            'c' => self::ENTITY_COMMENTS_FIELDS
+        ])->useFunction('c.created', 'UNIX_TIMESTAMP', 'c_created');
+        $sql->where(['ec.deleted' => 0]);
+        $sql->order('c.created', 'DESC');
+        return $sql;
+    }
+
+    /**
      * @param int|array $data integer entity id of article entity or array with article data.
      * > If parameter $data provided as integer entity id then article will be automatically loaded by entity id from database.
      * > If parameter $data provided as array with article data then article wouldn't be loaded from database and accepts provided data.
@@ -148,17 +198,6 @@ class Article extends EntityPrototype implements SitemapInterface
     }
 
     /**
-     * Load blog article entity by article alias
-     */
-    public function loadByAlias(string $alias): self
-    {
-        $sql = self::sql();
-        $sql->where(condition: ['a.alias' => $alias]);
-        $this->setLoadedData($sql->all());
-        return $this;
-    }
-
-    /**
      * @param string $view_mode is name of view mode. Also named constants are available
      */
     public function setViewMode(
@@ -168,11 +207,7 @@ class Article extends EntityPrototype implements SitemapInterface
             self::VIEW_MODE_TEASER
         )] string $view_mode
     ): self {
-        if (in_array($view_mode, self::VIEW_MODES)) {
-            $this->view_mode = $view_mode;
-        } else {
-            $this->view_mode = self::VIEW_MODE_FULL;
-        }
+        $this->view_mode = $view_mode;
         return $this;
     }
 
@@ -214,32 +249,64 @@ class Article extends EntityPrototype implements SitemapInterface
         return parent::render();
     }
 
+    public function load(?int $id = null, bool $load_comments = true): void
+    {
+        $this->loaded_with_comments = $load_comments;
+        if (!is_null($id)) {
+            $this->id = $id;
+        }
+        if ($this->id()) {
+            $sql = $load_comments ? self::sqlJoinComments() : self::sql();
+            $sql->andWhere(condition: ['e.eid' => $this->id()]);
+            $this->setLoadedData($sql->all());
+        }
+        return;
+    }
+
+    /**
+     * Load blog article entity by article alias
+     */
+    public function loadByAlias(string $alias): self
+    {
+        $sql = self::sqlJoinComments();
+        $sql->andWhere(condition: ['a.alias' => $alias]);
+        $this->setLoadedData($sql->all());
+        return $this;
+    }
+
     protected function setLoadedData(array $data): void
     {
         if (!empty($data)) {
             $this->data = $data[0];
             $this->id = $this->data['id'];
-            unset(
-                $this->data['cid'],
-                $this->data['deleted'],
-                $this->data['comment_status']
-            );
-            $this->comments_count = 0;
-            foreach ($data as $row) {
-                if ($row['cid'] && $row['deleted'] == 0) {
-                    $this->comments[$row['cid']] = [
-                        'cid' => $row['cid'],
-                        'status' => $row['comment_status']
-                    ];
-                    $this->comments_count += $row['comment_status'];
-                }
-            }
+            $this->comments_data = $this->setLoadedCommentsData($data);
+            
         }
-        $this->comments_ids_loaded = true;
         $this->exists = !empty($this->data);
         $this->loaded = true;
         $this->preprocessData();
         return;
+    }
+
+    protected function setLoadedCommentsData(array $data): array
+    {
+        $comments = [];
+        if (!$this->loaded_with_comments) {
+            return $comments;
+        }
+        foreach ($data as $row) {
+            if ($row['cid']) {
+                foreach (self::ENTITY_COMMENTS_FIELDS as $alias => $column) {
+                    $comments[$row['cid']]['cid'] = $row['cid'];
+                    $comments[$row['cid']][$column] = $row[$alias];
+                }
+            }
+        }
+        unset($this->data['cid']);
+        foreach (self::ENTITY_COMMENTS_FIELDS as $alias => $column) {
+            unset($this->data[$alias]);
+        }
+        return $comments;
     }
 
     protected function preprocessData(): void
@@ -253,20 +320,37 @@ class Article extends EntityPrototype implements SitemapInterface
     }
 
     /**
-     * @return Comment[] $comments
+     * @return CommentPrototype[]
      */
     public function getComments(): array
     {
-        if (!$this->comments_loaded) {
-            $this->comments = Comment::loadByIds(array_keys($this->comments), Comment::VIEW_MODE_ARTICLE);
-            $this->comments_loaded = true;
+        if (!isset($this->comments)) {
+            $this->comments = [];
+            if (!$this->loaded_with_comments) {
+                // TODO: load comments data for entity
+            }
+            foreach ($this->comments_data as $i => $comment_data) {
+                $this->comments[$i] = new CommentPrototype(
+                    $comment_data,
+                    CommentPrototype::VIEW_MODE_ARTICLE
+                );
+            }
         }
         return $this->comments;
     }
 
+    /**
+     * @return int count of comments with published status for loaded article
+     */
     public function getCommentsCount(): int
     {
-        return $this->comments_count;
+        if (!isset($this->comments_count) && $this->loaded_with_comments) {
+            $this->comments_count = 0;
+            foreach ($this->comments_data as $comment_data) {
+                $this->comments_count += $comment_data['status'] ?? 0;
+            }
+        }
+        return $this->comments_count ?? 0;
     }
 
     public function title(): ?string

@@ -2,8 +2,8 @@
 
 namespace Blog\Controller\Components;
 
-use Blog\Modules\Entity\Article;
-use Blog\Modules\Entity\Comment;
+use Blog\Modules\Entity\ArticlePrototype;
+use Blog\Modules\Entity\CommentPrototype;
 use Blog\Modules\User\User;
 use Blog\Request\RequestFactory;
 
@@ -29,7 +29,7 @@ trait BlogControllerPostRequests
     {
         $request = RequestFactory::get('comment');
         if ($request->isValid()) {
-            $result = Comment::create($request);
+            $result = CommentPrototype::create($request);
         } else {
             $result = null;
         }
@@ -38,7 +38,7 @@ trait BlogControllerPostRequests
         } else if (!is_null($result)) {
             msgr()->error('При отправке комментария возникла ошибка. Если проблема повторяется, пожалуйста @contact_me.', ['contact_me' => '<a href="' . tpllink('contacts') . '">свяжитесь со мной</a>']);
         }
-        app()->router()->redirect('<current>');
+        app()->router()->redirect('<previous>');
         return;
     }
 
@@ -53,7 +53,7 @@ trait BlogControllerPostRequests
         }
         $request = RequestFactory::get('article');
         if ($request->isValid()) {
-            $result = Article::create($request);
+            $result = ArticlePrototype::create($request);
         } else {
             $result = null;
         }

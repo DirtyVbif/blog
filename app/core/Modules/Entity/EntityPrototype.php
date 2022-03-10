@@ -10,6 +10,7 @@ abstract class EntityPrototype extends TemplateFacade
 {
     public const ENTITY_PK = 'eid';
     public const ENTITY_TABLE = 'entities';
+    public const ENTITY_TABLE_ALIAS = 'e';
     public const ENTITY_COLUMNS = ['id' => self::ENTITY_PK, 'created', 'updated', 'etid'];
 
     protected array $data = [];
@@ -20,8 +21,11 @@ abstract class EntityPrototype extends TemplateFacade
     abstract public static function getSqlTableName(): array|string;
     abstract public static function getSqlTableColumns(): array;
     abstract public static function countItems(): int;
+    abstract public static function loadList(array $options): array;
 
     abstract protected function setLoadedData(array $data): void;
+    abstract public function url(): ?string;
+    abstract public function load(?int $id = null, bool $load_comments = true): void;
 
     public function __construct(
         protected int $id
@@ -61,32 +65,15 @@ abstract class EntityPrototype extends TemplateFacade
         return $this->loaded ?? false;
     }
 
-    public function load(?int $id = null): void
-    {
-        if (!is_null($id)) {
-            $this->id = $id;
-        }
-        if ($this->id()) {
-            $sql = self::sql();
-            $sql->where(condition: ['e.eid' => $this->id()]);
-            $this->setLoadedData($sql->all());
-        }
-        return;
-    }
-
     public static function sql(): SQLSelect
     {
-        $sql = sql_select(from: ['e' => static::ENTITY_TABLE]);
+        $sql = sql_select(from: [static::ENTITY_TABLE_ALIAS => static::ENTITY_TABLE]);
         $sql->join(table: static::getSqlTableName(), using: static::ENTITY_PK, type: 'INNER')
-            ->join(table: ['ec' => 'entities_comments'], using: static::ENTITY_PK)
             ->join(table: ['et' => 'entities_types'], using: 'etid')
-            ->join(table: ['c' => 'comments'], using: 'cid')
             ->columns(static::getSqlTableColumns())
             ->columns([
-                'e' => static::ENTITY_COLUMNS,
-                'et' => ['type_name' => 'name'],
-                'ec' => ['cid', 'deleted'],
-                'c' => ['comment_status' => 'status']
+                static::ENTITY_TABLE_ALIAS => static::ENTITY_COLUMNS,
+                'et' => ['type_name' => 'name']
             ])
             ->useFunction('e.created', 'unix_timestamp', 'created')
             ->useFunction('e.updated', 'unix_timestamp', 'updated');
@@ -96,7 +83,18 @@ abstract class EntityPrototype extends TemplateFacade
     public static function delete(int $id): bool
     {
         $sql = sql_delete(self::ENTITY_TABLE);
-        $sql->where(['eid' => $id]);
+        $sql->where([static::ENTITY_PK => $id]);
         return (bool)$sql->delete();
+    }
+
+    public static function getNewId(): int
+    {
+        $sql = sql()->query(
+            'SELECT AUTO_INCREMENT'
+            . ' FROM information_schema.TABLES'
+            . ' WHERE TABLE_SCHEMA = "' . app()->env()->DB['NAME'] . '"'
+            . ' AND `TABLE_NAME` = "' . static::ENTITY_TABLE . '";');
+        $result = $sql->fetch();
+        return $result['AUTO_INCREMENT'];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Blog\Modules\Entity;
 
+use JetBrains\PhpStorm\ExpectedValues;
+
 class EntityFactory
 {
     public static function getNewId(): int
@@ -26,15 +28,42 @@ class EntityFactory
         return $result['name'] ?? null;
     }
     
-    public static function load(int $entity_id): ?EntityPrototype
+    public static function load(int $entity_id, ?string $entity_type = null): ?EntityPrototype
     {
-        switch (self::getTypeById($entity_id)) {
+        $entity_type ??= self::getTypeById($entity_id);
+        switch ($entity_type) {
             case 'article':
-                return new Article($entity_id);
+                return new ArticlePrototype($entity_id);
             case 'feedback':
                 return new Feedback($entity_id);
             default:
                 return null;
+        }
+    }
+
+    /**
+     * Load list of entities
+     * 
+     * @return CommentPrototype[]|ArticlePrototype[]|Feedback[]
+     */
+    public static function loadList(
+        #[ExpectedValues('comment', 'feedback', 'article')]
+        string $entity_type,
+        array $options = []
+    ): array {
+        switch ($entity_type) {
+            case 'comment':
+                return CommentPrototype::loadList($options);
+            // TODO: rebuil Feedback::Class to FeedbackPrototype
+            // case 'feedback':
+            //     return Feedback::loadList($options);
+            case 'article':
+                return ArticlePrototype::loadList($options);
+            default:
+                pre([
+                    'error' => "Unknown entity type {$entity_type}. Entity list of specified type cannot be loaded."
+                ]);
+                exit;
         }
     }
 }
