@@ -15,9 +15,9 @@
     {% if admin_access %}
         <footer class="comment__footer comment_full__footer">
             {% if status == 0 %}
-                {{ link('/blog/comment/' ~ cid ~ '/approve').label(t('approve')).addClass('comment__edit') }}
+                {{ link('/blog/comment/' ~ id ~ '/approve').label(t('approve')).addClass('comment__edit') }}
             {% endif %}
-            {{ link('/blog/comment/' ~ cid ~ '/delete').label(t('delete')).addClass('comment__edit comment__edit_delete') }}
+            {{ link('/blog/comment/' ~ id ~ '/delete').label(t('delete')).addClass('comment__edit comment__edit_delete') }}
         </footer>
     {% endif %}
 {{ wrapper.close() }}
