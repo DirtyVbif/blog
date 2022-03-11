@@ -70,8 +70,14 @@ function user(): \Blog\Client\User
     return app()->user();
 }
 
-function systemLog(string $type, string $message): void
+function consoleLog(string $type, string $message): void
 {
-    app()->logger()->log($type, $message);
+    app()->logger()->console($type, $message);
+    return;
+}
+
+function systemLog(string $type, string $text, array $data = []): void
+{
+    app()->logger()->log($type, $text, $data);
     return;
 }

@@ -125,10 +125,10 @@ class User
     protected function setUserStatus(): self
     {
         if ($this->token()->utoken() || $this->token()->getCookieUToken()) {
-            systemLog(self::LOGID, 'User token exists. Verifying User session.');
+            consoleLog(self::LOGID, 'User token exists. Verifying User session.');
             $this->verifyUserSession();
         } else {
-            systemLog(self::LOGID, 'There is no User token. Setting default User status.');
+            consoleLog(self::LOGID, 'There is no User token. Setting default User status.');
             $this->setDefaultStatus();
         }
         return $this;
@@ -137,11 +137,11 @@ class User
     protected function verifyUserSession(): self
     {
         if ($this->token()->verifySessionTokenTimeout()) {
-            systemLog(self::LOGID, 'User token verification doesn\'t timed out. Validating User status.');
+            consoleLog(self::LOGID, 'User token verification doesn\'t timed out. Validating User status.');
         } else if ($this->token()->verify()) {
-            systemLog(self::LOGID, 'User token verified successfully. Validating User status.');
+            consoleLog(self::LOGID, 'User token verified successfully. Validating User status.');
         } else {
-            systemLog(self::LOGID, 'User token verification failed. Setting default User status.');
+            consoleLog(self::LOGID, 'User token verification failed. Setting default User status.');
             return $this->setDefaultStatus();
         }
         $this->verifyUserStatus();
@@ -152,7 +152,7 @@ class User
     {
         $s = session()->get(self::SESSUID . '/status');
         if (!isset($s, $s['id'], $s['status'], $s['label'])) {
-            systemLog(self::LOGID, 'There is no valid User status. Setting default User status.');
+            consoleLog(self::LOGID, 'There is no valid User status. Setting default User status.');
             return $this->setDefaultStatus();
         }
         $us = $this->status_list[$s['status']] ?? null;
@@ -162,10 +162,10 @@ class User
             || ($us['status'] ?? null) != $s['status']
             || ($us['label'] ?? null) != $s['label']
         ) {
-            systemLog(self::LOGID, 'Invalid User status. Setting default User status.');
+            consoleLog(self::LOGID, 'Invalid User status. Setting default User status.');
             return $this->setDefaultStatus();
         }
-        systemLog(self::LOGID, 'User status is valid.');
+        consoleLog(self::LOGID, 'User status is valid.');
         $this->authorized = true;
         return $this;
     }

@@ -146,7 +146,7 @@ class Bridge
         if (!$this->transaction) {
             $this->transaction = true;
             $this->query('START TRANSACTION;');
-            systemLog(self::LOGID, 'Database transaction started;');
+            consoleLog(self::LOGID, 'Database transaction started;');
         }
         return;
     }
@@ -158,7 +158,7 @@ class Bridge
         } else if ($this->transaction) {
             $this->transaction = false;
             $this->query('COMMIT;');
-            systemLog(self::LOGID, 'Database transaction completed;');
+            consoleLog(self::LOGID, 'Database transaction completed;');
         }
         return;
     }
@@ -169,7 +169,7 @@ class Bridge
         if ($this->transaction) {
             $this->transaction = false;
             $this->query('ROLLBACK;');
-            systemLog(self::LOGID, 'Database transaction rolled back;');
+            consoleLog(self::LOGID, 'Database transaction rolled back;');
         }
         return;
     }

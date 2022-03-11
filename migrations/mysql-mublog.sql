@@ -106,6 +106,18 @@ INSERT INTO `entities_types` (`etid`, `name`) VALUES
 	(1, 'article'),
 	(2, 'feedback');
 
+-- Дамп структуры для таблица mublog.log
+DROP TABLE IF EXISTS `log`;
+CREATE TABLE `log` (
+	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`type` VARCHAR(16) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`output` TEXT NOT NULL COLLATE 'utf8mb4_general_ci',
+	`data` JSON NULL DEFAULT NULL,
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `type` (`type`) USING BTREE
+) COLLATE='utf8mb4_general_ci' ENGINE=InnoDB;
+
 -- Дамп структуры для таблица mublog.users
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
