@@ -2,8 +2,8 @@
 
 namespace Blog\Controller\Components;
 
-use Blog\Modules\Entity\ArticlePrototype;
-use Blog\Modules\Entity\CommentPrototype;
+use Blog\Modules\Entity\Article;
+use Blog\Modules\Entity\Comment;
 use Blog\Modules\User\User;
 use Blog\Request\RequestFactory;
 
@@ -29,7 +29,7 @@ trait BlogControllerPostRequests
     {
         $request = RequestFactory::get('comment');
         if ($request->isValid()) {
-            $result = CommentPrototype::create($request);
+            $result = Comment::create($request);
         } else {
             $result = null;
         }
@@ -53,7 +53,7 @@ trait BlogControllerPostRequests
         }
         $request = RequestFactory::get('article');
         if ($request->isValid()) {
-            $result = ArticlePrototype::create($request);
+            $result = Article::create($request);
         } else {
             $result = null;
         }

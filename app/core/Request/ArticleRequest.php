@@ -2,7 +2,7 @@
 
 namespace Blog\Request;
 
-use Blog\Modules\Entity\ArticlePrototype;
+use Blog\Modules\Entity\Article;
 
 class ArticleRequest extends RequestPrototype
 {
@@ -23,13 +23,13 @@ class ArticleRequest extends RequestPrototype
     protected string $alias;
 
     #[RequestPropertyLabelAttribute('Image preview src link')]
-    #[Preproccessors\DefaultValue(ArticlePrototype::DEFAULT_PREVIEW_SRC)]
+    #[Preproccessors\DefaultValue(Article::DEFAULT_PREVIEW_SRC)]
     #[Validators\Type('string')]
     #[Validators\StringLength(256)]
     protected string $preview_src;
 
     #[RequestPropertyLabelAttribute('Image alt text')]
-    #[Preproccessors\DefaultValue(ArticlePrototype::DEFAULT_PREVIEW_ALT)]
+    #[Preproccessors\DefaultValue(Article::DEFAULT_PREVIEW_ALT)]
     #[Validators\Type('string')]
     #[Validators\StringLength(256)]
     protected string $preview_alt;
@@ -51,7 +51,7 @@ class ArticleRequest extends RequestPrototype
     protected string $body;
 
     #[RequestPropertyLabelAttribute('Author')]
-    #[Preproccessors\DefaultValue(ArticlePrototype::DEFAULT_AUTHOR)]
+    #[Preproccessors\DefaultValue(Article::DEFAULT_AUTHOR)]
     #[Validators\Type('string')]
     #[Validators\StringLength(48)]
     protected string $author;

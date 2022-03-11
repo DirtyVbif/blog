@@ -2,7 +2,7 @@
 
 namespace Blog\Request\Preproccessors;
 
-use Blog\Modules\Entity\ArticlePrototype;
+use Blog\Modules\Entity\Article;
 use Blog\Request\RequestPrototype;
 
 #[\Attribute]
@@ -13,8 +13,8 @@ class ArticleAlias implements PreproccessorInterface
         $alias = $request->raw($field_name) ?
             $request->raw($field_name)
             : kebabCase($request->raw('title'), true);
-        if (ArticlePrototype::isAliasExists($alias)) {
-            $alias .= '_' . ArticlePrototype::getNewId();
+        if (Article::isAliasExists($alias)) {
+            $alias .= '_' . Article::getNewId();
         }
         return $alias;
     }

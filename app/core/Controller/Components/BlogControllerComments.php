@@ -2,7 +2,7 @@
 
 namespace Blog\Controller\Components;
 
-use Blog\Modules\Entity\CommentPrototype;
+use Blog\Modules\Entity\Comment;
 use Blog\Modules\User\User;
 use Blog\Modules\View\Comments;
 
@@ -24,8 +24,8 @@ trait BlogControllerComments
         }
         $action = pascalCase($action);
         if (
-            !method_exists(CommentPrototype::class, $action)
-            || !CommentPrototype::$action($cid)
+            !method_exists(Comment::class, $action)
+            || !Comment::$action($cid)
         ) {
             $this->status = 404;
             return false;

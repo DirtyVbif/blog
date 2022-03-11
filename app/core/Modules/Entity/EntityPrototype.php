@@ -20,7 +20,6 @@ abstract class EntityPrototype extends TemplateFacade
     abstract public static function create(RequestPrototype $request, ?array $data = null): bool;
     abstract public static function getSqlTableName(): array|string;
     abstract public static function getSqlTableColumns(): array;
-    abstract public static function countItems(): int;
     abstract public static function loadList(array $options): array;
 
     abstract protected function setLoadedData(array $data): void;

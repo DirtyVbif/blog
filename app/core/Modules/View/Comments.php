@@ -2,7 +2,7 @@
 
 namespace Blog\Modules\View;
 
-use Blog\Modules\Entity\CommentPrototype;
+use Blog\Modules\Entity\Comment;
 use Blog\Modules\TemplateFacade\Pager;
 use Blog\Modules\User\User;
 
@@ -20,9 +20,9 @@ class Comments extends BaseView
     }
 
     /**
-     * @return CommentPrototype[] $items
+     * @return Comment[] $items
      */
-    public function preview(int $limit, string $view_format = CommentPrototype::VIEW_MODE_FULL): array
+    public function preview(int $limit, string $view_format = Comment::VIEW_MODE_FULL): array
     {
         $items = [];
         // TODO: complete preview for last blog comments
@@ -49,11 +49,11 @@ class Comments extends BaseView
             $view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
-        $view->items = CommentPrototype::loadList([
+        $view->items = Comment::loadList([
             'limit' => self::ITEMS_PER_PAGE,
             'offset' => $offset,
             'order' => 'DESC',
-            'view_mode' => CommentPrototype::VIEW_MODE_FULL
+            'view_mode' => Comment::VIEW_MODE_FULL
         ]);
         return $view;
     }

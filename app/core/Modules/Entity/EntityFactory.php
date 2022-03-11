@@ -33,7 +33,7 @@ class EntityFactory
         $entity_type ??= self::getTypeById($entity_id);
         switch ($entity_type) {
             case 'article':
-                return new ArticlePrototype($entity_id);
+                return new Article($entity_id);
             case 'feedback':
                 return new Feedback($entity_id);
             default:
@@ -44,7 +44,7 @@ class EntityFactory
     /**
      * Load list of entities
      * 
-     * @return CommentPrototype[]|ArticlePrototype[]|Feedback[]
+     * @return Comment[]|Article[]|Feedback[]
      */
     public static function loadList(
         #[ExpectedValues('comment', 'feedback', 'article')]
@@ -53,13 +53,13 @@ class EntityFactory
     ): array {
         switch ($entity_type) {
             case 'comment':
-                return CommentPrototype::loadList($options);
-            // TODO: rebuil Feedback::Class to FeedbackPrototype
-            // case 'feedback':
-            //     return Feedback::loadList($options);
+                return Comment::loadList($options);
+            case 'feedback':
+                return Feedback::loadList($options);
             case 'article':
-                return ArticlePrototype::loadList($options);
+                return Article::loadList($options);
             default:
+                // TODO: set throwable error
                 pre([
                     'error' => "Unknown entity type {$entity_type}. Entity list of specified type cannot be loaded."
                 ]);

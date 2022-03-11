@@ -2,7 +2,7 @@
 
 namespace Blog\Modules\View;
 
-use Blog\Modules\Entity\ArticlePrototype;
+use Blog\Modules\Entity\Article;
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Pager;
@@ -18,7 +18,7 @@ class Blog extends BaseView
         // check if argument is article id
         if (is_numeric($argument)) {
             // try to load article by article id
-            $article = new ArticlePrototype($argument);
+            $article = new Article($argument);
             // check if article has an alias
             if ($article->hasAlias()) {
                 // redirect to named url (alias) for article
@@ -26,7 +26,7 @@ class Blog extends BaseView
             }
         } else {
             // try to load article by url alias
-            $article = new ArticlePrototype(0);
+            $article = new Article(0);
             $article->loadByAlias($argument);
         }
         if (!$article->exists()) {
@@ -78,14 +78,15 @@ class Blog extends BaseView
     }
     
     /**
-     * @return ArticlePrototype[] $items
+     * @return Article[] $items
      */
-    public function preview(int $limit, string $view_format = ArticlePrototype::VIEW_MODE_TEASER): array
+    public function preview(int $limit, string $view_format = Article::VIEW_MODE_TEASER): array
     {
-        $items = ArticlePrototype::loadList([
+        $items = Article::loadList([
             'limit' => $limit,
             'order' => 'DESC',
-            'view_mode' => $view_format
+            'view_mode' => $view_format,
+            'load_with_comments' => false
         ]);
         return $items;
     }
@@ -97,16 +98,21 @@ class Blog extends BaseView
             'pager' => null
         ];
         $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
-        $total_items = ArticlePrototype::countItems();
+        $sql = sql_select(['eid'], ['a' => Article::ENTITY_DATA_TABLE]);
+        $sql->where(['status' => 1]);
+        $sql->useFunction('a.eid', 'COUNT', 'count');
+        $result = $sql->first();
+        $total_items = $result['count'];
         if ($total_items > self::ITEMS_PER_PAGE) {
             $view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
-        $view->items = ArticlePrototype::loadList([
+        $view->items = Article::loadList([
             'limit' => self::ITEMS_PER_PAGE,
             'offset' => $offset,
             'order' => 'DESC',
-            'view_mode' => ArticlePrototype::VIEW_MODE_PREVIEW
+            'view_mode' => Article::VIEW_MODE_PREVIEW,
+            'load_with_comments' => true
         ]);
         return $view;
     }
