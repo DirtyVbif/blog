@@ -66,6 +66,11 @@ trait PageBuilderMenu
             }
             $link['class'] = classlistToString($menu_data['class'], suffix: '__item');
             $link['link_class'] = classlistToString($menu_data['class'], suffix: '__link');
+            $attributes = [];
+            foreach ($link['attributes'] ?? [] as $attr_name => $attr_value) {
+                $attributes[$attr_name] = $attr_value ? "{$attr_name}=\"{$attr_value}\"" : $attr_name;
+            }
+            $link['attributes'] = empty($attributes) ? '' : implode(' ', $attributes);
             $links[$name] = $link;
         }
         return $links;

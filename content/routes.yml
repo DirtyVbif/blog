@@ -77,7 +77,10 @@ feedbacks: {
 sitemap: {
   url: '/sitemap.xml',
   label: 'sitemap',
-  sitemap_exclude: true
+  sitemap_exclude: true,
+  attributes: {
+    target: '_blank'
+  }
 }
 sitemap_generate: {
   url: '/sitemap/generate',
