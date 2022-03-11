@@ -5,7 +5,7 @@ namespace Blog\Modules\Mailer;
 use Blog\Components\AbstractModule;
 use Blog\Components\ModuleInterface;
 use Blog\Modules\Entity\Feedback;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 use Blog\Request\FeedbackRequest;
 
 class Mailer extends AbstractModule implements ModuleInterface

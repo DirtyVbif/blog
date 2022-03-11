@@ -4,7 +4,7 @@ namespace Blog\Controller\Components;
 
 use Blog\Modules\Entity\Article;
 use Blog\Modules\Entity\Comment;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 use Blog\Request\RequestFactory;
 
 trait BlogControllerPostRequests

@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\Modules\User;
+namespace Blog\Client;
 
 use Blog\Modules\DateFormat\DateFormat;
 use JetBrains\PhpStorm\ExpectedValues;
@@ -24,7 +24,7 @@ class User
     protected array $default_status;
     protected bool $initialized = false;
     protected bool $authorized = false;
-    protected Token $token;
+    protected UserToken $token;
     protected UserAgent $agent;
     protected ?string $utoken;
     protected array $opened_sessions;
@@ -87,10 +87,10 @@ class User
             ->all();
     }
     
-    public function token(): Token
+    public function token(): UserToken
     {
         if (!isset($this->token)) {
-            $this->token = new Token;
+            $this->token = new UserToken;
         }
         return $this->token;
     }
@@ -176,8 +176,8 @@ class User
         session()->set(self::SESSUID . '/token', null);
         session()->set(self::SESSUID . '/udata', null);
         $this->utoken = null;
-        if (cookies()->isset(Token::COOKIE_USER_TOKEN)) {
-            cookies()->unset(Token::COOKIE_USER_TOKEN);
+        if (cookies()->isset(UserToken::COOKIE_USER_TOKEN)) {
+            cookies()->unset(UserToken::COOKIE_USER_TOKEN);
         }
         $this->authorized = false;
         return $this;

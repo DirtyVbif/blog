@@ -1,9 +1,9 @@
 <?php
 
-namespace Blog\Modules\User\Components;
+namespace Blog\Client\Components;
 
 use Blog\Request\LoginRequest;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 
 trait UserAuthMethods
 {

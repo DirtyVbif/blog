@@ -3,7 +3,7 @@
 namespace Blog\Controller\Components;
 
 use Blog\Modules\Entity\Comment;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 use Blog\Modules\View\Comments;
 
 trait BlogControllerComments

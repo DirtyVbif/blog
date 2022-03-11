@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\Modules\User;
+namespace Blog\Client;
 
 /**
  * Generate, verify and operate with authorization token.
@@ -9,7 +9,7 @@ namespace Blog\Modules\User;
  * * default token (called `token`) that stores in storage and matchs to `/[\w-]{32}/` pattern;
  * * user token (called `utoken`) that stores in cookie and session and has integrated timestamp when it was generated/updated.
  */
-class Token
+class UserToken
 {
     public const COOKIE_USER_TOKEN = 'user-remembered-token';
     protected int $lifetime;

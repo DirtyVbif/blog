@@ -2,6 +2,7 @@
 
 namespace Blog\Modules\Cache;
 
+use Blog\Client\User;
 use Blog\Modules\FileSystem\Folder;
 
 class CacheSystem implements \Blog\Components\AjaxModule
@@ -21,7 +22,7 @@ class CacheSystem implements \Blog\Components\AjaxModule
      */
     public function clear(?string $cache_entity_name = null): array
     {
-        if (!app()->user()->verifyAccessLevel(\Blog\Modules\User\User::ACCESS_LEVEL_MASTER)) {
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_MASTER)) {
             return [
                 'status' => 403,
                 'output' => 'access denied'

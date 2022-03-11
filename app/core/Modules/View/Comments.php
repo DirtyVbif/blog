@@ -4,7 +4,7 @@ namespace Blog\Modules\View;
 
 use Blog\Modules\Entity\Comment;
 use Blog\Modules\TemplateFacade\Pager;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 
 class Comments extends BaseView
 {

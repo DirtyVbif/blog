@@ -3,7 +3,7 @@
 namespace Blog\Request;
 
 use Blog\Modules\CSRF\Token;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 use ReflectionClass;
 use ReflectionProperty;
 

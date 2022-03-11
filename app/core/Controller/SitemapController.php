@@ -3,7 +3,7 @@
 namespace Blog\Controller;
 
 use Blog\Modules\Sitemap\Sitemap;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 
 class SitemapController extends BaseController
 {

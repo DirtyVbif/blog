@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\Modules\User;
+namespace Blog\Client;
 
 class UserAgent
 {
