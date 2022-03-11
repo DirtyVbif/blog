@@ -7,6 +7,7 @@ use Blog\Modules\Cache\CacheEntity;
 trait BridgeCacheSystem
 {
     protected CacheEntity $cache;
+    
     /**
      * private table names that must be excluded from cache.
      */
@@ -18,10 +19,10 @@ trait BridgeCacheSystem
      * Request type patterns (RTP).
      */
     protected array $RTP = [
-        'select' => '/\bselect\s+.*\s+from\s+/i',
-        'delete' => '/\bdelete\s+from\s+/i',
-        'insert' => '/\binsert\s+into\s+/i',
-        'update' => '/\bupdate\s+.*\s+set\s+/i'
+        'select' => '/\bselect([\`\.\w\(\)\*\'\"\,\s]+)from\s+([\w\.\`]+)/i',
+        'delete' => '/\bdelete\s+from\s+([\w\.\`]+)/i',
+        'insert' => '/\binsert\s+into\s+([\w\.\`]+)/i',
+        'update' => '/\bupdate\s+([\w\.\`]+)\s+set\s+/i'
     ];
 
     protected array $parsed_tables = [];
@@ -31,7 +32,7 @@ trait BridgeCacheSystem
         return app()->cache('sql');
     }
 
-    public function bindVariables(string $raw_request, array $data): string
+    public function bindVariables(string $raw_request, array $data, bool $check_cache_update = true): string
     {
         $replace_values = [];
         $replace_keys = [];
@@ -42,12 +43,25 @@ trait BridgeCacheSystem
                 $value = "'$value'";
             }
             $replace_values[$i] = $value;
-            $replace_keys[$i] = '/\:' . quotemeta($key) . '\b/';
+            $replace_keys[$i] = '/' . strRegexQuote(":{$key}", ['/', ':']) . '/';
             $i++;
         }
         $request = preg_replace($replace_keys, $replace_values, $raw_request);
         $request = strrws($request);
-        $this->markupCacheToUpdate($request);
+        if (!$check_cache_update) {
+            return $request;
+        }
+        $requests = preg_split('/\s*\;\s*/', $request);
+        if (empty($requests)) {
+            $this->markupCacheToUpdate($request);
+        } else {
+            foreach ($requests as $query) {
+                if (!preg_replace('/\s*/', '', $query)) {
+                    continue;
+                }
+                $this->markupCacheToUpdate($query);
+            }
+        }
         return $request;
     }
 
@@ -55,7 +69,7 @@ trait BridgeCacheSystem
     {
         if ($this->isPrivateRequest($request)) {
             return null;
-        } elseif (!$this->cache()->status()) {
+        } else if (!$this->cache()->status()) {
             return null;
         }
         $query = $this->cache()->get($request);
@@ -102,15 +116,19 @@ trait BridgeCacheSystem
             return;
         }
         // check if current SQL request string is INSERT / UPDATE / DELETE
+        $tables_string = implode(', ', $tables);
         foreach ($this->RTP as $key => $pattern) {
             if (preg_match($pattern, $request) && in_array($key, ['insert', 'update', 'delete'])) {
                 $update = true;
+                consoleLog('SQL-Cache', "Updated required for tables `{$tables_string}`. Request is: {$request}");
                 break;
             }
         }
         // if update required
         if ($update ?? false) {
             $this->cache()->markupToUpdate($tables);
+        } else {
+            consoleLog('SQL-Cache', "No updates needed for SQL REQUEST: {$request}");
         }
         return;
     }
@@ -169,8 +187,8 @@ trait BridgeCacheSystem
             [
                 '/\s*(\bleft\b\s*)?(\bright\b\s*)?(\bfull\b\s*)?(\bouter\b\s*)?(\binner\b\s*)?\bjoin\b\s*/i',
                 '/\s*\bon\s+(\b\w+\.)?\w+\b\s+=\s(\b\w+\.)?\w+\s*/i',
-                '/\s*\busing\b\(\s*\b\w+\b\s*\)\s*/i',
-                '/\s*\bselect\b[\s\w\.\*\,]+\bfrom\s+/i',
+                '/\s*\busing\b\s*\(([\s\w\`\.]*)\)\s*/i',
+                '/\s*\bselect([\`\.\w\(\)\*\'\"\,\s]+)(?=\bfrom\b)from\s+/i',
                 '/\s*\bwhere\s.*/i',
                 '/\s*\border\s+by\b.*/i',
                 '/\s*\bgroup\s+by\b.*/i',

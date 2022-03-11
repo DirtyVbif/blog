@@ -91,7 +91,7 @@ class Bridge
      */
     public function selectFirst(string $request, array $data = []): array
     {
-        $cache_request = $this->bindVariables($request, $data);
+        $cache_request = $this->bindVariables($request, $data, false);
         $query = $this->getCacheQuery($cache_request, false);
         if (empty($query)) {
             $row = $this->query($request, $data)->fetch();
@@ -109,7 +109,7 @@ class Bridge
      */
     public function select(string $request, array $data = []): array
     {
-        $cache_request = $this->bindVariables($request, $data);
+        $cache_request = $this->bindVariables($request, $data, false);
         $query = $this->getCacheQuery($cache_request);
         return empty($query) ?
             $this->setCacheQuery(
@@ -124,7 +124,6 @@ class Bridge
     public function change(string $request, array $data = []): int
     {
         $cache_request = $this->bindVariables($request, $data);
-        $this->markupCacheToUpdate($cache_request);
         return $this->query($request, $data)->rowCount();
     }
 
@@ -136,7 +135,6 @@ class Bridge
     public function insert(string $request, array $data = [], ?string $last_insert_id_name = null): string|false
     {
         $cache_request = $this->bindVariables($request, $data);
-        $this->markupCacheToUpdate($cache_request);
         $this->query($request, $data);
         return $this->connect()->lastInsertId($last_insert_id_name);
     }
