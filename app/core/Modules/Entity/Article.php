@@ -265,7 +265,7 @@ class Article extends EntityPrototype implements SitemapInterface
     {
         $sql = self::sqlJoinComments();
         $sql->where(condition: ['a.alias' => $alias]);
-        $this->setLoadedData([$sql->first()]);
+        $this->setLoadedData($sql->all());
         return $this;
     }
 
