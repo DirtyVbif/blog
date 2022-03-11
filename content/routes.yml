@@ -88,3 +88,9 @@ sitemap_generate: {
   access_level: 5,
   sitemap_exclude: true
 }
+admin_log: {
+  url: '/admin/log',
+  label: 'log',
+  access_level: 4,
+  sitemap_exclude: true
+}

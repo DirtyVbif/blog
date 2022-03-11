@@ -11,6 +11,20 @@ class Logger extends \Blog\Modules\TemplateFacade\TemplateFacade
     protected array $items = [];
     protected bool $library_used = false;
 
+    public static function getSystemLog(array $options = []): array
+    {
+        $sql = sql_select(from: self::TABLE);
+        $sql->columns(['created', 'output', 'data', 'type']);
+        if ($type = $options['type'] ?? false) {
+            $sql->where(['type' => $type]);
+        }
+        $sql->limit($options['limit'] ?? 1000);
+        $sql->limitOffset($options['offset'] ?? null);
+        $sql->order('created', $options['order'] ?? 'DESC');
+        $sql->useFunction('created', 'UNIX_TIMESTAMP', 'created');
+        return $sql->all();
+    }
+
     /**
      * @return Element $tpl
      */
