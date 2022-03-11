@@ -56,8 +56,10 @@ function strSuffix($input, string $suffix, bool $remove = false)
  * Returns a version of str with a backslash character (\) before every character that is among these:
  * `. \ + * ? [ ^ ] ( $ )`
  * 
+ * @link https://www.php.net/manual/en/function.quotemeta.php
+ * 
  * @param string $string
- * @param array $chars - addition characters in array to be protected with a backslash
+ * @param array $chars - additional characters in array to be protected with a backslash character (\)
  */
 function strRegexQuote(string $string, array $chars = ['/']): string
 {
