@@ -9,12 +9,20 @@ class CacheSystem implements \Blog\Components\AjaxModule
 {
     protected array $entities = [];
 
-    public function entity(string $name): CacheEntity
+    public function entity(string $name): CacheEntity|CacheSql
     {
         if (!isset($this->entities[$name])) {
-            $this->entities[$name] = new CacheEntity($name);
+            $this->entities[$name] = preg_match('/^sql$/i', $name) ? new CacheSql : new CacheEntity($name);
         }
         return $this->entities[$name];
+    }
+
+    public function sql(): CacheSql
+    {
+        if (!isset($this->entities['sql'])) {
+            $this->entities['sql'] = new CacheSql;
+        }
+        return $this->entities['sql'];
     }
 
     /**

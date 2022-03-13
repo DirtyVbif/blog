@@ -3,6 +3,7 @@
 namespace Blog\Database\Components;
 
 use Blog\Modules\Cache\CacheEntity;
+use Blog\Modules\Cache\CacheSql;
 
 trait BridgeCacheSystem
 {
@@ -27,9 +28,9 @@ trait BridgeCacheSystem
 
     protected array $parsed_tables = [];
 
-    public function cache(): CacheEntity
+    public function cache(): CacheSql
     {
-        return app()->cache('sql');
+        return app()->cache()->sql();
     }
 
     public function bindVariables(string $raw_request, array $data, bool $check_cache_update = true): string
@@ -65,15 +66,15 @@ trait BridgeCacheSystem
         return $request;
     }
 
-    protected function getCacheQuery(string $request, bool $all = true): ?array
+    protected function getCacheQuery(string $request, bool $all = true): array|false
     {
         if ($this->isPrivateRequest($request)) {
-            return null;
+            return false;
         } else if (!$this->cache()->status()) {
-            return null;
+            return false;
         }
         $query = $this->cache()->get($request);
-        return $all ? $query : $query[0] ?? null;
+        return $all ? $query : $query[0] ?? false;
     }
 
     protected function setCacheQuery(string $request, $query)
@@ -116,17 +117,17 @@ trait BridgeCacheSystem
             return;
         }
         // check if current SQL request string is INSERT / UPDATE / DELETE
-        $tables_string = implode(', ', $tables);
         foreach ($this->RTP as $key => $pattern) {
             if (preg_match($pattern, $request) && in_array($key, ['insert', 'update', 'delete'])) {
                 $update = true;
-                consoleLog('SQL-Cache', "Updated required for tables `{$tables_string}`. Request is: {$request}");
                 break;
             }
         }
         // if update required
         if ($update ?? false) {
-            $this->cache()->markupToUpdate($tables);
+            $tables_string = implode(', ', $tables);
+            consoleLog('SQL-Cache', "Updated required for tables `{$tables_string}`. Request is: {$request}");
+            $this->cache()->markupToDateTables($tables);
         } else {
             consoleLog('SQL-Cache', "No updates needed for SQL REQUEST: {$request}");
         }

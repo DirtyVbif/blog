@@ -155,7 +155,7 @@ class File
     public function del(): bool
     {
         $file = $this->filename();
-        if ($this->exists) {
+        if ($this->exists()) {
             $this->exists = false;
             consoleLog(self::LOGID, "File {$file} deleted successfully.");
             return unlink($file);
