@@ -74,6 +74,11 @@ trait BridgeCacheSystem
             return false;
         }
         $query = $this->cache()->get($request);
+        if (!$query) {
+            consoleLog('SQL-Cache', "There is no avtual cache for SQL REQUEST {$request}.");
+        } else {
+            consoleLog('SQL-Cache', "Getting cached data for SQL REQUEST {$request}.");
+        }
         return $all ? $query : $query[0] ?? false;
     }
 

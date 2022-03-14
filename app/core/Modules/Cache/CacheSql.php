@@ -8,6 +8,7 @@ use Blog\Modules\FileSystem\Folder;
 class CacheSql
 {
     public const DATAFILE = 'data.json';
+    public const LOGID = 'SQL-Cache';
 
     protected array $config;
     protected int $lifetime;
@@ -154,6 +155,7 @@ class CacheSql
         }
         $cache_name = $this->cacheNameFormRequest($sql_request);
         if (!$this->validateCache($cache_name)) {
+            consoleLog('SQL-Cache', "Cache lifetime expired for SQL REQUEST {$sql_request}.");
             return false;
         }
         return $this->getCache($cache_name);
@@ -169,10 +171,9 @@ class CacheSql
             return false;
         }
         $cache_timestamp = $data[$cache_name]['timestamp'] ?? 0;
-        if (!$this->lifetime() > (time() - $cache_timestamp)) {
-            return false;
-        }
-        return true;
+        $cache_lifetime = time() - $cache_timestamp;
+        consoleLog('SQL-Cache', "Validating timestamp for cache: LIFETIME={$this->lifetime()}; CACHE_LIFETIME={$cache_lifetime};");
+        return $this->lifetime() > $cache_lifetime;
     }
 
     /**
@@ -214,13 +215,15 @@ class CacheSql
         } else if (is_null($cache_files)) {
             $this->clearCache();
             return;
+        } else if (!empty($cache_files)) {
+            $data = $this->getData();
+            foreach ($cache_files as $cache_name => $bool) {
+                consoleLog(self::LOGID, "Deleting cache {$cache_name}.");
+                unset($data[$cache_name]);
+                unlink($this->folder()->path() . $cache_name);
+            }
+            $this->setData($data);
         }
-        $data = $this->getData();
-        foreach ($cache_files as $cache_name => $bool) {
-            unset($data[$cache_name]);
-            unlink($this->folder()->path() . $cache_name);
-        }
-        $this->setData($data);
         return;
     }
 
