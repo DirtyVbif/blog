@@ -67,7 +67,8 @@ class Bridge
                     . ';dbname=' . $this->cfg('name');
                 break;
             default:
-                throw new Exception("Database [{$this->cfg('driver')}] is not configured", 500);
+                pre("Database [{$this->cfg('driver')}] is not configured");
+                exit;
         }
         return new PDO($dsn, $this->cfg('user'), $this->cfg('pass'), $options);
     }
@@ -77,12 +78,11 @@ class Bridge
      */
     public function query(SQLAbstractStatement|string $sql, array $data = []): PDOStatement
     {
-        if (is_string($sql)) {
-            $this->statement = $this->connect()->prepare($sql);
-        } else {
-            $this->statement = $this->connect()->prepare($sql->raw());
+        if (!is_string($sql)) {
             $data = $sql->data();
+            $sql = $sql->raw();
         }
+        $this->statement = $this->connect()->prepare($sql);
         $this->statement->execute($data);
         $this->statementErrors();
         return $this->statement;
@@ -112,12 +112,10 @@ class Bridge
         $query = $this->cad()->get($sql);
         if (empty($query)) {
             $new_cache_data = $this->query($sql)->fetch();
-            $query = $this->cad()->set(
-                $sql,
-                [$new_cache_data]
-            );
+            $new_cache_data = $new_cache_data ? [0 => $new_cache_data] : [];
+            $query = $this->cad()->set($sql, $new_cache_data);
         }
-        return $query[0];
+        return $query ? ($query[0] ?? []) : [];
     }
 
     /**
