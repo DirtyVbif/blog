@@ -58,7 +58,7 @@ class CacheSql
         if (!$this->status()) {
             return;
         } else if (!$this->fdata()->exists()) {
-            $this->setData([]);
+            $this->saveData([]);
         }
         return;
     }
@@ -106,7 +106,7 @@ class CacheSql
         );
     }
 
-    protected function setData(array $data): void
+    protected function saveData(array $data): void
     {
         $this->fdata()->content(
             $this->exportData($data),
@@ -128,20 +128,22 @@ class CacheSql
      */
     public function set(string $sql_request, array $data, array $tables): self
     {
-        $cache_name = $this->cacheNameFormRequest($sql_request);
-        $timestamp = time();
-        f($cache_name, $this->folder()->path())
-            ->content(
-                $this->exportData($data),
-                false
-            )->save();
-        $data = $this->getData();
-        $data[$cache_name] = [
-            'request' => $sql_request,
-            'timestamp' => $timestamp,
-            'tables' => $tables
-        ];
-        $this->setData($data);
+        if ($this->status()) {
+            $cache_name = $this->cacheNameFormRequest($sql_request);
+            $timestamp = time();
+            f($cache_name, $this->folder()->path())
+                ->content(
+                    $this->exportData($data),
+                    false
+                )->save();
+            $data = $this->getData();
+            $data[$cache_name] = [
+                'request' => $sql_request,
+                'timestamp' => $timestamp,
+                'tables' => $tables
+            ];
+            $this->saveData($data);
+        }
         return $this;
     }
 
@@ -190,7 +192,7 @@ class CacheSql
         );
     }
 
-    public function markupToDateTables(array $tables): void
+    public function refreshTables(array $tables): void
     {
         if (!$this->status()) {
             return;
@@ -222,7 +224,7 @@ class CacheSql
                 unset($data[$cache_name]);
                 unlink($this->folder()->path() . $cache_name);
             }
-            $this->setData($data);
+            $this->saveData($data);
         }
         return;
     }

@@ -8,19 +8,29 @@ use PDOStatement;
 
 class Bridge
 {
-    use Components\BridgeCacheSystem;
-    
     private const LOGID = 'sql';
 
     private object $config;
     private PDO $connection;
     private PDOStatement $statement;
     private bool $transaction = false;
+    private BridgeCacheAdapter $cache_adapter;
 
     public function __construct()
     {
         $this->config = (object)app()->env()->DB;
         return $this;
+    }
+
+    /**
+     * cad - cache adapter
+     */
+    private function cad(): BridgeCacheAdapter
+    {
+        if (!isset($this->cache_adapter)) {
+            $this->cache_adapter = new BridgeCacheAdapter;
+        }
+        return $this->cache_adapter;
     }
 
     private function cfg(string $key): string
@@ -57,7 +67,7 @@ class Bridge
                     . ';dbname=' . $this->cfg('name');
                 break;
             default:
-                throw new Exception("Database [{$this->cfg('driver')}] not configured", 500);
+                throw new Exception("Database [{$this->cfg('driver')}] is not configured", 500);
         }
         return new PDO($dsn, $this->cfg('user'), $this->cfg('pass'), $options);
     }
@@ -65,9 +75,14 @@ class Bridge
     /**
      * Make raw SQL-reqquest using PDOStatement
      */
-    public function query(string $request, array $data = []): PDOStatement
+    public function query(SQLAbstractStatement|string $sql, array $data = []): PDOStatement
     {
-        $this->statement = $this->connect()->prepare($request);
+        if (is_string($sql)) {
+            $this->statement = $this->connect()->prepare($sql);
+        } else {
+            $this->statement = $this->connect()->prepare($sql->raw());
+            $data = $sql->data();
+        }
         $this->statement->execute($data);
         $this->statementErrors();
         return $this->statement;
@@ -83,48 +98,53 @@ class Bridge
             'PDOStatement::errorCode()' => $this->statement->errorCode(),
             'PDOStatement::errorInfo()' => $this->statement->errorInfo()
         ]);
-        die;
+        exit;
     }
 
     /**
      * Make SELECT sql-request and get the first row from the table
      */
-    public function selectFirst(string $request, array $data = []): array
+    public function selectFirst(SQLSelect $sql): array
     {
-        $cache_request = $this->bindVariables($request, $data, false);
-        $query = $this->getCacheQuery($cache_request, false);
-        if (empty($query)) {
-            $row = $this->query($request, $data)->fetch();
-            $query = $this->setCacheQuery(
-                $cache_request,
-                [0 => $row ? $row : []]
-            );
-            $query =  $query[0];
+        if (!$sql->cacheAvailable()) {
+            return $this->query($sql)->fetch();
         }
-        return $query;
+        $query = $this->cad()->get($sql);
+        if (empty($query)) {
+            $new_cache_data = $this->query($sql)->fetch();
+            $query = $this->cad()->set(
+                $sql,
+                [$new_cache_data]
+            );
+        }
+        return $query[0];
     }
 
     /**
      * Make SELECT sql-request and get all founded rows from the table
      */
-    public function select(string $request, array $data = []): array
+    public function select(SQLSelect $sql): array
     {
-        $cache_request = $this->bindVariables($request, $data, false);
-        $query = $this->getCacheQuery($cache_request);
+        if (!$sql->cacheAvailable()) {
+            return $this->query($sql)->fetchAll();
+        }
+        $query = $this->cad()->get($sql);
         return empty($query) ?
-            $this->setCacheQuery(
-                $cache_request,
-                $this->query($request, $data)->fetchAll()
+            $this->cad()->set(
+                $sql,
+                $this->query($sql)->fetchAll()
             ) : $query;
     }
 
     /**
      * Make UPDATE / DELETE sql-request and get count of changes
      */
-    public function change(string $request, array $data = []): int
+    public function change(SQLUpdate|SQLInsert $sql): int
     {
-        $cache_request = $this->bindVariables($request, $data);
-        return $this->query($request, $data)->rowCount();
+        if ($sql->cacheAvailable()) {
+            $this->cad()->update($sql);
+        }
+        return $this->query($sql)->rowCount();
     }
 
     /**
@@ -132,11 +152,13 @@ class Bridge
      * 
      * @return string last inserted id on success
      */
-    public function insert(string $request, array $data = [], ?string $last_insert_id_name = null): string|false
+    public function insert(SQLInsert $sql): string|false
     {
-        $cache_request = $this->bindVariables($request, $data);
-        $this->query($request, $data);
-        return $this->connect()->lastInsertId($last_insert_id_name);
+        if ($sql->cacheAvailable()) {
+            $this->cad()->update($sql);
+        }
+        $this->query($sql);
+        return $this->connect()->lastInsertId($sql->lastInsertIdName());
     }
 
     public function startTransation(): void
@@ -163,7 +185,6 @@ class Bridge
 
     public function rollback(): void
     {
-        
         if ($this->transaction) {
             $this->transaction = false;
             $this->query('ROLLBACK;');
