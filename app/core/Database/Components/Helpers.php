@@ -50,7 +50,7 @@ trait Helpers
         $q = $this->q;
         $table_name = $this->clearTableName($table_name);
         if ($this->driver === 'pgsql') {
-            $table_name = app()->env()->DB['SCHEMA'] . '.' . $table_name;
+            $table_name = (app()->env()->DB['SCHEMA'] ?? app()->env()->DB['NAME']) . '.' . $table_name;
         }
         $table_alias = $alias_name ? $this->clearTableName($alias_name) : null;
         $as = $table_alias ? " AS {$q}{$table_alias}{$q}" : '';

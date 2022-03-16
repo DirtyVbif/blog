@@ -164,14 +164,10 @@ class SQLSelect extends SQLAbstractStatement
         } else {
             $first = $args[0] ?? false;
         }
-        $this->current_sql_string = $this->currentSqlString();
-        if (!isset($this->result) || !$this->compareWithPreviousRequest()) {
-            $this->previous_sql_string = $this->current_sql_string;
-            $this->result = $first ?            
-                sql()->selectFirst($this->current_sql_string, $this->data())
-                : sql()->select($this->current_sql_string, $this->data());
-        }
-        return $this->result;
+        $this->current_sql_string = $this->raw();
+        return $first ?            
+                sql()->selectFirst($this)
+                : sql()->select($this);
     }
 
     /**
@@ -206,7 +202,7 @@ class SQLSelect extends SQLAbstractStatement
     /**
      * {@inheritDoc}
      */
-    public function currentSqlString(): string
+    public function currentSqlString(bool $bind = false): string
     {
         $sql_string = "SELECT\n\t%s\nFROM %s";
         $columns = $this->currentSqlStringColumns();
@@ -217,7 +213,7 @@ class SQLSelect extends SQLAbstractStatement
         $order = $this->currentSqlStringOrder();
         $limit = $this->currentSqlStringLimit();
         $sql_string .= $join . $where_condition . $order . $limit . ';';
-        return $sql_string;
+        return $bind ? $this->bind($sql_string, $this->data()) : $sql_string;
     }
 
     protected function currentSqlStringColumns(): string
@@ -325,5 +321,17 @@ class SQLSelect extends SQLAbstractStatement
             'as' => $column_alias
         ];
         return $this;
+    }
+
+    public function getRequestTables(): array
+    {
+        $tables = [];
+        foreach ($this->from as $table) {
+            $tables[$table['name']] = $table['name'];
+        }
+        foreach ($this->join as $join) {
+            $tables[$join['table']] = $join['table'];
+        }
+        return $tables;
     }
 }

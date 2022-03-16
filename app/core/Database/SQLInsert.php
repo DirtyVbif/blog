@@ -19,6 +19,15 @@ class SQLInsert extends SQLAbstractStatement
         return $this;
     }
 
+    public function getRequestTables(): array
+    {
+        $tables = [];
+        if (isset($this->table)) {
+            $tables[] = $this->table;
+        }
+        return $tables;
+    }
+
     /**
      * Specify columns and it's values to insert
      * 
@@ -80,27 +89,22 @@ class SQLInsert extends SQLAbstractStatement
     }
 
     /**
-     * @param bool $rows_affected return number of affected rows or last inserted id
-     * @return string last inserted id or number of affected rows
+     * @param bool $rows_affected set TRUE to return number of affected rows or FALSE for last inserted id
+     * @return int last inserted id or number of affected rows
      */
-    public function exe(bool $rows_affected = false): string|false
+    public function exe(bool $rows_affected = false): int
     {
         $this->bindValues();
-        $last_inserted_id = $this->isPgsql() ?
-            sprintf(
-                '%s.%s_%s_seq',
-                $this->schema,
-                $this->table,
-                table($this->table)->getPkName()
-            ) : null;
-        $method = $rows_affected ? 'change' : 'insert';
-        return sql()->$method($this->raw(), $this->data(), $last_inserted_id);
+        if ($rows_affected) {
+            return sql()->change($this);
+        }
+        return (int)sql()->insert($this);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function currentSqlString(): string
+    public function currentSqlString(bool $bind = false): string
     {
         $insert_string = 'INSERT INTO ' . $this->normalizeTableName($this->table) . "\n\t(%s)\nVALUES";
         $columns = [];
@@ -121,7 +125,7 @@ class SQLInsert extends SQLAbstractStatement
         }
         $insert_string = sprintf($insert_string, implode(', ', $columns));
         $insert_string .= implode(',', $values_stack) . ';';
-        return $insert_string;
+        return $bind ? $this->bind($insert_string, $this->data()) : $insert_string;
     }
 
     protected function bindValues(): void
@@ -144,5 +148,16 @@ class SQLInsert extends SQLAbstractStatement
     {
         $this->column_functions[$column] = strtoupper($function);
         return $this;
+    }
+
+    public function lastInsertIdName(): ?string
+    {
+        return $this->isPgsql() ?
+            sprintf(
+                '%s.%s_%s_seq',
+                $this->schema,
+                $this->table,
+                table($this->table)->getPkName()
+            ) : null;
     }
 }
