@@ -39,7 +39,7 @@ abstract class SQLAbstractStatement
      */
     public function raw(bool $bind = false): string
     {
-        return $this->currentSqlString();
+        return $this->currentSqlString($bind);
     }
     
     protected function compareWithPreviousRequest(): bool

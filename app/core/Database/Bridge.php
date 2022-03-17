@@ -84,11 +84,11 @@ class Bridge
         }
         $this->statement = $this->connect()->prepare($sql);
         $this->statement->execute($data);
-        $this->statementErrors();
+        $this->statementErrors($sql);
         return $this->statement;
     }
 
-    private function statementErrors()
+    private function statementErrors(string $sql)
     {
         $errCode = $this->statement->errorCode();
         if (!(int)$errCode) {
@@ -96,7 +96,8 @@ class Bridge
         }
         pre([
             'PDOStatement::errorCode()' => $this->statement->errorCode(),
-            'PDOStatement::errorInfo()' => $this->statement->errorInfo()
+            'PDOStatement::errorInfo()' => $this->statement->errorInfo(),
+            'SQL-REQUEST' => $sql
         ]);
         exit;
     }
