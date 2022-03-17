@@ -4,9 +4,14 @@ namespace Blog\Controller;
 
 use Blog\Client\User;
 use Blog\Modules\Messenger\Logger;
+use Blog\Modules\TemplateFacade\Form;
 
 class AdminController extends BaseController
 {
+    use Components\AdminControllerPostrequest;
+    
+    public const ADMIN_ACCESS_LEVEL = User::ACCESS_LEVEL_ADMIN;
+
     protected int $status = 200;
 
     public function prepare(): void
@@ -24,7 +29,7 @@ class AdminController extends BaseController
 
     protected function validateRequest(): bool
     {
-        if (!user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+        if (!user()->verifyAccessLevel(self::ADMIN_ACCESS_LEVEL)) {
             $this->status = 403;
             return false;
         }
@@ -36,7 +41,6 @@ class AdminController extends BaseController
             $this->viewAdminPage();
             return true;
         }
-        // TODO: validate request for correct request
         $this->status = 404;
         return false;
     }
@@ -55,9 +59,23 @@ class AdminController extends BaseController
         return true;
     }
 
-    public function postRequest(): void
+    protected function getRequestSkill(): bool
     {
-        pre($_POST);
-        exit;
+        $argument = app()->router()->arg(3);
+        if (is_numeric($argument)) {
+            msgr()->warning('Complete AdminController::getRequestSkill() method for existing entity.');
+            return true;
+        } else if ($argument === 'create') {
+            /** @var \BlogLibrary\HtmlTagsAutofill\HtmlTagsAutofill $html_tags_autofill */
+            $html_tags_autofill = app()->library('html-tags-autofill');
+            $html_tags_autofill->use();
+            $form = new Form('skill');
+            $form->tpl()->set('html_tags_autofill', $html_tags_autofill->getTemplate('form-skill--body'));
+            $this->getTitle()->set('Создание нового материала типа &laquo;Навыки&raquo;');
+            app()->page()->addContent($form);
+            return true;
+        }
+        $this->status = 404;
+        return false;
     }
 }

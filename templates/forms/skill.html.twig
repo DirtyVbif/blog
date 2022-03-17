@@ -1,0 +1,57 @@
+{{ wrapper.addClass('form-wrapper form-wrapper_skill').open() }}
+    <form action="/admin" method="POST" {{ id('form-skill', true) }} class="form form_skill">
+        <input type="hidden" name="type" value="entity-skill-create">
+
+        <div class="form__field form_skill__field">
+            <label for="form-skill--title" class="form__field-label form_skill__field-label">Title:</label>
+            <input
+                type="text"
+                {{ id('form-skill--title', true) }}
+                name="title"
+                max-length="256"
+                class="form__input form_skill__input"
+                required{{ old('title', true) }}>
+        </div>
+
+        <div class="form__field form_skill__field">
+            <label for="form-skill--icon-src" class="form__field-label form_skill__field-label">Skill icon src link:</label>
+            <input
+                type="text"
+                {{ id('form-skill--icon-src', true) }}
+                name="icon_src"
+                max-length="256"
+                class="form__input form_skill__input"
+                required{{ old('icon_src', true) }}>
+        </div>
+
+        <div class="form__field form_skill__field">
+            <label for="form-skill--icon-alt" class="form__field-label form_skill__field-label">Skill icon alternative text:</label>
+            <input
+                type="text"
+                {{ id('form-skill--icon-alt', true) }}
+                name="icon_alt"
+                max-length="256"
+                class="form__input form_skill__input"
+                required{{ old('icon_alt', true) }}>
+        </div>
+        
+        <div class="form__field form_skill__field">
+            <label for="form-skill--body" class="form__field-label form_skill__field-label">Body:</label>
+            <textarea
+                {{ id('form-skill--body', true) }}
+                name="body"
+                class="form__textarea form_skill__textarea form_skill__textarea_body"
+                rows="8"
+                required>{{ old('body') }}</textarea>
+            <div class="form__field-footer form_skill__field-footer">
+                {{ html_tags_autofill }}
+            </div>
+        </div>
+
+        <footer class="form__footer form_skill__footer">
+            <div class="form__field form_skill__field form_skill__field_submit">
+                <input type="submit" value="Save" class="btn btn_transparent form__submit form_skill__submit">
+            </div>
+        </footer>
+    </form>
+{{ wrapper.close() }}
