@@ -94,3 +94,9 @@ admin_log: {
   access_level: 4,
   sitemap_exclude: true
 }
+entity_skill_create: {
+  url: '/admin/skill/create',
+  label: '+ skill',
+  access_level: 4,
+  sitemap_exclude: true
+}
