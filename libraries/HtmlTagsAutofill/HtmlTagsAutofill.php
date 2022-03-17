@@ -27,7 +27,14 @@ class HtmlTagsAutofill extends \Blog\Modules\Library\AbstractLibrary
     protected static $counter = 0;
 
     protected bool $twig_namespace_defined = false;
-    protected array $tags = ['a', 'p', 'ul', 'ol', 'li', 'span', 'b', 'i'];
+    protected array $tags;
+
+    public function __construct()
+    {
+        $tags_list = f('tags-list', ROOTDIR . self::SRC_PATH, 'json')
+            ->json_decode();
+        $this->setTags($tags_list);
+    }
 
     public function use(): void
     {
