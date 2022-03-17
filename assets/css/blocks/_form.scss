@@ -22,6 +22,7 @@
     // MODIFICATORS <---------------------------------------------------
 
     // MODIFICATORS --------------------------------------------------->
+    &_skill,
     &_blog-article {
         display: block;
     }
@@ -144,6 +145,7 @@
         }
     }
     
+    &_skill,
     &_blog-article {
         &__field {
             &_checkbox {
@@ -165,6 +167,10 @@
 
         &__input {
             width: 100%;
+        }
+
+        &__textarea {
+            font-size: 14px;
         }
     }
     // MODIFICATORS <---------------------------------------------------
