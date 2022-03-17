@@ -14,7 +14,7 @@ class Feedback extends EntityPrototype
     /** @var int entity type id (etid) specified in entities_types table */
     public const ENTITY_TYPE_ID = 2;
     public const VIEW_MODE_FULL = 'full';
-    public const URL_MASK = '/feedbacks/%d';
+    public const URL_MASK = '/admin/feedback/%d';
 
     public static function getSqlTableName(): array|string
     {
@@ -100,33 +100,6 @@ class Feedback extends EntityPrototype
             parent::__construct($data);
         }
         $this->setViewMode($view_mode);
-    }
-
-    public function load(?int $id = null, bool $load_comments = true): void
-    {
-        if (!is_null($id)) {
-            $this->id = $id;
-        }
-        if ($this->id()) {
-            $sql = self::sql();
-            $sql->where(condition: ['e.eid' => $this->id()]);
-            $this->setLoadedData($sql->all());
-        }
-        return;
-    }
-
-    protected function setLoadedData(array $data): void
-    {
-        if (!arrayIsFlat($data)) {
-            // TODO: set throwable error
-            pre([
-                'error' => 'Provided comment data is not compatable with Entity/Comment::class',
-                'data' => $data
-            ]);
-            die;
-        }
-        $this->data = $data;
-        return;
     }
 
     /**

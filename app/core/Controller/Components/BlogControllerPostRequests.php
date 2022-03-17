@@ -58,10 +58,10 @@ trait BlogControllerPostRequests
             $result = null;
         }
         if ($result) {
-            msgr()->notice(t('Blog article "@name" published.', ['name' => $request->title]));
+            msgr()->notice(t('New entity &laquo;@name&raquo; of type &laquo;article&raquo; successfully saved.', ['name' => $request->title]));
             app()->router()->redirect('<current>');
         } else {
-            msgr()->warning(t('There was an error wile creating article "@name".', ['name' => $request->raw('title')]));
+            msgr()->warning(t('There was an error while creating new entity &laquo;@name&raquo; of type &laquo;skill&raquo;.', ['name' => $request->raw('title')]));
             app()->router()->redirect('<previous>');
         }
         exit;

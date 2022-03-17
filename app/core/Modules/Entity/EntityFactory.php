@@ -31,39 +31,34 @@ class EntityFactory
     public static function load(int $entity_id, ?string $entity_type = null): ?EntityPrototype
     {
         $entity_type ??= self::getTypeById($entity_id);
-        switch ($entity_type) {
-            case 'article':
-                return new Article($entity_id);
-            case 'feedback':
-                return new Feedback($entity_id);
-            default:
-                return null;
+        $class = '\\Blog\\Modules\\Entity\\' . pascalCase($entity_type);
+        if (class_exists($class)) {
+            /** @var EntityPrototype $class */
+            return new $class($entity_id);
         }
+        return null;
     }
 
     /**
      * Load list of entities
      * 
-     * @return Comment[]|Article[]|Feedback[]
+     * @return Comment[]|Article[]|Feedback[]|Skill[]
      */
     public static function loadList(
         #[ExpectedValues('comment', 'feedback', 'article')]
         string $entity_type,
         array $options = []
     ): array {
-        switch ($entity_type) {
-            case 'comment':
-                return Comment::loadList($options);
-            case 'feedback':
-                return Feedback::loadList($options);
-            case 'article':
-                return Article::loadList($options);
-            default:
-                // TODO: set throwable error
-                pre([
-                    'error' => "Unknown entity type {$entity_type}. Entity list of specified type cannot be loaded."
-                ]);
-                exit;
+        $class = '\\Blog\\Modules\\Entity\\' . pascalCase($entity_type);
+        if (class_exists($class) && method_exists($class, 'loadList')) {
+            /** @var EntityPrototype $class */
+            return $class::loadList($options);
+        } else {
+            // TODO: set throwable error
+            pre([
+                'error' => "Unknown entity type {$entity_type}. Entity list of specified type cannot be loaded."
+            ]);
+            exit;
         }
     }
 }

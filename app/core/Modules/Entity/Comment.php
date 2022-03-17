@@ -208,34 +208,14 @@ class Comment extends EntityPrototype implements SitemapInterface
         return parent::render();
     }
 
-    public function load(?int $id = null, bool $load_comments = true): void
-    {
-        if (!is_null($id)) {
-            $this->id = $id;
-        }
-        if ($this->id()) {
-            $sql = self::sql();
-            $sql->where(condition: ['c.cid' => $this->id()]);
-            $this->setLoadedData($sql->all());
-        }
-        return;
-    }
-
     protected function setLoadedData(array $data): void
     {
-        if (!arrayIsFlat($data)) {
-            // TODO: set throwable error
-            pre([
-                'error' => 'Provided comment data is not compatable with Entity/Comment::class',
-                'data' => $data
-            ]);
-            die;
-        }
         if ($data['cid'] ?? false) {
             $data['id'] = $data['cid'];
             unset($data['cid']);
         }
-        $this->data = $data;
+        parent::setLoadedData($data);
+        return;
     }
 
     protected function preprocessData(): void

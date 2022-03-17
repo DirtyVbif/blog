@@ -21,10 +21,7 @@ abstract class EntityPrototype extends TemplateFacade
     abstract public static function getSqlTableName(): array|string;
     abstract public static function getSqlTableColumns(): array;
     abstract public static function loadList(array $options): array;
-
-    abstract protected function setLoadedData(array $data): void;
     abstract public function url(): ?string;
-    abstract public function load(?int $id = null, bool $load_comments = true): void;
 
     public function __construct(
         protected int $id
@@ -95,5 +92,32 @@ abstract class EntityPrototype extends TemplateFacade
             . ' AND `TABLE_NAME` = "' . static::ENTITY_TABLE . '";');
         $result = $sql->fetch();
         return $result['AUTO_INCREMENT'];
+    }
+
+    public function load(?int $id = null): void
+    {
+        if (!is_null($id)) {
+            $this->id = $id;
+        }
+        if ($this->id()) {
+            $sql = static::sql();
+            $sql->where(condition: [static::ENTITY_TABLE_ALIAS . '.' . static::ENTITY_PK => $this->id()]);
+            $this->setLoadedData($sql->all());
+        }
+        return;
+    }
+
+    protected function setLoadedData(array $data): void
+    {
+        if (!arrayIsFlat($data)) {
+            // TODO: set throwable error
+            pre([
+                'error' => 'Provided comment data is not compatable with Entity/Comment::class',
+                'data' => $data
+            ]);
+            die;
+        }
+        $this->data = $data;
+        return;
     }
 }
