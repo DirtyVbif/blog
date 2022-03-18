@@ -81,19 +81,27 @@
     list-style-type: none;
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
 
     &__item {
         margin-bottom: 15px;
-
-        &:not(:last-child) {
-            margin-right: 15px;
-        }
     }
 }
 
+$skill_card_h: 40px;
+
 .skill-card {
-    @include card();
+    border-radius: 8px;
     padding: 8px;
+    height: calc(#{$skill_card_h} + 8px * 2);
+    background-color: #fcffe3;
+    transition: $transition;
+    cursor: pointer;
+
+    &:hover {
+        background-color: white;
+        box-shadow: $shadow;
+    }
 
     &_teaser {
         display: flex;
@@ -102,6 +110,7 @@
         &__icon {
             max-width: 40px;
             max-height: 40px;
+            height: auto;
             margin-right: 10px;
         }
 
