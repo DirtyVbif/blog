@@ -45,7 +45,7 @@ class EntityFactory
      * @return Comment[]|Article[]|Feedback[]|Skill[]
      */
     public static function loadList(
-        #[ExpectedValues('comment', 'feedback', 'article')]
+        #[ExpectedValues('comment', 'feedback', 'article', 'skill')]
         string $entity_type,
         array $options = []
     ): array {

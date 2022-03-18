@@ -4,6 +4,7 @@ namespace Blog\Modules\Entity;
 
 use Blog\Modules\Template\Element;
 use Blog\Request\RequestPrototype;
+use JetBrains\PhpStorm\ExpectedValues;
 
 class Skill extends EntityPrototype
 {
@@ -12,6 +13,7 @@ class Skill extends EntityPrototype
     /** @var int entity type id (etid) specified in entities_types table */
     public const ENTITY_TYPE_ID = 3;        // skill
     public const VIEW_MODE_FULL = 'full';
+    public const VIEW_MODE_TEASER = 'teaser';
     public const URL_MASK = '/admin/skill/%d';
 
     public static function getSqlTableName(): array|string
@@ -77,15 +79,16 @@ class Skill extends EntityPrototype
         return !$rollback;
     }
 
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
-    {
-        if (!isset($this->tpl)) {
-            $this->tpl = new Element;
+    public function __construct(
+        int|array $data = 0,
+        #[ExpectedValues(self::VIEW_MODE_FULL, self::VIEW_MODE_TEASER)]
+        protected string $view_mode = self::VIEW_MODE_FULL
+    ) {
+        if (is_array($data)) {
+            $this->setLoadedData($data);
+        } else {
+            parent::__construct($data);
         }
-        return $this->tpl;
     }
 
     public function render()

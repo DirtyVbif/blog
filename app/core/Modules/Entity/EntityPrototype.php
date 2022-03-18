@@ -3,6 +3,7 @@
 namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
+use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\TemplateFacade;
 use Blog\Request\RequestPrototype;
 
@@ -119,5 +120,16 @@ abstract class EntityPrototype extends TemplateFacade
         }
         $this->data = $data;
         return;
+    }
+
+    /**
+     * @return Element $tpl
+     */
+    public function tpl()
+    {
+        if (!isset($this->tpl)) {
+            $this->tpl = new Element;
+        }
+        return $this->tpl;
     }
 }
