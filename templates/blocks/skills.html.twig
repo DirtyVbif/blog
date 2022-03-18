@@ -1,24 +1,13 @@
+{% set list_class = 'skills' %}
+
 {{ wrapper.open() }}
     {{ label }}
-    <ul class="js-slider" {{ id('skills', true) }}>
-        <li class="js-slider__control prev" role="button"></li>
-        {% set i = 0 %}
-        {% for key, item in items %}
-            {% if i == 0 %}
-                <li class="js-slider__item skill left">
-            {% elseif i == 1 %}
-                <li class="js-slider__item skill middle">
-            {% elseif i == 2 %}
-                <li class="js-slider__item skill right">
-            {% else %}
-                <li class="js-slider__item skill hidden">
-            {% endif %}
-                <div class="skill__icon">{{ item.icon }}</div>
-                <h3 class="skill__title">{{- item.label -}}</h3>
-                <div class="skill__desc">{{- item.desc|raw -}}</div>
-            </li>
-            {% set i = i + 1 %}
+    <ul class="{{ list_class }}" {{ id('skills', true) }}>
+        {% for item in items %}
+            <li class="{{ classlistToString(list_class, '', '__item') }}">{{ item }}</li>
         {% endfor %}
-        <li class="js-slider__control next" role="button"></li>
     </ul>
+    <footer class="{{ classlistToString(wrapper.attributes().classList(), '', '__footer') }}">
+        <div id="skill-card-placeholder"></div>
+    </footer>
 {{ wrapper.close() }}

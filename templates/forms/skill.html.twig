@@ -14,25 +14,27 @@
         </div>
 
         <div class="form__field form_skill__field">
-            <label for="form-skill--icon-src" class="form__field-label form_skill__field-label">Skill icon src link:</label>
-            <input
-                type="text"
-                {{ id('form-skill--icon-src', true) }}
-                name="icon_src"
-                max-length="256"
-                class="form__input form_skill__input"
-                required{{ old('icon_src', true) }}>
-        </div>
-
-        <div class="form__field form_skill__field">
-            <label for="form-skill--icon-alt" class="form__field-label form_skill__field-label">Skill icon alternative text:</label>
-            <input
-                type="text"
-                {{ id('form-skill--icon-alt', true) }}
-                name="icon_alt"
-                max-length="256"
-                class="form__input form_skill__input"
-                required{{ old('icon_alt', true) }}>
+            <label for="form-skill--icon-src" class="form__field-label form_skill__field-label">Icon image</label>
+            <div class="form__input-line form_skill__input-line">
+                <label for="form-skill--icon-src" class="form__input-prefix form_skill__input-prefix">src:</label>
+                <input
+                    type="text"
+                    {{ id('form-skill--icon-src', true) }}
+                    name="icon_src"
+                    max-length="256"
+                    class="form__input form_skill__input"
+                    required{{ old('icon_src', true) }}>
+            </div>
+            <div class="form__input-line form_skill__input-line">
+                <label for="form-skill--icon-alt" class="form__input-prefix form_skill__input-prefix">alt:</label>
+                <input
+                    type="text"
+                    {{ id('form-skill--icon-alt', true) }}
+                    name="icon_alt"
+                    max-length="256"
+                    class="form__input form_skill__input"
+                    required{{ old('icon_alt', true) }}>
+            </div>
         </div>
         
         <div class="form__field form_skill__field">

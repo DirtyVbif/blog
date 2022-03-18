@@ -1,0 +1,7 @@
+{% set class = 'skill-card skill-card_teaser' %}
+
+{{ wrapper.set('article').addClass(class).open() }}
+    {{ img(icon_src).alt(icon_alt).addClass(classlistToString(class, '', '__icon')) }}
+    <h3 class="{{ classlistToString(class, '', '__title') }}">{{ title }}</h3>
+    <div class="{{ classlistToString(class, '', '__body') }} hidden">{{ body }}</div>
+{{ wrapper.close() }}
