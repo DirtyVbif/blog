@@ -6,7 +6,6 @@ use Blog\Modules\Template\Element;
 
 class HtmlTagsAutofill extends \Blog\Modules\Library\AbstractLibrary
 {
-    protected const SRC_PATH = 'libraries/HtmlTagsAutofill/src/';
     protected const TWIG_NAMESPACE = 'lib_htmltagsautofill';
     protected const SRC = [
         'js' => [
@@ -31,7 +30,7 @@ class HtmlTagsAutofill extends \Blog\Modules\Library\AbstractLibrary
 
     public function __construct()
     {
-        $tags_list = f('tags-list', ROOTDIR . self::SRC_PATH, 'json')
+        $tags_list = f('tags-list', $this->getSelfSrcDir(), 'json')
             ->json_decode();
         $this->setTags($tags_list);
     }
@@ -57,7 +56,7 @@ class HtmlTagsAutofill extends \Blog\Modules\Library\AbstractLibrary
     public function getTemplate(string $target_element_id): Element
     {
         if (!$this->twig_namespace_defined) {
-            app()->twig_add_namespace(self::SRC_PATH, self::TWIG_NAMESPACE);
+            app()->twig_add_namespace($this->getSelfSrcDir(), self::TWIG_NAMESPACE);
             $this->twig_namespace_defined = true;
         }
         $id = $target_element_id . "-html-tags-autofill";
