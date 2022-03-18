@@ -8,7 +8,7 @@ abstract class TemplateFacade
 {
     protected BaseTemplate $tpl;
     protected bool $renderable = true;
-
+    
     abstract public function tpl();
 
     public function __toString()
@@ -27,9 +27,15 @@ abstract class TemplateFacade
         return $this;
     }
 
-    public function addClass(string $class_string): self
+    public function setData(string $name, ?string $value = null): self
     {
-        $this->tpl()->addClass($class_string);
+        $this->tpl()->wrapper()->setData($name, $value);
+        return $this;
+    }
+
+    public function addClass(string|array $classes): self
+    {
+        $this->tpl()->addClass($classes);
         return $this;
     }
 }
