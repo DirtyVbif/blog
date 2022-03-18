@@ -28,6 +28,27 @@ class Make extends ServicePrototype implements ServiceInterface
         return;
     }
 
+    protected function createClassFile(string $filename, string $directory, string $content): bool
+    {
+        $folder = new Folder($directory);
+        $folder->create();
+        if (!$folder->exists()) {
+            forge()->setError("Failed to create `{$directory}` directory.");
+            return false;
+        } else {
+            Folder::chmod($folder->path(), true);
+        }
+        $file = f($filename, $folder->path());
+        $file->content($content);
+        $file->save();
+        if (!$file->exists()) {
+            forge()->setError("Failed to create `{$directory}{$filename}` file.");
+            return false;
+        }
+        forge()->setSuccess("File `{$directory}{$filename}` created.");
+        return true;
+    }
+
     public function class(): void
     {
         $name = $GLOBALS['argv'][2] ?? null;
@@ -37,40 +58,57 @@ class Make extends ServicePrototype implements ServiceInterface
         }
         $classname = $this->normalizeClassname($name);
         $namespace = count($classname['namespace']) ? implode('\\', $classname['namespace']) : null;
-        $content = $this->generateScriptContent($classname['class'], $namespace);
+        $content = $this->generateClassFileContent($classname['class'], $namespace);
         $filename = "{$classname['class']}.php";
         $directory = strSuffix(COREDIR . implode('/', $classname['namespace']), '/');
-        $folder = new Folder($directory);
-        $folder->create();
-        if (!$folder->exists()) {
-            forge()->setError("Failed to create `{$directory}` directory.");
-            return;
-        } else {
-            Folder::chmod($folder->path(), true);
-        }
-        $file = f($filename, $folder->path());
-        $file->content($content);
-        $file->save();
-        $result = $file->exists();
-        if (!$result) {
-            forge()->setError("Failed to create `{$directory}{$filename}` file.");
-        } else {
-            forge()->setSuccess("File `{$directory}{$filename}` created.");
-        }
+        $this->createClassFile($filename, $directory, $content);
         return;
     }
 
-    protected function generateScriptContent(string $classname, ?string $namespace = null): string
+    /**
+     * Alias method for @method library()
+     */
+    public function lib(): void
     {
+        $this->library();
+        return;
+    }
+
+    public function library(): void
+    {
+        $name = $GLOBALS['argv'][2] ?? null;
+        if (!$name) {
+            forge()->setError("No library name provided.");
+            return;
+        }
+        $class = $this->normalizeClassname($name);
+        $classname = $namespace = $class['class'];
+        $options = [
+            'extends' => '\Blog\Modules\Library\AbstractLibrary',
+            'vendor' => 'blog-library'
+        ];
+        $content = $this->generateClassFileContent($classname, $namespace, $options);
+        $filename = "{$classname}.php";
+        $directory = LIBDIR . "{$namespace}/";
+        $this->createClassFile($filename, $directory, $content);
+        return;
+    }
+
+    protected function generateClassFileContent(string $classname, ?string $namespace = null, array $options = []): string
+    {
+        $vendor = pascalCase($options['vendor'] ?? 'blog');
         $option = $GLOBALS['argv'][3] ?? null;
         $construct_word = self::OPTIONS[$option] ?? 'class';
-        $content = "<?php\n\n";
-        if ($namespace) {
-            $content .= "namespace Blog\\{$namespace};\n\n";
-        } else {
-            $content .= "namespace Blog;";
+        $content = sprintf(
+            "<?php\n\nnamespace {$vendor}%s;\n\n",
+            ($namespace ? "\\{$namespace}" : '')
+        );
+        $content .= "{$construct_word} {$classname}%s\n{\n\n}\n";
+        $implementation = '';
+        if ($ext = $options['extends'] ?? false) {
+            $implementation .= " extends {$ext}";
         }
-        $content .= "{$construct_word} {$classname}\n{\n\n}\n";
+        $content = sprintf($content, $implementation);
         return $content;
     }
 }
