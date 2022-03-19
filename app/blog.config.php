@@ -27,7 +27,8 @@ $__config['webmaster'] = [
  * Application development settings
  */
 $__config['development'] = [
-    'js' => true
+    'js' => true,
+    'livereload' => false
 ];
 
 /**
