@@ -3,7 +3,7 @@ class ItemProjectorList
     get s() {
         return {
             /** @type {int} time for random switching projecting items (ms) */
-            interval: 7500,
+            interval: 12500,
             /** @type {int} time for projecting animation (ms) */
             animtime: 400
         };
