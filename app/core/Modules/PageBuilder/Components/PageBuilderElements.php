@@ -88,6 +88,9 @@ trait PageBuilderElements
         $label->set(t('My stack'));
         $label->addClass('section__header section_skills__header');
         $block->set('label', $label);
+        /** @var \BlogLibrary\ItemProjector\ItemProjector $projector_lib */
+        $projector_lib = app()->library('item-projector');
+        $projector_lib->use();
         return $block;
     }
 
