@@ -2,12 +2,14 @@
 
 {{ wrapper.open() }}
     {{ label }}
-    <ul class="{{ list_class }}" {{ id('skills', true) }}>
+    <ul class="js-item-projector__list {{ list_class }}"
+        {{ id('skills', true) }}
+        data-item-project-placeholder="skill-cards-placeholder">
         {% for item in items %}
             <li class="{{ classlistToString(list_class, '', '__item') }}">{{ item }}</li>
         {% endfor %}
     </ul>
     <footer class="{{ classlistToString(wrapper.attributes().classList(), '', '__footer') }}">
-        <div id="skill-card-placeholder"></div>
+        <div id="{{ id('skill-cards-placeholder') }}"></div>
     </footer>
 {{ wrapper.close() }}

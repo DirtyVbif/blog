@@ -2,9 +2,11 @@
 
 namespace Blog\Modules\Entity;
 
+use Blog\Client\User;
 use Blog\Modules\Template\Element;
 use Blog\Request\RequestPrototype;
 use JetBrains\PhpStorm\ExpectedValues;
+use Twig\Markup;
 
 class Skill extends EntityPrototype
 {
@@ -93,12 +95,24 @@ class Skill extends EntityPrototype
 
     public function render()
     {
+        $this->preprocessData();
         $this->tpl()->setName('content/skill--' . $this->view_mode);
         $this->tpl()->setId('skill-' . $this->id());
         foreach ($this->data as $key => $value) {
             $this->tpl()->set($key, $value);
         }
         return parent::render();
+    }
+
+    protected function preprocessData(): void
+    {
+        $this->data['body'] = new Markup($this->data['body'], CHARSET);
+        $this->data['url'] = [
+            'edit' => $this->url() . '/edit',
+            'delete' => $this->url() . '/delete'
+        ];
+        $this->data['is_master'] = user()->verifyAccessLevel(User::ACCESS_LEVEL_MASTER);
+        return;
     }
 
     public function url(): ?string
