@@ -3,6 +3,7 @@
 namespace Blog\Controller;
 
 use Blog\Client\User;
+use Blog\Modules\Entity\EntityFactory;
 use Blog\Modules\Messenger\Logger;
 use Blog\Modules\TemplateFacade\Form;
 
@@ -62,20 +63,38 @@ class AdminController extends BaseController
     protected function getRequestSkill(): bool
     {
         $argument = app()->router()->arg(3);
-        if (is_numeric($argument)) {
-            msgr()->warning('Complete AdminController::getRequestSkill() method for existing entity.');
-            return true;
+        $result = false;
+        $form = new Form('skill');
+        /** @var \BlogLibrary\HtmlTagsAutofill\HtmlTagsAutofill $html_tags_autofill */
+        $html_tags_autofill = app()->library('html-tags-autofill');
+        $html_tags_autofill->use();
+        $form_data = [
+            'type' => 'create',
+            'action' => '/admin/skill',
+            'html_tags_autofill' => $html_tags_autofill->getTemplate('form-skill--body')
+        ];
+        /** @var \Blog\Modules\Entity\Skill $skill */
+        if (is_numeric($argument) && $skill = EntityFactory::load($argument, 'skill')) {
+            $title = "Редактирование материала типа &laquo;навык&raquo; - #{$skill->id()} " . $skill->get('title');
+            $form_data['title'] = $skill->get('title');
+            $form_data['icon_src'] = $skill->get('icon_src');
+            $form_data['icon_alt'] = $skill->get('icon_alt');
+            $form_data['body'] = $skill->get('body');
+            $form_data['id'] = $skill->id();
+            $form_data['action'] = $skill->url();
+            $form_data['type'] = 'edit';
+            $result = true;
         } else if ($argument === 'create') {
-            /** @var \BlogLibrary\HtmlTagsAutofill\HtmlTagsAutofill $html_tags_autofill */
-            $html_tags_autofill = app()->library('html-tags-autofill');
-            $html_tags_autofill->use();
-            $form = new Form('skill');
-            $form->tpl()->set('html_tags_autofill', $html_tags_autofill->getTemplate('form-skill--body'));
-            $this->getTitle()->set('Создание нового материала типа &laquo;Навыки&raquo;');
-            app()->page()->addContent($form);
-            return true;
+            $title = 'Создание нового материала типа &laquo;навык&raquo;';
+            $result = true;
         }
-        $this->status = 404;
-        return false;
+        if ($result) {
+            $this->getTitle()->set($title);
+            $form->tpl()->set($form_data);
+            app()->page()->addContent($form);
+        } else {
+            $this->status = 404;
+        }
+        return $result;
     }
 }

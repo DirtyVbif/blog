@@ -1,6 +1,6 @@
 {{ wrapper.addClass('form-wrapper form-wrapper_skill').open() }}
-    <form action="/admin" method="POST" {{ id('form-skill', true) }} class="form form_skill">
-        <input type="hidden" name="type" value="entity-skill-create">
+    <form action="{{ action }}" method="POST" {{ id('form-skill', true) }} class="form form_skill">
+        <input type="hidden" name="type" value="{{ type }}">
 
         <div class="form__field form_skill__field">
             <label for="form-skill--title" class="form__field-label form_skill__field-label">Title:</label>
@@ -10,7 +10,8 @@
                 name="title"
                 max-length="256"
                 class="form__input form_skill__input"
-                required{{ old('title', true) }}>
+                value="{{ title ? title : old('title') }}"
+                required>
         </div>
 
         <div class="form__field form_skill__field">
@@ -23,7 +24,8 @@
                     name="icon_src"
                     max-length="256"
                     class="form__input form_skill__input"
-                    required{{ old('icon_src', true) }}>
+                    value="{{ icon_src ? icon_src : old('icon_src') }}"
+                    required>
             </div>
             <div class="form__input-line form_skill__input-line">
                 <label for="form-skill--icon-alt" class="form__input-prefix form_skill__input-prefix">alt:</label>
@@ -33,7 +35,8 @@
                     name="icon_alt"
                     max-length="256"
                     class="form__input form_skill__input"
-                    required{{ old('icon_alt', true) }}>
+                    value="{{ icon_alt ? icon_alt : old('icon_alt') }}"
+                    required>
             </div>
         </div>
         
@@ -44,7 +47,7 @@
                 name="body"
                 class="form__textarea form_skill__textarea form_skill__textarea_body"
                 rows="8"
-                required>{{ old('body') }}</textarea>
+                required>{{ body ? body : old('body') }}</textarea>
             <div class="form__field-footer form_skill__field-footer">
                 {{ html_tags_autofill }}
             </div>

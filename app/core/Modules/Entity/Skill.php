@@ -72,13 +72,27 @@ class Skill extends EntityPrototype
                 ['eid', 'title', 'body', 'icon_src', 'icon_alt']
             );
             $result = $sql->exe(true);
-            if ($result) {
-                $rollback = false;
-                $request->complete();
-            }
+            $rollback = $result ? false : true;
         }
         sql()->commit($rollback);
         return !$rollback;
+    }
+
+    /**
+     * @param \Blog\Request\SkillRequest $request
+     */
+    public static function edit(int $id, RequestPrototype $request): bool
+    {
+        
+        $sql = sql_update(table: self::ENTITY_DATA_TABLE);
+        $sql->set([
+            'title' => $request->title,
+            'icon_src' => $request->icon_src,
+            'icon_alt' => $request->icon_alt,
+            'body' => $request->body
+        ]);
+        $sql->where([self::ENTITY_PK => $id]);
+        return (bool)$sql->update();
     }
 
     public function __construct(
