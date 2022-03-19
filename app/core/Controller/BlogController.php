@@ -81,7 +81,10 @@ class BlogController extends BaseController
         }
         $form = new Form('article');
         $form->tpl()->useGlobals(true);
-        // app()->page()->setTitle('Создание нового материала для блога');
+        /** @var \BlogLibrary\HtmlTagsAutofill\HtmlTagsAutofill $library */
+        $library = app()->library('html-tags-autofill');
+        $library->use();
+        $form->tpl()->set('html_tags_autofill', $library->getTemplate('form-blog-article--body'));
         $this->getTitle()->set('Создание нового материала для блога');
         app()->page()->addContent($form);
         return true;
