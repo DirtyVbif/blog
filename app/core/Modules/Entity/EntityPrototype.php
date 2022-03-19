@@ -103,7 +103,7 @@ abstract class EntityPrototype extends TemplateFacade
         if ($this->id()) {
             $sql = static::sql();
             $sql->where(condition: [static::ENTITY_TABLE_ALIAS . '.' . static::ENTITY_PK => $this->id()]);
-            $this->setLoadedData($sql->all());
+            $this->setLoadedData($sql->first());
         }
         return;
     }
@@ -118,6 +118,8 @@ abstract class EntityPrototype extends TemplateFacade
             ]);
             die;
         }
+        $this->loaded = true;
+        $this->exists = !empty($data);
         $this->data = $data;
         return;
     }
