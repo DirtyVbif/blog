@@ -18,6 +18,8 @@ assets/img/
 # local configuration and automaticly generated files
 env
 public/sitemap.xml
+public/js
+public/css
 
 # some temporary files
 test/

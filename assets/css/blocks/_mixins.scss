@@ -47,3 +47,17 @@
         box-shadow: $shadow;
     }
 }
+
+@mixin notLast()
+{
+    &:not(:last-child) {
+        @content;
+    }
+}
+
+@mixin notFirst()
+{
+    &:not(:first-child) {
+        @content;
+    }
+}

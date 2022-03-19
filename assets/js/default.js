@@ -18,3 +18,19 @@ function isCookieAccepted()
         return true;
     }
 }
+
+Math.randomInt = function(
+        /** @param {int} int */
+        int = 2
+    ) {
+        int = parseInt(int);
+        if (int == 0 || int == 1) {
+            int = 2;
+        } else if (int == -1) {
+            int = -2;
+        }
+        if (int < 0) {
+            return Math.floor(-1 + Math.random() * int);
+        }
+        return Math.floor(1 + Math.random() * int);
+    };
