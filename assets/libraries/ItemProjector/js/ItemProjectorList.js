@@ -3,7 +3,8 @@ class ItemProjectorList
     get s() {
         return {
             /** @type {int} time for random switching projecting items (ms) */
-            interval: 12500,
+            interval: 10000,
+            delay: 15000,
             /** @type {int} time for projecting animation (ms) */
             animtime: 400
         };
@@ -26,9 +27,10 @@ class ItemProjectorList
         this.projected_item = -1;
         /** @type {int[]} stack of last projected item indexes. If All items was projected then stack would be refreshed */
         this.last_projected_items = [];
-        this.timer = null;
         /** @type {Function} */
         this.callback = null;
+        this.timer = null;
+        this.delay = null;
     }
 
     /**
@@ -53,8 +55,9 @@ class ItemProjectorList
     /**
      * @param {HTMLElement} clone_item 
      * @param {int} index 
+     * @param {bool} delay_random_projecting 
      */
-    projectNewItem(clone_item, index)
+    projectNewItem(clone_item, index, delay_random_projecting = false)
     {
         this.projected_item = index;
         this._animateProjecting(clone_item);
@@ -64,7 +67,11 @@ class ItemProjectorList
         if (!this.last_projected_items.includes(index)) {
             this.last_projected_items.push(index);
         }
-        this._setNewRandomizerInterval();
+        if (delay_random_projecting) {
+            this._setDelayRandomProjecting();
+        } else {
+            this._setNewRandomizerInterval();
+        }
     }
 
     /**
@@ -76,13 +83,34 @@ class ItemProjectorList
         this._setNewRandomizerInterval();
     }
 
-    _setNewRandomizerInterval()
+    _clearCurrentTimer()
     {
         if (this.timer != null) {
             clearInterval(this.timer);
         }
+    }
+
+    _setNewRandomizerInterval()
+    {
+        this._clearCurrentTimer();
+        this._clearCurrentDelay();
         if (this.callback != null) {
             this.timer = setInterval(this.callback, this.s.interval);
+        }
+    }
+
+    _setDelayRandomProjecting()
+    {
+        this._clearCurrentTimer();
+        this.delay = setTimeout(() => {
+            this._setNewRandomizerInterval()
+        }, this.s.delay);
+    }
+
+    _clearCurrentDelay()
+    {
+        if (this.delay != null) {
+            clearTimeout(this.delay);
         }
     }
 

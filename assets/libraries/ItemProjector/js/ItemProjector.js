@@ -51,18 +51,18 @@ class ItemProjector
         for (let i = 0; i < this.lists.length; i++) {
             for (let x = 0; x < this.lists[i].items.length; x++) {
                 this.lists[i].items[x].addEventListener('click', () => {
-                    this._projectItem(this.lists[i], x);
+                    this._projectItem(this.lists[i], x, true);
                 });
             }
         }
     }
 
     /**
-     * @param {ItemProjectorList} list
-     * 
+     * @param {ItemProjectorList} list 
      * @param {int} index index of currently projected DOM Element in list
+     * @param {bool} delay_random_projecting
      */
-    _projectItem(list, index)
+    _projectItem(list, index, delay_random_projecting = false)
     {
         /** @type {HTMLElement} iClone */
         let iClone = list.items[index].cloneNode(true);
@@ -79,7 +79,7 @@ class ItemProjector
         if (!list.items[index].classList.contains(this.s.projector_class)) {
             list.items[index].classList.add(this.s.projector_class);
         }
-        list.projectNewItem(iClone, index);
+        list.projectNewItem(iClone, index, delay_random_projecting);
     }
 
     /**
