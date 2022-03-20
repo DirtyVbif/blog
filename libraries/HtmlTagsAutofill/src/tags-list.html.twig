@@ -1,0 +1,9 @@
+{% set class = wrapper.attributes().classList() %}
+
+{{ wrapper.open() }}
+    {% for item in items %}
+        <li class="{{ classlistToString(class, '', '__item') }}">
+            <span class="{{ classlistToString(class, '', '__btn') }}">{{ item }}</span>
+        </li>
+    {% endfor %}
+{{ wrapper.close() }}

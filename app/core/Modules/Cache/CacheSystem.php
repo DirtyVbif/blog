@@ -2,18 +2,27 @@
 
 namespace Blog\Modules\Cache;
 
+use Blog\Client\User;
 use Blog\Modules\FileSystem\Folder;
 
 class CacheSystem implements \Blog\Components\AjaxModule
 {
     protected array $entities = [];
 
-    public function entity(string $name): CacheEntity
+    public function entity(string $name): CacheEntity|CacheSql
     {
         if (!isset($this->entities[$name])) {
-            $this->entities[$name] = new CacheEntity($name);
+            $this->entities[$name] = preg_match('/^sql$/i', $name) ? new CacheSql : new CacheEntity($name);
         }
         return $this->entities[$name];
+    }
+
+    public function sql(): CacheSql
+    {
+        if (!isset($this->entities['sql'])) {
+            $this->entities['sql'] = new CacheSql;
+        }
+        return $this->entities['sql'];
     }
 
     /**
@@ -21,7 +30,7 @@ class CacheSystem implements \Blog\Components\AjaxModule
      */
     public function clear(?string $cache_entity_name = null): array
     {
-        if (!app()->user()->verifyAccessLevel(\Blog\Modules\User\User::ACCESS_LEVEL_MASTER)) {
+        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_MASTER)) {
             return [
                 'status' => 403,
                 'output' => 'access denied'

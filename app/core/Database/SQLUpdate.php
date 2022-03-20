@@ -20,6 +20,15 @@ class SQLUpdate extends SQLAbstractStatement
         return $this;    
     }
 
+    public function getRequestTables(): array
+    {
+        $tables = [];
+        if (isset($this->table)) {
+            $tables[] = $this->table;
+        }
+        return $tables;
+    }
+
     /**
      * Specify columns and it's values to update/insert
      * 
@@ -48,7 +57,7 @@ class SQLUpdate extends SQLAbstractStatement
      */
     public function exe(): int
     {
-        return sql()->change($this->raw(), $this->data());
+        return sql()->change($this, $this->data());
     }
 
     /**
@@ -76,7 +85,7 @@ class SQLUpdate extends SQLAbstractStatement
     /**
      * {@inheritDoc}
      */
-    public function currentSqlString(): string
+    public function currentSqlString(bool $bind = false): string
     {
         $sql_string = '';
         if ($this->isUpdate()) {
@@ -86,7 +95,7 @@ class SQLUpdate extends SQLAbstractStatement
             $sql_string .= 'DELETE FROM ' . $this->normalizeTableName($this->table);
         }
         $sql_string .= $this->currentSqlStringWhereCondition() . ';';
-        return $sql_string;
+        return $bind ? $this->bind($sql_string, $this->data()) : $sql_string;
     }
 
     protected function currentSqlStringSet(): string

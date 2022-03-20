@@ -4,7 +4,7 @@ namespace Blog\Controller;
 
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\BlockList;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 
 class CustomController extends BaseController
 {

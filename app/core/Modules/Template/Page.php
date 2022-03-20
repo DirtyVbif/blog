@@ -3,6 +3,7 @@
 namespace Blog\Modules\Template;
 
 use Blog\Modules\TemplateFacade\Title;
+use Twig\Markup;
 
 class Page extends BaseTemplate
 {
@@ -46,9 +47,9 @@ class Page extends BaseTemplate
             $this->js_order[$order] = [];
         }
         $this->js[$name] = [
-            'src' => $name,
+            'src' => is_null($content) ? $name : null,
             'type' => $load_type,
-            'content' => $content
+            'content' => is_null($content) ? null : new Markup($content, CHARSET)
         ];
         if (!in_array($name, $this->js_order[$order])) {
             array_push($this->js_order[$order], $name);
@@ -99,6 +100,10 @@ class Page extends BaseTemplate
     protected function getJsSrc(): array
     {
         $array = [];
+        if (app()->config('development')->livereload) {
+            $content = "document.write('<script src=\"http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1\"></' + 'script>');";
+            $this->useJs('_livereload', load_type: null, content: $content);
+        }
         foreach ($this->js_order as $stack) {
             foreach ($stack as $name) {
                 $array[] = $this->js[$name];

@@ -4,7 +4,6 @@ namespace Blog\Modules\Sitemap;
 
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Entity\Article;
-use Blog\Modules\View\Blog;
 
 class Sitemap
 {
@@ -28,14 +27,16 @@ class Sitemap
         $update = \Blog\Modules\View\Blog::lastUpdate();
         $links['/']['lastmod'] = $links['/blog']['lastmod'] = new DateFormat($update, DateFormat::COMPLETE);
         // generate blog articles data
-        foreach (Blog::loadArticlesData() as $article) {
-            $url = '/blog/' . $article['alias'];
-            $links[$url] = [
-                'loc' => fullUrlTo($url),
-                'priority' => Article::getSitemapPriority(),
-                'changefreq' => Article::getSitemapChangefreq(),
-                'lastmod' => new DateFormat($article['updated'], DateFormat::COMPLETE)
-            ];
+        foreach (Article::loadList(['load_with_comments' => false]) as $article) {
+            if ($article->exists()) {
+                $url = $article->url();
+                $links[$url] = [
+                    'loc' => fullUrlTo($url),
+                    'priority' => Article::getSitemapPriority(),
+                    'changefreq' => Article::getSitemapChangefreq(),
+                    'lastmod' => new DateFormat($article->get('updated'), DateFormat::COMPLETE)
+                ];
+            }
         }
         // generate sitemap.xml content from template
         $loader = new \Twig\Loader\FilesystemLoader(ROOTDIR . self::SRCPATH);

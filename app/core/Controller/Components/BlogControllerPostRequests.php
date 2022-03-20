@@ -4,7 +4,7 @@ namespace Blog\Controller\Components;
 
 use Blog\Modules\Entity\Article;
 use Blog\Modules\Entity\Comment;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 use Blog\Request\RequestFactory;
 
 trait BlogControllerPostRequests
@@ -38,7 +38,7 @@ trait BlogControllerPostRequests
         } else if (!is_null($result)) {
             msgr()->error('При отправке комментария возникла ошибка. Если проблема повторяется, пожалуйста @contact_me.', ['contact_me' => '<a href="' . tpllink('contacts') . '">свяжитесь со мной</a>']);
         }
-        app()->router()->redirect('<current>');
+        app()->router()->redirect('<previous>');
         return;
     }
 
@@ -58,10 +58,10 @@ trait BlogControllerPostRequests
             $result = null;
         }
         if ($result) {
-            msgr()->notice(t('Blog article "@name" published.', ['name' => $request->title]));
+            msgr()->notice(t('New entity &laquo;@name&raquo; of type &laquo;article&raquo; successfully saved.', ['name' => $request->title]));
             app()->router()->redirect('<current>');
         } else {
-            msgr()->warning(t('There was an error wile creating article "@name".', ['name' => $request->raw('title')]));
+            msgr()->warning(t('There was an error while creating new entity &laquo;@name&raquo; of type &laquo;skill&raquo;.', ['name' => $request->raw('title')]));
             app()->router()->redirect('<previous>');
         }
         exit;

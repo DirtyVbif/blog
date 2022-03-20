@@ -4,6 +4,7 @@ namespace Blog\Modules\FileSystem;
 
 class File
 {
+    protected const LOGID = 'Filesystem';
     protected const DEFAULT_FILE_PERMISIONS = 0644;
 
     protected string $dir;
@@ -153,10 +154,13 @@ class File
 
     public function del(): bool
     {
-        if ($this->exists) {
+        $file = $this->filename();
+        if ($this->exists()) {
             $this->exists = false;
-            $file = $this->filename();
+            consoleLog(self::LOGID, "File {$file} deleted successfully.");
             return unlink($file);
+        } else {
+            consoleLog(self::LOGID, "File {$file} can't be deleted. It's unexisting.");
         }
         return false;
     }

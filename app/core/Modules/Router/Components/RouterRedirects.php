@@ -24,7 +24,7 @@ trait RouterRedirects
      * 
      * @param int $status [optional] HTTP-redirect status. 302 by default
      */
-    public function redirect(string|int $location, int $status = 302): void
+    public function redirect(string|int $location, int $status = 302): never
     {
         if (is_numeric($location)) {
             $location = app()->router()->level($location);

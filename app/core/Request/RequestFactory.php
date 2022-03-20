@@ -2,11 +2,9 @@
 
 namespace Blog\Request;
 
-use Exception;
-
 class RequestFactory
 {
-    public static function get(string $name): RequestPrototype
+    public static function get(string $name, array $data = []): RequestPrototype
     {
         $class = "\\Blog\\Request\\" . pascalCase("{$name} request");
         if (!class_exists($class)) {
@@ -16,6 +14,6 @@ class RequestFactory
             pre("{$class}::class doesn't instance of \\Blog\\Request\\RequestPrototype");
             die;
         }
-        return new $class;
+        return new $class($data);
     }
 }

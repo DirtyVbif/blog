@@ -19,15 +19,17 @@ class Feedbacks extends BaseView
                 'pager' => null
             ];
             $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
-            $total_items = sql_select(from: 'comments')->count();
+            $total_items = Feedback::count();
             if ($total_items > self::ITEMS_PER_PAGE) {
                 $this->view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
             }
             $offset = $current_page * self::ITEMS_PER_PAGE;
-            foreach ($this->loadData(self::ITEMS_PER_PAGE, true, $offset) as $data) {
-                $feedback = new Feedback($data, Feedback::VIEW_MODE_FULL);
-                $this->view->items[] = $feedback;
-            }
+            $this->view->items = Feedback::loadList([
+                'limit' => self::ITEMS_PER_PAGE,
+                'offset' => $offset,
+                'order' => 'DESC',
+                'view_mode' => Feedback::VIEW_MODE_FULL
+            ]);
         }
         return $this->view;
     }
@@ -35,31 +37,7 @@ class Feedbacks extends BaseView
     public function preview(int $limit, string $view_mode): array
     {
         $items = [];
+        // TODO: complete preview method for feedbacks
         return $items;
-    }
-
-    /**
-     * Loads feedbacks data from storage as array
-     * 
-     * @return array of feedbacks data with following keys:
-     * ```
-     * array('id', 'created', 'updated', 'etid', 'type_name', 'subject', 'message', 'headers', 'status');
-     * ```
-     */
-    public static function loadData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
-    {
-        // $sql = sql_select(from: Feedback::ENTITY_TABLE);
-        // $sql->columns(Feedback::ENTITY_COLUMNS);
-        $sql = Feedback::sql();
-        $sql->limit($limit);
-        if ($offset) {
-            $sql->limitOffset($offset);
-        }
-        $order = 'ASC';
-        if ($order_desc) {
-            $order = 'DESC';
-        }
-        $sql->order('created', $order);
-        return $sql->all();
     }
 }

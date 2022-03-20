@@ -6,25 +6,21 @@ class LoginRequest extends RequestPrototype
 {
     protected const ACCESS_LEVEL = 1;
 
-    protected function rules(): array
-    {
-        return [
-            'mail' => [
-                '#label' => 'Login',
-                'type' => 'string',
-                'pattern' => '/^\w+@\w+\.[a-zA-Z]{2,}$/',
-                'required' => true
-            ],
-            'password' => [
-                '#label' => 'Password',
-                'type' => 'string',
-                'pattern' => "/[\w\@\%\#\!\?\&\$\-]{8,40}/",
-                'required' => true
-            ],
-            'remember_me' => [
-                '#label' => 'Remember login session',
-                'type' => 'boolean'
-            ],
-        ];
-    }
+    // TODO: set single attribute for validating email
+    #[RequestPropertyLabelAttribute('Login')]
+    #[Validators\Type('string')]
+    #[Validators\Pattern(self::EMAIL_PATTERN)]
+    #[Validators\Required(true)]
+    protected string $mail;
+    
+    #[RequestPropertyLabelAttribute('Password')]
+    #[Validators\Type('string')]
+    #[Validators\StringLength(64, 8)]
+    #[Validators\Pattern("/[\w\@\%\#\!\?\&\$\-]{8,64}/")]
+    #[Validators\Required(true)]
+    protected string $password;
+
+    #[RequestPropertyLabelAttribute('Remember login session')]
+    #[Validators\Type('bool')]
+    protected string $remember_me;
 }

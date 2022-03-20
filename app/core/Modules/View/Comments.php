@@ -2,10 +2,9 @@
 
 namespace Blog\Modules\View;
 
-use Blog\Modules\Entity\BaseEntity;
 use Blog\Modules\Entity\Comment;
 use Blog\Modules\TemplateFacade\Pager;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 
 class Comments extends BaseView
 {
@@ -27,9 +26,6 @@ class Comments extends BaseView
     {
         $items = [];
         // TODO: complete preview for last blog comments
-        // foreach ($this->loadArticlesData($limit, true) as $data) {
-        //     $items[] = new BlogArticle($data, $view_format);
-        // }
         return $items;
     }
     
@@ -40,50 +36,25 @@ class Comments extends BaseView
             'pager' => null
         ];
         $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
-        $total_items = sql_select(from: 'comments')->count();
+        $sql = sql_select(from: ['c' => 'comments']);
+        $sql->columns(['c' => ['cid']]);
+        $sql->join(['ec' => 'entities_comments'], using: 'cid');
+        $sql->where(['ec.deleted' => 0]);
+        if (!user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+            $sql->andWhere(['c.status' => 1]);
+        }
+        $result = $sql->all();
+        $total_items = count($result);
         if ($total_items > self::ITEMS_PER_PAGE) {
             $view->pager = new Pager($total_items, self::ITEMS_PER_PAGE);
         }
         $offset = $current_page * self::ITEMS_PER_PAGE;
-        foreach ($this->loadData(self::ITEMS_PER_PAGE, true, $offset) as $data) {
-            $comment = new Comment($data, Comment::VIEW_MODE_FULL);
-            $entity = BaseEntity::load($data['eid']);
-            $comment->tpl()->set('url', $entity->url() . "#comment-{$comment->id()}");
-            $comment->tpl()->set('title', $entity->title());
-            $view->items[] = $comment;
-        }
+        $view->items = Comment::loadList([
+            'limit' => self::ITEMS_PER_PAGE,
+            'offset' => $offset,
+            'order' => 'DESC',
+            'view_mode' => Comment::VIEW_MODE_FULL
+        ]);
         return $view;
-    }
-
-    /**
-     * Loads comments data from storage as array
-     * 
-     * @return array of comments data with following keys:
-     * ```
-     * array(
-     *      // comment fields
-     *      'cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip',
-     *      // parent entity fields
-     *      'eid', 'title', 'alias'
-     * );
-     * ```
-     */
-    public static function loadData(int $limit = 0, bool $order_desc = false, int $offset = 0): array
-    {
-        $sql = Comment::sql();
-        $sql->where(['ec.deleted' => 0]);
-        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
-            $sql->andWhere(['c.status' => 1]);
-        }
-        $sql->limit($limit);
-        if ($offset) {
-            $sql->limitOffset($offset);
-        }
-        $order = 'ASC';
-        if ($order_desc) {
-            $order = 'DESC';
-        }
-        $sql->order('created', $order);
-        return $sql->all();
     }
 }

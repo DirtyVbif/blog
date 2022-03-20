@@ -3,7 +3,7 @@
 namespace Blog\Modules\PageBuilder;
 
 use Blog\Modules\Template\Element;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 use Symfony\Component\Yaml\Yaml;
 
 class PageBuilder

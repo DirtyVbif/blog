@@ -28,8 +28,7 @@ trait SQLWhereCondition
             condition: $condition,
             operator: $operator,
             equal_columns: $equal_columns,
-            not: $not,
-            rewrite: $rewrite
+            not: $not
         );
     }
 
@@ -86,8 +85,7 @@ trait SQLWhereCondition
         string $operator,
         ?array $equal_columns,
         bool $not,
-        ?string $type = null,
-        bool $rewrite = false
+        ?string $type = null
     ): self {
         if ($condition) {
             $condition = $this->parseWhereCondition($condition);
@@ -98,14 +96,8 @@ trait SQLWhereCondition
         }
         $condition['op'] = $operator;
         $condition['not'] = $not;
-        if ($rewrite) {
-            $this->where_conditions = [$condition];
-        } else if (!isset($this->where_conditions[0])) {
-            $this->where_conditions[0] = $condition;
-        } else {
-            $condition['type'] = $type;
-            array_push($this->where_conditions, $condition);
-        }
+        $condition['type'] = $type;
+        array_push($this->where_conditions, $condition);
         return $this;
     }
 
@@ -147,8 +139,9 @@ trait SQLWhereCondition
             return '';
         }
         $condition_string = "\nWHERE ";
-        foreach ($this->where_conditions as $where) {
-            $prefix = isset($where['type']) ? " {$where['type']} " : '';
+        foreach ($this->where_conditions as $i => $where) {
+            $type = $i > 0 ? ($where['type'] ?? 'AND') : '';
+            $prefix = $type ? " {$type} " : '';
             $prefix .= $where['not'] ? 'NOT ' : '';
             $value = is_null($where['cond'][1]) ? '' : $where['cond'][1];
             switch (true) {

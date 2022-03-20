@@ -61,3 +61,29 @@ function arraySearchKeyByColumn(array $array, $search, string $column): array
     }
     return $found_array_keys;
 }
+
+/**
+ * Detect array depth level
+ * 
+ * @return int array depth level
+ */
+function arrayDepth(array $array): int
+{
+    $depth = 1;
+    $previous_depth = 0;
+    foreach ($array as $value) {
+        if (is_array($value)) {
+            $previous_depth = max($previous_depth, arrayDepth($value));
+        }
+        continue;
+    }
+    return $depth + $previous_depth;
+}
+
+/**
+ * Check if array is flat. Array is flat if it has no array inside.
+ */
+function arrayIsFlat(array $array): bool
+{
+    return arrayDepth($array) === 1;
+}

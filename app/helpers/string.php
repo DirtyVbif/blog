@@ -56,8 +56,10 @@ function strSuffix($input, string $suffix, bool $remove = false)
  * Returns a version of str with a backslash character (\) before every character that is among these:
  * `. \ + * ? [ ^ ] ( $ )`
  * 
+ * @link https://www.php.net/manual/en/function.quotemeta.php
+ * 
  * @param string $string
- * @param array $chars - addition characters in array to be protected with a backslash
+ * @param array $chars - additional characters in array to be protected with a backslash character (\)
  */
 function strRegexQuote(string $string, array $chars = ['/']): string
 {
@@ -198,4 +200,63 @@ function transliterate(string $input, string $langcode = 'ru'): string
 function stok(string $content): string
 {
     return \Blog\Modules\StringToken\StringToken::parse($content);
+}
+
+/**
+ * Get name of class from full classname with vendor and namespace string
+ * 
+ * @param string $classname string with classname e.g.: `Vendor\Namespace\Classname`
+ * @param object $classname any object which classname will be parsed
+ * 
+ * @return object
+ * ```
+ * {
+ *  public ?string $vendor
+ *  public ?string $namespace
+ *  public string $classname
+ * }
+ * ```
+ */
+function parseClassname(string|object $classname): object
+{
+    if (!is_string($classname)) {
+        /** @var string $classname */
+        $classname = $classname::class;
+    }
+    $parts = preg_split('/\\\+/', $classname);
+    $class = $vendor = $namespace = null;
+    foreach ($parts as $i => $part) {
+        if (!preg_replace('/\s*/', '', $part)) {
+            unset($parts[$i]);
+        }
+    }
+    $count = count($parts);
+    if ($count > 1) {
+        $vendor = array_shift($parts);
+    }
+    $class = array_pop($parts);
+    if (count($parts) > 0) {
+        $namespace = implode('\\', $parts);
+    }
+    
+    return new class($vendor, $namespace, $class) {
+        public function __construct(
+            public ?string $vendor,
+            public ?string $namespace,
+            public string $classname
+        ) {}
+
+        public function __toString()
+        {
+            $array = [];
+            if ($this->vendor) {
+                $array[] = $this->vendor;
+            }
+            if ($this->namespace) {
+                $array[] = $this->namespace;
+            }
+            $array[] = $this->classname;
+            return implode('\\', $array);
+        }
+    };
 }

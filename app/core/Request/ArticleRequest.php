@@ -2,60 +2,62 @@
 
 namespace Blog\Request;
 
+use Blog\Modules\Entity\Article;
+
 class ArticleRequest extends RequestPrototype
 {
     protected const ACCESS_LEVEL = 4;
-    protected const SKIP_CSRF = true;
+    protected const CSRF_SKIP = true;
 
-    protected function rules(): array
-    {
-        return [
-            'title' => [
-                '#label' => 'Article title',
-                'type' => 'string',
-                'max_length' => 256,
-                'required' => true
-            ],
-            'alias' => [
-                '#label' => 'Alias path',
-                'type' => 'string',
-                'max_length' => 256,
-                'pattern' => '/[\w\-]*/',
-                'required' => true
-            ],
-            'preview_src' => [
-                '#label' => 'Image preview src link',
-                'type' => 'string',
-                'max_length' => 256,
-                'required' => false
-            ],
-            'preview_alt' => [
-                '#label' => 'Image alt text',
-                'type' => 'string',
-                'max_length' => 256,
-                'required' => false
-            ],
-            'summary' => [
-                '#label' => 'Summary',
-                'type' => 'plain_text',
-                'max_length' => 512,
-                'required' => true
-            ],
-            'body' => [
-                '#label' => 'Body',
-                'type' => 'html_text',
-                'required' => true
-            ],
-            'author' => [
-                '#label' => 'Author',
-                'type' => 'string',
-                'max_length' => 50,
-                'required' => false
-            ],
-            'status' => [
-                '#label' => 'Publishing status',
-                'type' => 'boolean'
-            ],
-        ];
-    }
+    #[RequestPropertyLabelAttribute('Article title')]
+    #[Validators\Type('string')]
+    #[Validators\StringLength(256)]
+    #[Validators\Required(true)]
+    protected string $title;
+    
+    #[RequestPropertyLabelAttribute('Alias path')]
+    #[Preproccessors\ArticleAlias]
+    #[Validators\Type('string')]
+    #[Validators\Pattern('/[\w\-]*/')]
+    #[Validators\StringLength(256)]
+    protected string $alias;
+
+    #[RequestPropertyLabelAttribute('Image preview src link')]
+    #[Preproccessors\DefaultValue(Article::DEFAULT_PREVIEW_SRC)]
+    #[Validators\Type('string')]
+    #[Validators\StringLength(256)]
+    protected string $preview_src;
+
+    #[RequestPropertyLabelAttribute('Image alt text')]
+    #[Preproccessors\DefaultValue(Article::DEFAULT_PREVIEW_ALT)]
+    #[Validators\Type('string')]
+    #[Validators\StringLength(256)]
+    protected string $preview_alt;
+
+    #[RequestPropertyLabelAttribute('Summary')]
+    #[Validators\Type('string')]
+    #[Validators\StringLength(512)]
+    #[Validators\Required(true)]
+    #[Formatters\PlainText]
+    protected string $summary;
+
+    #[RequestPropertyLabelAttribute('Article body')]
+    #[Validators\Type('string')]
+    #[Validators\Required(true)]
+    #[Formatters\HtmlText(
+        html_strategy: Formatters\HtmlText::STRATEGY_FULL,
+        allow_attributes: true
+    )]
+    protected string $body;
+
+    #[RequestPropertyLabelAttribute('Author')]
+    #[Preproccessors\DefaultValue(Article::DEFAULT_AUTHOR)]
+    #[Validators\Type('string')]
+    #[Validators\StringLength(48)]
+    protected string $author;
+
+    #[RequestPropertyLabelAttribute('Publishing status')]
+    #[Preproccessors\DefaultValue(0)]
+    #[Validators\Type('int')]
+    protected string $status;
 }

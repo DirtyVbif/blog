@@ -1,0 +1,25 @@
+{% set class = ['skill-card', 'skill-card_full'] %}
+
+{{ wrapper.set('article').open() }}
+    <div class="{{ classlistToString(class, '', '__icon') }}">
+            {{ img(icon_src).alt(icon_alt) }}
+    </div>
+
+    <h2 class="{{ classlistToString(class, '', '__title') }}">{{ title }}</h2>
+
+    <main class="{{ classlistToString(class, '', '__body') }}">
+        {{ body }}
+    </main>
+    
+    <footer class="{{ classlistToString(class, '', '__footer') }}">
+        <ul class="{{ classlistToString(class, '', '__links') }}">
+            {% for key, path in url %}
+                <li class="{{ classlistToString(class, '', '__links-item') }}">
+                    {{ link(path)
+                        .label(t(key))
+                        .addClass(classlistToString(class, '', ['__link', '__link_' ~ key])) }}
+                </li>
+            {% endfor %}
+        </ul>
+    </footer>
+{{ wrapper.close() }}

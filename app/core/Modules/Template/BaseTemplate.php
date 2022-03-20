@@ -54,9 +54,21 @@ class BaseTemplate
         return $this->data;
     }
 
-    public function set(string $data_key, $value): self
+    /**
+     * @param string[]|string $data 
+     */
+    public function set(string|array $data, $value = null): self
     {
-        $this->data[$data_key] = $value;
+        if (is_array($data) && is_null($value)) {
+            foreach ($data as $key => $val) {
+                if (!is_string($key)) {
+                    continue;
+                }
+                $this->set($key, $val);
+            }
+        } else {
+            $this->data[$data] = $value;
+        }
         return $this;
     }
 

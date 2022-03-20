@@ -73,10 +73,25 @@ function csrf(bool $render = true)
  */
 function old(string $name, bool $as_attribute = false)
 {
-    // TODO: rebuild function to get required value via RequestPrototype::class method
     $value = session()->get(\Blog\Request\RequestPrototype::SESSID . '/' . $name);
     if ($as_attribute && $value) {
         return new \Twig\Markup(" value=\"{$value}\"", CHARSET);
     }
     return $value;
+}
+
+function strip_attributes(string $html): string
+{
+    // /            # Start Pattern
+    // <            # Match '<' at beginning of tags
+    // (            # Start Capture Group $1 - Tag Name
+    // [a-z]        # Match 'a' through 'z'
+    // [a-z0-9]*    # Match 'a' through 'z' or '0' through '9' zero or more times
+    // )            # End Capture Group
+    // ([^>]*?)     # Capture Group $2 - Match anything other than '>', Zero or More times, not-greedy (wont eat the /)
+    // (\/?)        # Capture Group $3 - '/' if it is there
+    // >            # Match '>'
+    // /is          # End Pattern - Case Insensitive & Multi-line ability
+    $pattern = '/<([a-z][a-z0-9]*)([^>]*?)(\/?)>/si';
+    return preg_replace($pattern, '<$1$3>', $html);
 }

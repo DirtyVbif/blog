@@ -5,124 +5,126 @@ namespace Blog\Modules\Entity;
 use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 use Blog\Request\RequestPrototype;
+use JetBrains\PhpStorm\ExpectedValues;
 
-class Comment extends BaseEntity
+class Comment extends EntityPrototype implements SitemapInterface
 {
-    public const ENTITY_TABLE = 'comments';
-    public const ENTITY_COLUMNS = ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'];
-    protected const VIEW_MODES = [
-        0 => self::VIEW_MODE_FULL,
-        1 => self::VIEW_MODE_ARTICLE
-    ];
-
     public const VIEW_MODE_FULL = 'full';
     public const VIEW_MODE_ARTICLE = 'article';
+    public const URL_MASK = '/comments/%d';
+    public const ENTITY_URL_MASK = '%s#comment-%d';
+    public const ENTITY_PK = 'cid';
+    public const ENTITY_TABLE = 'comments';
+    public const ENTITY_TABLE_ALIAS = 'c';
+    public const ENTITY_COLUMNS = ['cid', 'pid', 'created', 'name', 'email', 'body', 'status', 'ip'];
     public const SITEMAP_PRIORITY = 0.1;
     public const SITEMAP_CHANGEFREQ = 'yearly';
 
-    protected SQLSelect $sql;
-
     public static function getSqlTableName(): array|string
     {
-        return ['c' => self::ENTITY_TABLE];
+        return [self::ENTITY_TABLE_ALIAS => self::ENTITY_TABLE];
     }
 
     public static function getSqlTableColumns(): array
     {
-        return ['c' => self::ENTITY_COLUMNS];
+        return [self::ENTITY_TABLE_ALIAS => self::ENTITY_COLUMNS];
     }
 
-    public static function countItems(): int
+    public static function getSitemapPriority(): float
     {
-        return sql_select(from: self::ENTITY_TABLE)->count();
+        return self::SITEMAP_PRIORITY;
+    }
+
+    public static function getSitemapChangefreq(): string
+    {
+        return self::SITEMAP_CHANGEFREQ;
     }
 
     public static function sql(): SQLSelect
     {
         $sql = sql_select(from: self::getSqlTableName());
         $sql
-            ->join(table: ['ec' => 'entities_comments'], using: 'cid')
+            ->join(table: ['ec' => 'entities_comments'], using: self::ENTITY_PK)
             ->join(table: ['e' => 'entities'], using: 'eid')
             ->join(table: ['et' => 'entities_types'], using: 'etid');
         $sql->columns(self::getSqlTableColumns());
         $sql->columns([
+            'e' => ['created', 'updated', 'etid'],
             'ec' => ['eid', 'deleted'],
-            'et' => ['etid', 'entity_type' => 'name']
+            'et' => ['e_type' => 'name']
         ]);
-        $sql->useFunction('c.created', 'UNIX_TIMESTAMP', 'created');
+        $sql->useFunction('c.created', 'UNIX_TIMESTAMP', 'created')
+            ->useFunction('e.created', 'UNIX_TIMESTAMP', 'entity_created')
+            ->useFunction('e.updated', 'UNIX_TIMESTAMP', 'entity_updated');
         return $sql;
     }
 
     /**
-     * @param int|array $data is an id of article that must be loaded or already loaded article data.
-     * If integer id provided as `int $data` then article will be automatically loaded from storage.
-     * Else if array with article data provided as `array $data` then article wouldn't be loaded from storage and accept provided data.
+     * @param array $options recieves SQL QUERY SELECT options:
+     * * array key @var int 'limit'
+     * * array key @var int 'offset'
+     * * array key @var string 'order' => ASC or DESC
+     * * array key @var string 'view_mode'
+     * 
+     * @return CommentPrototype[]
      */
-    public function __construct(
-        int|array $data,
-        string $view_mode = self::VIEW_MODE_FULL
-    ) {
-        if (is_int($data)) {
-            parent::__construct($data);
-        } else {
-            $this->data = $data;
-            $this->id = $data['cid'] ?? 0;
+    public static function loadList(array $options): array
+    {
+        /** @var CommentPrototype[] $comments */
+        $comments = [];
+        $sql = sql_select(from: self::getSqlTableName());
+        $sql->join(table: ['ec' => 'entities_comments'], using: 'cid')
+            ->join(table: ['e' => 'entities'], using: 'eid')
+            ->join(table: ['et' => 'entities_types'], using: 'etid');
+        $sql->columns(self::getSqlTableColumns())
+            ->columns([
+                'e' => ['eid'],
+                'et' => ['entity_type' => 'name']
+            ]);
+        $sql->where(['ec.deleted' => 0]);
+        $sql->limit($options['limit'] ?? null);
+        $sql->limitOffset($options['offset'] ?? null);
+        $sql->order('c.created', $options['order'] ?? 'ASC');
+        $sql->useFunction('c.created', 'UNIX_TIMESTAMP', 'created');
+        if (!user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+            $sql->andWhere(['c.status' => 1]);
         }
-        $this->setViewMode($view_mode);
+        /** @var EntityPrototype[] $comments */
+        $entities = [];
+        foreach ($sql->all() as $cdata) {
+            $comments[$cdata['cid']] = new self($cdata, $options['view_mode'] ?? self::VIEW_MODE_FULL);
+            if (!isset($entities[$cdata['eid']])) {
+                $entity = EntityFactory::load(0, $cdata['entity_type']);
+                $entity->load($cdata['eid'], false);
+                $entities[$cdata['eid']] = $entity;
+            }
+            $comments[$cdata['cid']]->tpl()->set('title', $entities[$cdata['eid']]?->title());
+            $comments[$cdata['cid']]->tpl()->set(
+                'url',
+                sprintf(
+                    self::ENTITY_URL_MASK,
+                    $entities[$cdata['eid']]?->url(),
+                    $comments[$cdata['cid']]->id()
+                )
+            );
+        }
+        return $comments;
     }
 
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    public static function approve(int $id): bool
     {
-        if (!isset($this->tpl)) {
-            $this->tpl = new Element;
-        }
-        return $this->tpl;
+        $sql = sql_update(['status' => 1], self::ENTITY_TABLE);
+        $sql->where([self::ENTITY_PK => $id]);
+        return (bool)$sql->update();
     }
 
-    public function render()
+    public static function delete(int $id): bool
     {
-        $this->preprocessData();
-        $this->tpl()->setName('content/comment--' . $this->view_mode);
-        $this->tpl()->setId('comment-' . $this->id());
-        foreach ($this->data as $key => $value) {
-            $this->tpl()->set($key, $value);
-        }
-        if (!$this->status()) {
-            $this->tpl()->addClass('unpublished');
-        }
-        if (app()->user()->verifyAccessLevel(4)) {
-            $this->tpl()->set('admin_access', true);
-        }
-        return parent::render();
-    }
-
-    protected function preprocessData(): void
-    {
-        if (!empty($this->data)) {
-            $this->data['date'] = new DateFormat($this->data['created']);
-        }
-        return;
-    }
-
-    public function loadById(int $id): self
-    {
-        $sql = self::sql();
-        $sql->where(['cid' => $id]);
-        $this->data = $sql->first();
-        $this->loaded = true;
-        $this->exists = !empty($this->data);
-        return $this;
-    }
-
-    public function status(): bool
-    {
-        $status = (int)$this->data['status'] ?? 0;
-        return $status;
+        $sql = sql_update(['deleted' => 1], 'entities_comments');
+        $sql->where([self::ENTITY_PK => $id]);
+        return (bool)$sql->update();
     }
     
     /**
@@ -158,105 +160,77 @@ class Comment extends BaseEntity
         return !$rollback;
     }
 
-    /**
-     * @return Comments[] $comments
-     */
-    public static function loadByIds(array $ids, string $view_mode = self::VIEW_MODE_FULL): array
-    {
-        $comments = [];
-        $sql = self::sql();
-        $sql->where(condition: ['c.cid' => $ids], operator: 'IN');
-        $sql->andWhere(condition: ['ec.deleted' => 0]);
-        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
-            $sql->andWhere(condition: ['c.status' => 1]);
+    public function __construct(
+        int|array $data = 0,
+        #[ExpectedValues(self::VIEW_MODE_FULL, self::VIEW_MODE_ARTICLE)]
+        protected string $view_mode = self::VIEW_MODE_FULL
+    ) {
+        if (is_array($data)) {
+            $this->setLoadedData($data);
+        } else {
+            parent::__construct($data);
         }
-        foreach ($sql->all() as $comment) {
-            $comments[$comment['cid']] = new self($comment, $view_mode);
-        }
-        return $comments;
     }
-    
-    /**
-     * @return Comments[] $comments
-     */
-    public static function loadByArticleId(int $aid, string $view_mode = self::VIEW_MODE_FULL): array
+
+    public function status(): bool
     {
-        $comments = [];
-        $sql = self::sql();
-        $sql->where(condition: ['ec.eid' => $aid]);
-        $sql->andWhere(condition: ['ec.deleted' => 0]);
-        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
-            $sql->andWhere(condition: ['c.status' => 1]);
-        }
-        foreach ($sql->all() as $comment) {
-            $comments[$comment['cid']] = new self($comment, $view_mode);
-        }
-        return $comments;
+        return (int)($this->data['status'] ?? 0);
     }
 
     /**
-     * @param string $view_mode is name of view mode. Also named constants are available:
-     * * Comment::VIEW_MODE_FULL
+     * @return Element $tpl
      */
-    public function setViewMode(string $view_mode): self
+    public function tpl()
     {
-        if (in_array($view_mode, self::VIEW_MODES)) {
-            $this->view_mode = $view_mode;
-        } else {
-            $this->view_mode = self::VIEW_MODE_FULL;
+        if (!isset($this->tpl)) {
+            $this->tpl = new Element;
         }
-        return $this;
+        return $this->tpl;
     }
 
-    public function approve(): void
+    public function render()
     {
-        if ($this->status()) {
-            msgr()->warning(t('Comment #@id already published.', ['id' => $this->id()]));
-            return;
+        $this->preprocessData();
+        $admin_access = user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN);
+        if (!$this->status() && !$admin_access) {
+            return '';
+        } else if (!$this->status()) {
+            $this->tpl()->addClass('unpublished');
         }
-        $sql = sql_update(['status' => 1], 'comments');
-        $sql->where(['cid' => $this->id()]);
-        if ($sql->update()) {
-            msgr()->notice(t('Comment #@id was published.', ['id' => $this->id()]));
-        } else {
-            msgr()->error(t('Comment #@id wasn\'t published.', ['id' => $this->id()]));
+        $this->tpl()->setName('content/comment--' . $this->view_mode);
+        $this->tpl()->setId('comment-' . $this->id());
+        foreach ($this->data as $key => $value) {
+            $this->tpl()->set($key, $value);
+        }
+        if ($admin_access) {
+            $this->tpl()->set('admin_access', true);
+        }
+        return parent::render();
+    }
+
+    protected function setLoadedData(array $data): void
+    {
+        if ($data['cid'] ?? false) {
+            $data['id'] = $data['cid'];
+            unset($data['cid']);
+        }
+        parent::setLoadedData($data);
+        return;
+    }
+
+    protected function preprocessData(): void
+    {
+        if (!empty($this->data)) {
+            $this->data['date'] = new DateFormat($this->data['created']);
         }
         return;
     }
 
-    public function delete(): void
+    public function url(): ?string
     {
-        if ($this->deleted) {
-            msgr()->warning(t('Comment #@id already deleted.', ['id' => $this->id()]));
-            return;
+        if ($this->id()) {
+            return sprintf(self::URL_MASK, $this->id());
         }
-        $sql = sql_update(['deleted' => 1], 'article_comments');
-        $sql->where(['cid' => $this->id()]);
-        if ($sql->update()) {
-            msgr()->notice(t('Comment #@id was deleted.', ['id' => $this->id()]));
-        } else {
-            msgr()->error(t('Comment #@id wasn\'t deleted.', ['id' => $this->id()]));
-        }
-        return;
-    }
-
-    public static function getSitemapPriority(): float
-    {
-        return self::SITEMAP_PRIORITY;
-    }
-
-    public static function getSitemapChangefreq(): string
-    {
-        return self::SITEMAP_CHANGEFREQ;
-    }
-
-    public function url(): string
-    {
-        return '';
-    }
-
-    public function title(): string
-    {
-        return '';
+        return null;
     }
 }

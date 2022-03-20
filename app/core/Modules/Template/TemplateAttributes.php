@@ -37,9 +37,18 @@ class TemplateAttributes extends BaseTemplateElement
         return $this->attributes[$name] ?? null;
     }
 
-    public function addClass(string $class_string): self
+    /**
+     * @param string[]|string $classes
+     */
+    public function addClass(string|array $classes): self
     {
-        $classes = preg_split('/\s+/', $class_string);
+        if (is_array($classes)) {
+            foreach ($classes as $class) {
+                $this->addClass($class);
+            }
+            return $this;
+        }
+        $classes = preg_split('/\s+/', $classes);
         foreach ($classes as $i => $class) {
             if (!$class) {
                 unset($classes[$i]);

@@ -1,0 +1,31 @@
+.article-menu {
+    list-style-type: none;
+    display: flex;
+    padding-left: 0;
+
+    &__item {
+        &:not(:last-child) {
+            margin-right: 1em;
+        }
+    }
+
+    &__link {
+        display: block;
+        padding: 4px 15px;
+        font-size: 13px;
+        text-transform: uppercase;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        color: $btn_blue;
+
+        &:hover {
+            border-color: $btn_blue_hover;
+            color: $btn_blue_hover;
+        }
+
+        &:active {
+            border-color: $grey;
+            color: $grey;
+        }
+    }
+}

@@ -42,4 +42,22 @@ trait SQLDataBinding
     {
         return $this->data;
     }
+
+    public function bind(string $sql_request, array $pdo_data): string
+    {
+        // check data array for values
+        if (empty($pdo_data)) {
+            return $sql_request;
+        }
+        $replace_values = $replace_keys = [];
+        foreach ($pdo_data as $key => $value) {
+            $replace_values[] = is_numeric($value) ? $value : "'{$value}'";
+            $replace_keys[] = '/\:' . strRegexQuote($key) . '/';
+        }
+        // replace pdo bindable keys with values
+        $request_string = preg_replace($replace_keys, $replace_values, $sql_request);
+        // remove extra white spaces from request string
+        $request_string = strrws($request_string);
+        return $request_string;
+    }
 }

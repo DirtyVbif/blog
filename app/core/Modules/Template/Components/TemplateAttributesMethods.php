@@ -22,15 +22,36 @@ trait TemplateAttributesMethods
         return $this;
     }
 
+    /**
+     * Set new data attribute
+     * 
+     * @param string $name data attribute name without `data-` prefix
+     */
+    public function setData(string $name, ?string $value = null): self
+    {
+        $name = strPrefix($name, 'data-');
+        $this->setAttr($name, $value);
+        return $this;
+    }
+
     public function setAttribute(string $name, ?string $value = null): self
     {
         $this->setAttr($name, $value);
         return $this;
     }
 
-    public function addClass(string $class): self
+    /**
+     * @param string[]|string $classes
+     */
+    public function addClass(string|array $classes): self
     {
-        $this->attributes()->addClass($class);
+        if (is_array($classes)) {
+            foreach ($classes as $class) {
+                $this->addClass($class);
+            }
+        } else {
+            $this->attributes()->addClass($classes);
+        }
         return $this;
     }
 

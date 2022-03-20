@@ -19,15 +19,23 @@ abstract class AbstractLibrary
     abstract protected function getSources(): object;
 
     /**
-     * Get relative path to current library directory with trailing slash `/`.
+     * Get absolute path to current library directory with trailing slash `/`.
      * 
-     * @return string `relative/path/to/library/`
+     * @return string `%ROOT%/path/to/library/`
      */
     protected function getSelfDir(): string
     {
-        $dir = explode('\\', get_called_class());
-        unset($dir[0], $dir[1]);
-        return LIBDIR . implode('/', $dir) . '/';
+        return LIBDIR . parseClassname(static::class)->classname . '/';
+    }
+
+    /**
+     * Get absolute path to current library source directory with trailing slash `/`.
+     * 
+     * @return string `%ROOT%/path/to/library/src/`
+     */
+    protected function getSelfSrcDir(): string
+    {
+        return $this->getSelfDir() . 'src/';
     }
 
     protected function getSrcContent(string $source_type): string

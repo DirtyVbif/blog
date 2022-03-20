@@ -1,15 +1,46 @@
-.skill {
-    background: $bkgd;
-    border-radius: 8px;
+$skill_card_h: 40px;
+$skill_card_h_m: 24px;
 
+// BLOCK -------------------------------------------------------------->
+.skills {
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 15px -5px 0;
+
+    // ELEMENTS ------------------------------------------------------->
+    &__item {
+        margin: 0 5px 15px;
+
+        @include vwMax($vwbp_m) {
+            margin-bottom: 10px;
+        }
+    }
+    // ELEMENTS <-------------------------------------------------------
+}
+// BLOCK <--------------------------------------------------------------
+
+// BLOCK -------------------------------------------------------------->
+.skill-card {
+    border-radius: 4px;
+    padding: 15px;
+    background-color: $bkgd;
+
+    // ELEMENTS ------------------------------------------------------->
     &__icon {
+        width: 100px;
+        height: 100px;
+        margin-right: 15px;
+        float: left;
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 54px;
-        height: 54px;
-        padding: 10px;
-        float: left;
+
+        @include vwMax($vwbp_m) {
+            width: 64px;
+            height: 64px;
+        }
 
         & img {
             width: 100%;
@@ -20,58 +51,102 @@
 
     &__title {
         font-size: 1.2em;
-        margin-right: 12px;
-        margin-left: 12px;
-        margin-top: 12px;
-        margin-bottom: 10px;
         font-weight: 400;
+        margin: 0;
     }
 
-    &__desc {
-        padding: 0 12px 5px 12px;
-        font-size: 14px;
-
-        @include vwMax($vwbp_xs) {
-            font-size: 12px;
-        }
-
+    &__body {
+        font-size: 0.8em;
         & p {
-            margin-top: 0;
-            margin-bottom: 7px;
+            margin: 10px 0 0;
         }
     }
 
-    &.left,
-    &.right {
-        width: 100px;
-        height: 100px;
-        margin: 0 20px;
-        align-self: center;
+    &__links {
+        display: flex;
+        justify-content: flex-end;
+        padding-left: 0;
+        list-style-type: none;
+        margin: 10px 0 0;
+    }
 
+    &__links-item {
+        @include notLast() {
+            margin-right: 10px;
+        }
+    }
+
+    &__link {
+        color: $green;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 2px 12px;
+        font-size: 12px;
+        text-transform: uppercase;
+
+        &:hover {
+            color: $bkgd;
+            background-color: $green;
+        }
+
+        &_delete {
+            color: $red;
+
+            &:hover {
+                color: $red_hover;
+                border-color: $red_hover;
+                background-color: transparent;
+            }
+        }
+    }
+    // ELEMENTS <-------------------------------------------------------
+
+    // MODIFICATORS --------------------------------------------------->
+    &_teaser {
+        display: flex;
+        align-items: center;
+        height: calc(#{$skill_card_h} + 8px * 2);
+        background-color: #fcffe3;
+        transition: $transition;
+        border-radius: 8px;
+        padding: 8px;
+        cursor: pointer;
+        
         @include vwMax($vwbp_m) {
-            margin: 0;
+            border-radius: 5px;
+            padding: 5px;
+            height: calc(#{$skill_card_h_m} + 5px * 2);
         }
 
-        & .skill__icon {
-            width: 100%;
-            height: 100%;
+        &:hover {
+            background-color: white;
+            box-shadow: $shadow;
         }
-        & .skill__title,
-        & .skill__desc {
-            display: none;
+
+        &.projected {
+            background-color: $bkgd;
         }
+
+        // MODIFICATOR ELEMENTS --------------------------------------->
+        &__icon {
+            width: $skill_card_h;
+            height: $skill_card_h;
+            float: none;
+
+            @include vwMax($vwbp_m) {
+                width: $skill_card_h_m;
+                height: $skill_card_h_m;
+                margin-right: 5px;
+            }
+        }
+
+        &__title {
+            @include vwMax($vwbp_m) {
+                font-size: 1.05em;
+            }
+        }
+        // MODIFICATOR ELEMENTS <---------------------------------------
     }
-
-    &.middle {
-        box-shadow: $shadow;
-        width: 480px;
-
-        @include vwMax($vwbp_xl) {
-            width: 360px;
-        }
-
-        @include vwMax($vwbp_m) {
-            width: 100%;
-        }
-    }
+    // MODIFICATORS <---------------------------------------------------
 }
+// BLOCK <--------------------------------------------------------------

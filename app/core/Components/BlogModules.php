@@ -2,8 +2,11 @@
 
 namespace Blog\Components;
 
-use Blog\Client\CookiesFacade;
-use Blog\Client\SessionFacade;
+use Blog\Client\{
+    CookiesFacade,
+    SessionFacade,
+    User
+};
 use Blog\Database\Bridge;
 use Blog\Modules\{
     Cache\CacheEntity,
@@ -15,7 +18,6 @@ use Blog\Modules\{
     Response\Response,
     Router\Router,
     Template\Page,
-    User\User,
     View\BaseView,
     Cache\CacheSystem
 };

@@ -3,10 +3,7 @@
 namespace Blog\Modules\PageBuilder\Components;
 
 use Blog\Modules\Template\Element;
-use Blog\Modules\TemplateFacade\BlockList;
-use Blog\Modules\TemplateFacade\BodyText;
 use Blog\Modules\TemplateFacade\Form;
-use Blog\Modules\TemplateFacade\Image;
 use Blog\Modules\TemplateFacade\Title;
 
 trait PageBuilderElements
@@ -84,17 +81,16 @@ trait PageBuilderElements
         $block->setName('blocks/skills');
         $block->addClass('section section_skills')
             ->setId('about');
-        $items = $this->getContent('skills');
-        foreach ($items as &$item) {
-            $item['icon'] = new Image($item['icon']);
-            $item['icon']->width(120);
-            $item['desc'] = new BodyText($item['desc']);
-        }
-        $block->set('items', $items);
+        /** @var \Blog\Modules\View\Skills $view */
+        $view = app()->view('skills');
+        $block->set('items', $view->preview(0));
         $label = new Title(2);
-        $label->set(t('My skills'));
+        $label->set(t('My stack'));
         $label->addClass('section__header section_skills__header');
         $block->set('label', $label);
+        /** @var \BlogLibrary\ItemProjector\ItemProjector $projector_lib */
+        $projector_lib = app()->library('item-projector');
+        $projector_lib->use();
         return $block;
     }
 

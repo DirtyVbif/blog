@@ -10,21 +10,25 @@ class CacheEntity
     protected const DATFILE = 'cache.module';
     protected const DEFAULT_DIR_PERMISIONS = 0755;
     protected const TEST = 'test';
+    protected const LOGID = 'cache-%s';
 
     protected array $config;
     protected int $lifetime;
     protected bool $status;
-    protected array $cache_data = [];
+    protected array $cache_index;
+    protected array $cache_list;
     protected bool $initialized = false;
     protected Folder $directory;
     protected File $data_file;
+    protected string $log_id;
 
-    public function __construct(protected string $name)
-    {
-        $this->config = app()->config('cache')->$name ?? [];
-        $this->lifetime($this->cfg('lifetime'))
-            ->status($this->cfg('status'));
-
+    public function __construct(
+        protected string $name
+    ) {
+        $this->log_id = sprintf(self::LOGID, $this->name);
+        $this->config = app()->config('cache')->{$this->name} ?? [];
+        $this->lifetime($this->cfg('lifetime'));
+        $this->status($this->cfg('status'));
         $this->initialize();
         return $this;
     }
@@ -40,7 +44,7 @@ class CacheEntity
             return $this;
         }
         $this->prepareCacheDir();
-        $this->prepareCacheDataFile();
+        $this->refreshMemCacheData();
         $this->initialized = true;
         return $this;
     }
@@ -52,12 +56,43 @@ class CacheEntity
         $this->dir()->create();
         return $this;
     }
-
-    protected function prepareCacheDataFile(): self
+    
+    public function dir(?string $directory = null): Folder
     {
-        $this->cache_data['list'] = $this->dir()->scan();
-        $this->cache_data['data'] = $this->getDataFileContent();
+        if (!is_null($directory)) {
+            $this->directory = new Folder($directory);
+        }
+        return $this->directory;
+    }
+
+    protected function refreshMemCacheData(): self
+    {
+        $this->cache_list = $this->dir()->scan();
+        $this->cache_index = $this->getIndexData();
+        $this->updateCacheData();
         return $this;
+    }
+
+    public function getIndexData(): array
+    {
+        $data = include $this->dataFile()->filename();
+        return $data;
+    }
+
+    protected function updateCacheData(): void
+    {
+        $need_update = false;
+        foreach ($this->getMemCache('data') as $cache_name => $data) {
+            if (isset($this->getMemCache()->list[$cache_name])) {
+                continue;
+            }
+            $need_update = true;
+            unset($this->cache_data['data'][$cache_name]);
+        }
+        if ($need_update) {
+            $this->updateDataFile();
+        }
+        return;
     }
 
     protected function getRequestCacheName(string $request): string
@@ -101,38 +136,23 @@ class CacheEntity
             $this->data_file = f(self::DATFILE, $this->dir()->path());
         }
         if (!$this->data_file->exists()) {
-            $content = $this->varphpstr([]);
+            $content = $this->exportToPhp([]);
             $this->data_file->content($content)->save();
         }
         return $this->data_file;
     }
 
-    public function getDataFileContent(): array
-    {
-        $data = include $this->dataFile()->filename();
-        return $data;
-    }
-
     /**
      * get @var self::$cache_data or exact @var self::$cache_data variable as @var object
      */
-    public function cacheData(?string $key = null)
+    public function getMemCache(?string $key = null): array|object|null
     {
-        if (!is_null($key)) {
-            return $this->cache_data[$key] ?? null;
+        if (!is_null($key) && isset($this->cache_data[$key])) {
+            return $this->cache_data[$key];
+        } else if (!is_null($key)) {
+            return null;
         }
         return (object)$this->cache_data;
-    }
-
-    /**
-     * @param bool|self $status
-     */
-    public function dir(?string $directory = null): Folder
-    {
-        if (!is_null($directory)) {
-            $this->directory = new Folder($directory);
-        }
-        return $this->directory;
     }
 
     /**
@@ -143,7 +163,7 @@ class CacheEntity
     public function get(string $request): ?array
     {
         $name = $this->getRequestCacheName($request);
-        if (!$this->status() || !in_array($name, $this->cacheData()->list)) {
+        if (!$this->status() || !in_array($name, $this->getMemCache()->list)) {
             return null;
         }
         $cache_file = f($name, $this->dir()->path());
@@ -182,7 +202,7 @@ class CacheEntity
         $cache_data['query'] = $query;
         $data_info['tables'] = $tbls;
         $cache_file = f($cache_name, $this->dir()->path());
-        $content = $this->varphpstr($cache_data);
+        $content = $this->exportToPhp($cache_data);
         $cache_file->content($content)->save();
         $this->storeCacheFileData($cache_name, $data_info);
         return $this;
@@ -197,7 +217,7 @@ class CacheEntity
 
     protected function updateDataFile(): self
     {
-        $content = $this->varphpstr($this->cacheData()->data);
+        $content = $this->exportToPhp($this->getMemCache()->data);
         $this->dataFile()->content($content)->save();
         return $this;
     }
@@ -205,19 +225,24 @@ class CacheEntity
     /**
      * Converts any Variable to PHP String of it's representation
      */
-    protected function varphpstr($variable): string
+    protected function exportToPhp($variable): string
     {
         $content = '<?php return ' . var_export($variable, true) . '; ?>';
         if ($this->cfg('minimized')) {
-            $content = preg_replace('/[\n\t\r\s]+/', ' ', $content);
+            $content = preg_replace(
+                ['/^[\n\t\r\s]+/', '/[\n\t\r\s]+/', '/[\n\t\r\s]+$/'],
+                ['', ' ', ''],
+                $content
+            );
         }
         return $content;
     }
 
     public function markupToUpdate(array $tables): self
     {
+        pre($tables, $this->getMemCache('data'));
         $outdated_cache = [];
-        foreach ($this->getDataFileContent() as $cache_name => $data) {
+        foreach ($this->getMemCache('data') as $cache_name => $data) {
             foreach ($tables as $t) {
                 if (in_array($t, $data['tables'])) {
                     $outdated_cache[$cache_name] = $cache_name;
@@ -225,6 +250,7 @@ class CacheEntity
             }
         }
         if (!empty($outdated_cache)) {
+            pre($outdated_cache);
             $this->clear($outdated_cache);
         }
         return $this;
@@ -241,10 +267,11 @@ class CacheEntity
             return $this;
         }
         foreach ($files as $file) {
-            f($file, $this->dir()->path())->del();
-            unset($this->container['data'][$file]);
+            $f = f($file, $this->dir()->path());
+            pre($f);
+            $f->del();
         }
-        $this->updateDataFile();
+        $this->refreshMemCacheData();
         return $this;
     }
 }

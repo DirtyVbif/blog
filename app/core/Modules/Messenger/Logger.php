@@ -6,9 +6,24 @@ use Blog\Modules\Template\Element;
 
 class Logger extends \Blog\Modules\TemplateFacade\TemplateFacade
 {
+    public const TABLE = 'log';
     protected bool $access;
     protected array $items = [];
     protected bool $library_used = false;
+
+    public static function getSystemLog(array $options = []): array
+    {
+        $sql = sql_select(from: self::TABLE);
+        $sql->columns(['created', 'output', 'data', 'type']);
+        if ($type = $options['type'] ?? false) {
+            $sql->where(['type' => $type]);
+        }
+        $sql->limit($options['limit'] ?? 1000);
+        $sql->limitOffset($options['offset'] ?? null);
+        $sql->order('created', $options['order'] ?? 'DESC');
+        $sql->useFunction('created', 'UNIX_TIMESTAMP', 'created');
+        return $sql->all();
+    }
 
     /**
      * @return Element $tpl
@@ -35,7 +50,7 @@ class Logger extends \Blog\Modules\TemplateFacade\TemplateFacade
         return parent::render();
     }
 
-    public function log(string $type, string $message): void
+    public function console(string $type, string $message): void
     {
         $this->useLibrary();
         if (!isset($this->items[$type])) {
@@ -60,5 +75,20 @@ class Logger extends \Blog\Modules\TemplateFacade\TemplateFacade
             $this->access = app()->user()->isMaster();
         }
         return $this->access;
+    }
+
+    public function log(string $type, string $output, array $data = []): void
+    {
+        $sql = sql_insert(self::TABLE);
+        if (!empty($data)) {
+            $data = json_encode($data);
+        } else {
+            $data = null;
+        }
+        $sql->set(
+            [$type, $output, $data],
+            ['type', 'output', 'data']
+        );
+        $sql->exe();
     }
 }

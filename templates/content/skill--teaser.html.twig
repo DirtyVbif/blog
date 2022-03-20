@@ -1,0 +1,35 @@
+{% set class = ['skill-card', 'skill-card_teaser'] %}
+
+{{ wrapper.set('article')
+    .addClass(['js-item-projector__item', class])
+    .setData('item-project-type', 'self')
+    .setData('item-project-remove-class', 'skill-card_teaser')
+    .open() }}
+    <div class="{{ classlistToString(class, '', '__icon') }}"
+        data-item-project-remove-class="skill-card_teaser__icon">
+            {{ img(icon_src).alt(icon_alt) }}
+    </div>
+
+    <h3 class="{{ classlistToString(class, '', '__title') }}"
+        data-item-project-remove-class="skill-card_teaser__title">{{ title }}</h3>
+
+    <main class="{{ classlistToString(class, '', '__body') }} hidden"
+        data-item-project-remove-class="{{ classlistToString(class[1], '', '__body') }}, hidden">
+        {{ body }}
+    </main>
+
+    {% if is_master %}
+        <footer class="{{ classlistToString(class, '', '__footer') }} hidden"
+            data-item-project-remove-class="{{ classlistToString(class[1], '', '__body') }}, hidden">
+            <ul class="{{ classlistToString(class, '', '__links') }}">
+                {% for key, path in url %}
+                    <li class="{{ classlistToString(class, '', '__links-item') }}">
+                        {{ link(path)
+                            .label(t(key))
+                            .addClass(classlistToString(class, '', ['__link', '__link_' ~ key])) }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </footer>
+    {% endif %}
+{{ wrapper.close() }}

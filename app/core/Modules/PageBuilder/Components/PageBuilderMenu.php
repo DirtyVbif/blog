@@ -6,7 +6,7 @@ use Blog\Modules\Template\Element;
 
 trait PageBuilderMenu
 {
-    public function getMenu(string $name): ?Element
+    public function getMenu(string $name, array $arguments = []): ?Element
     {
         /** @var array $links */
         $menu_data = $this->getMenuData($name);
@@ -14,7 +14,7 @@ trait PageBuilderMenu
             return null;
         }
         $menu_data['class'] ??= "menu menu_{$name}";
-        $links = $this->buildMenuLinks($menu_data ?? []);
+        $links = $this->buildMenuLinks($menu_data, $arguments);
         if (empty($links)) {
             return null;
         }
@@ -34,10 +34,13 @@ trait PageBuilderMenu
         return $this->menu_links[$menu_name] ?? [];
     }
 
-    protected function buildMenuLinks(array $menu_data): array
+    protected function buildMenuLinks(array $menu_data, array $arguments = []): array
     {
         $links = [];
-        if (isset($menu_data['access_level']) && !app()->user()->verifyAccessLevel($menu_data['access_level'])) {
+        if (
+            isset($menu_data['access_level'])
+            && !app()->user()->verifyAccessLevel($menu_data['access_level'])
+        ) {
             return $links;
         }
         foreach ($menu_data['items'] ?? [] as $name) {
@@ -51,6 +54,9 @@ trait PageBuilderMenu
             ) {
                 continue;
             }
+            foreach ($arguments as $arg => $value) {
+                $link['url'] = str_replace('{$' . $arg . '}', $value, $link['url']);
+            }
             $link['current'] = $this->isLinkMatchsCurrentUrl($link['url']);
             if (preg_match('/^\#/', $link['url'])) {
                 $link_classes[] = 'js-anchor-link';
@@ -60,6 +66,11 @@ trait PageBuilderMenu
             }
             $link['class'] = classlistToString($menu_data['class'], suffix: '__item');
             $link['link_class'] = classlistToString($menu_data['class'], suffix: '__link');
+            $attributes = [];
+            foreach ($link['attributes'] ?? [] as $attr_name => $attr_value) {
+                $attributes[$attr_name] = $attr_value ? "{$attr_name}=\"{$attr_value}\"" : $attr_name;
+            }
+            $link['attributes'] = empty($attributes) ? '' : implode(' ', $attributes);
             $links[$name] = $link;
         }
         return $links;

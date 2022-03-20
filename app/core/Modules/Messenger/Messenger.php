@@ -3,7 +3,7 @@
 namespace Blog\Modules\Messenger;
 
 use Blog\Modules\Template\Element;
-use Blog\Modules\User\User;
+use Blog\Client\User;
 
 class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
 {

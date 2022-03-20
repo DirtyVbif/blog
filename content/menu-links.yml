@@ -10,11 +10,17 @@ footer: {
 
 admin_bar: {
   access_level: 4,
-  items: ['user_profile', 'user_login', 'user_logout', 'feedbacks', 'sitemap_generate', 'blog_article_create'],
+  items: ['user_profile', 'user_login', 'user_logout', 'feedbacks', 'sitemap_generate', 'blog_article_create', 'entity_skill_create', 'admin_log'],
   class: 'admin-nav'
 }
 
 info: {
   items: ['contacts', 'cookie_agreement', 'sitemap'],
   class: 'menu menu_info'
+}
+
+article_edit: {
+  access_level: 4,
+  items: ['blog_article_edit', 'blog_article_delete'],
+  class: 'article-menu'
 }

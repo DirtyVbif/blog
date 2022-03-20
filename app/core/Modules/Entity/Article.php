@@ -6,30 +6,61 @@ use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Request\RequestPrototype;
+use JetBrains\PhpStorm\ExpectedValues;
 use Twig\Markup;
 
-class Article extends BaseEntity implements SitemapInterface
+class Article extends EntityPrototype implements SitemapInterface
 {
     public const VIEW_MODE_FULL = 'full';
     public const VIEW_MODE_TEASER = 'teaser';
     public const VIEW_MODE_PREVIEW = 'preview';
-    public const TYPE_ID = 1;
-    protected const VIEW_MODES = [
-        0 => self::VIEW_MODE_FULL,
-        1 => self::VIEW_MODE_TEASER,
-        2 => self::VIEW_MODE_PREVIEW
+    public const URL_MASK = '/blog/%s';
+    public const ENTITY_COMMENTS_FIELDS = [
+        'c_pid' => 'pid', 'c_created' => 'created',
+        'c_name' => 'name', 'c_email' => 'email',
+        'c_body' => 'body', 'c_status' => 'status',
+        'c_ip' => 'ip'
     ];
+    
+    /**
+     * Article entity type id is 1
+     * 
+     * It's equals `article` value from `entities_types` where `etid` = 1
+     */
+    public const ENTITY_TYPE_ID = 1;
+
+    /**
+     * Article entity data table name that contains article data
+     */
     public const ENTITY_DATA_TABLE = 'entities_article_data';
     public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'status', 'preview_src', 'preview_alt', 'author', 'views'];
     public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
+    
+    /**
+     * Default value for article preview image source
+     */
+    public const DEFAULT_PREVIEW_SRC = '/images/article-preview-default.webp';
+
+    /**
+     * Default value for article preview image alt text
+     */
+    public const DEFAULT_PREVIEW_ALT = 'Article preview image';
+
+    /**
+     * Default value for article author
+     */
+    public const DEFAULT_AUTHOR = 'mublog.site';
 
     protected string $view_mode;
     protected SQLSelect $sql;
+    /** @var Comment[] $comments */
     protected array $comments;
-    protected bool $comments_loaded = false;
-    protected bool $comments_preloaded;
+    protected array $comments_data;
+    protected bool $loaded_with_comments;
+    /** @var int $comments_count count of comments with published status for loaded article */
     protected int $comments_count;
+    protected bool $has_alias;
 
     public static function getSqlTableName(): array|string
     {
@@ -41,40 +72,153 @@ class Article extends BaseEntity implements SitemapInterface
         return ['a' => self::ENTITY_DATA_COLUMNS];
     }
 
-    public static function countItems(): int
+    public static function getSitemapPriority(): float
     {
-        return sql_select(from: self::ENTITY_DATA_TABLE)->count();
+        return self::SITEMAP_PRIORITY;
+    }
+
+    public static function getSitemapChangefreq(): string
+    {
+        return self::SITEMAP_CHANGEFREQ;
+    }
+
+    public static function getUrl(int $id): ?string
+    {
+        $self = new self($id);
+        return $self->url();
     }
 
     /**
-     * @param int|array $data is an id of article that must be loaded or already loaded article data.
-     * If integer id provided as `int $data` then article will be automatically loaded from storage.
-     * Else if array with article data provided as `array $data` then article wouldn't be loaded from storage and accept provided data.
+     * Check provided article alias for uniqueness
+     */
+    public static function isAliasExists(string $alias): bool
+    {
+        $sql = sql_select(['eid'], self::ENTITY_DATA_TABLE);
+        $sql->where(['alias' => $alias]);
+        $result = $sql->exe();
+        return !empty($result);
+    }
+
+    /**
+     * @param \Blog\Request\ArticleRequest $request
+     */
+    public static function create(RequestPrototype $request, ?array $data = null): bool
+    {
+        $time = time();
+        $sql = sql_insert(self::ENTITY_TABLE);
+        $sql->set(
+            [$time, $time, self::ENTITY_TYPE_ID],
+            ['created', 'updated', 'etid']
+        );
+        $sql->useFunction('created', 'FROM_UNIXTIME')
+            ->useFunction('updated', 'FROM_UNIXTIME');
+        sql()->startTransation();
+        $rollback = true;
+        if ($eid = $sql->exe()) {
+            $sql = sql_insert(self::ENTITY_DATA_TABLE);
+            $columns = self::ENTITY_DATA_COLUMNS;
+            $columns[] = 'eid';
+            $values = [
+                $request->title, $request->summary,
+                $request->body, $request->alias, $request->status,
+                $request->preview_src, $request->preview_alt,
+                $request->author, 0, $eid
+            ];
+            $sql->set($values, $columns);
+            if ($sql->exe(true)) {
+                $rollback = false;
+                $request->complete();
+            }
+        }
+        sql()->commit($rollback);
+        return !$rollback;
+    }
+
+    /**
+     * @param array $options recieves SQL QUERY SELECT options:
+     * * array key @var int 'limit'
+     * * array key @var int 'offset'
+     * * array key @var string 'order' => ASC or DESC
+     * * array key @var string 'view_mode'
+     * * array key @var bool 'load_with_comments' => load article with or without comments data
+     * @return Article[]
+     */
+    public static function loadList(array $options = []): array
+    {
+        $sql = sql_select(columns: ['eid'], from: self::ENTITY_TABLE);
+        $sql->limit($options['limit'] ?? null);
+        $sql->limitOffset($options['offset'] ?? null);
+        $sql->order('created', ($options['order'] ?? 'ASC'));
+        $sql->where(['etid' => self::ENTITY_TYPE_ID]);
+        $view_mode = $options['view_mode'] ?? self::VIEW_MODE_FULL;
+        $articles = [];
+        foreach ($sql->all() as $row) {
+            if (isset($options['load_with_comments'])) {
+                $article = new self(0, $view_mode);
+                $article->load($row['eid'], $options['load_with_comments']);
+            } else {
+                $article = new self($row['eid'], $view_mode);
+            }
+            $articles[$row['eid']] = $article;
+        }
+        return $articles;
+    }
+
+    public static function sqlJoinComments(): SQLSelect
+    {
+        $sql = static::sql();        
+        $sql->join(table: ['ec' => 'entities_comments'], using: 'eid')
+            ->join(table: ['c' => 'comments'], using: 'cid');
+        $sql->columns([
+            'ec' => ['cid', 'deleted'],
+            'c' => self::ENTITY_COMMENTS_FIELDS
+        ])->useFunction('c.created', 'UNIX_TIMESTAMP', 'c_created');
+        $sql->order('c.created', 'DESC');
+        return $sql;
+    }
+
+    /**
+     * @param int|array $data integer entity id of article entity or array with article data.
+     * > If parameter $data provided as integer entity id then article will be automatically loaded by entity id from database.
+     * > If parameter $data provided as array with article data then article wouldn't be loaded from database and accepts provided data.
+     * 
+     * @param string $view_mode @see self::class->setViewMode()
      */
     public function __construct(
-        int|array $data,
+        int $id = 0,
         string $view_mode = self::VIEW_MODE_FULL
     ) {
-        if (is_int($data)) {
-            parent::__construct($data);
-        } else if ($data) {
-            $this->data = $data;
-            $this->comments_preloaded = false;
-        } else {
-            $this->data = [];
-        }
-        $this->preprocessData();
+        parent::__construct($id);
         $this->setViewMode($view_mode);
     }
 
-    protected function preprocessData(): void
+    /**
+     * @param string $view_mode is name of view mode. Also named constants are available
+     */
+    public function setViewMode(
+        #[ExpectedValues(
+            self::VIEW_MODE_FULL,
+            self::VIEW_MODE_PREVIEW,
+            self::VIEW_MODE_TEASER
+        )] string $view_mode
+    ): self {
+        $this->view_mode = $view_mode;
+        return $this;
+    }
+
+    public function url(): ?string
     {
-        if (!empty($this->data)) {
-            $this->data['url'] = $this->url();
-            $this->data['date'] = new DateFormat($this->data['created']);
-            $this->data['comments_count'] = $this->getCommentsCount();
+        if ($this->get('alias')) {
+            return sprintf(self::URL_MASK, $this->get('alias'));
+        } else if ($this->id()) {
+            return sprintf(self::URL_MASK, $this->id());
         }
-        return;
+        return null;
+    }
+
+    public function hasAlias(): bool
+    {
+        return (bool)$this->get('alias');
     }
 
     /**
@@ -93,200 +237,119 @@ class Article extends BaseEntity implements SitemapInterface
         $this->tpl()->setName('content/article--' . $this->view_mode);
         foreach ($this->data as $key => $value) {
             if ($key === 'body') {
-                $value = new Markup(htmlspecialchars_decode($value), CHARSET);
+                $value = new Markup($value, CHARSET);
             }
             $this->tpl()->set($key, $value);
         }
         return parent::render();
     }
 
-    public function loadById(int $id): self
+    public function load(?int $id = null, bool $load_comments = true): void
     {
-        $sql = self::sql();
-        $sql->where(condition: ['e.eid' => $id]);
-        $result = $sql->all();
-        $this->setLoadedData($result);
-        return $this;
+        $this->loaded_with_comments = $load_comments;
+        if (!is_null($id)) {
+            $this->id = $id;
+        }
+        if ($this->id()) {
+            $sql = $load_comments ? self::sqlJoinComments() : self::sql();
+            $sql->where(condition: ['e.eid' => $this->id()]);
+            $this->setLoadedData($sql->all());
+        }
+        return;
     }
 
+    /**
+     * Load blog article entity by article alias
+     */
     public function loadByAlias(string $alias): self
     {
-        $sql = self::sql();
+        $sql = self::sqlJoinComments();
         $sql->where(condition: ['a.alias' => $alias]);
-        $result = $sql->all();
-        $this->setLoadedData($result);
-        $this->preprocessData();
+        $this->setLoadedData($sql->all());
         return $this;
     }
 
     protected function setLoadedData(array $data): void
     {
-        $this->comments = [];
-        if (empty($data)) {
-            $this->data = [];
-        } else {
-            $columns = array_merge(self::ENTITY_COLUMNS, self::ENTITY_DATA_COLUMNS);
-            foreach ($columns as $key => $column) {
-                $key = is_numeric($key) ? $column : $key;
-                $this->data[$key] = $data[0][$key];
-            }
-            $comments_count = 0;
-            foreach ($data as $row) {
-                if (!$row['cid']) {
-                    continue;
-                }
-                $this->comments[$row['cid']] = [
-                    'deleted' => $row['deleted']
-                ];
-                if ($row['deleted'] == 0) {
-                    $comments_count++;
-                }
-            }
-            $this->comments_count = $comments_count;
+        if (!empty($data)) {
+            $this->data = $data[0];
             $this->id = $this->data['id'];
+            $this->comments_data = $this->setLoadedCommentsData($data);
+            
         }
-        $this->is_exists = !empty($this->data);
+        $this->exists = !empty($this->data);
         $this->loaded = true;
-        $this->comments_preloaded = true;
+        $this->preprocessData();
+        return;
+    }
+
+    protected function setLoadedCommentsData(array $data): array
+    {
+        $comments = [];
+        if (!$this->loaded_with_comments) {
+            return $comments;
+        }
+        foreach ($data as $row) {
+            if ($row['cid'] && $row['deleted'] == 0) {
+                foreach (self::ENTITY_COMMENTS_FIELDS as $alias => $column) {
+                    $comments[$row['cid']]['cid'] = $row['cid'];
+                    $comments[$row['cid']][$column] = $row[$alias];
+                }
+            }
+        }
+        unset($this->data['cid']);
+        foreach (self::ENTITY_COMMENTS_FIELDS as $alias => $column) {
+            unset($this->data[$alias]);
+        }
+        return $comments;
+    }
+
+    protected function preprocessData(): void
+    {
+        if ($this->exists()) {
+            $this->data['url'] = $this->url();
+            $this->data['date'] = new DateFormat($this->data['created']);
+            $this->data['comments_count'] = $this->getCommentsCount();
+        }
         return;
     }
 
     /**
-     * @param string $view_mode is name of view mode. Also named constants are available:
-     * * BlogArticle::VIEW_MODE_FULL
-     * * BlogArticle::VIEW_MODE_TEASER
-     * * BlogArticle::VIEW_MODE_PREVIEW
-     */
-    public function setViewMode(string $view_mode): self
-    {
-        if (in_array($view_mode, self::VIEW_MODES)) {
-            $this->view_mode = $view_mode;
-        } else {
-            $this->view_mode = self::VIEW_MODE_FULL;
-        }
-        return $this;
-    }
-
-    /**
-     * @return Comment[] $comments
+     * @return Comment[]
      */
     public function getComments(): array
     {
-        if (!$this->comments_loaded && $this->comments_preloaded && !empty($this->comments)) {
-            $this->comments = Comment::loadByIds(array_keys($this->comments), Comment::VIEW_MODE_ARTICLE);
-            $this->comments_loaded = true;
-        } else if (!$this->comments_loaded && !$this->comments_preloaded) {
-            $this->comments = Comment::loadByArticleId($this->id(), Comment::VIEW_MODE_ARTICLE);
-            $this->comments_loaded = true;
+        if (!isset($this->comments)) {
+            $this->comments = [];
+            if (!$this->loaded_with_comments) {
+                // TODO: load comments data for entity
+            }
+            foreach ($this->comments_data as $i => $comment_data) {
+                $this->comments[$i] = new Comment(
+                    $comment_data,
+                    Comment::VIEW_MODE_ARTICLE
+                );
+            }
         }
         return $this->comments;
     }
 
+    /**
+     * @return int count of comments with published status for loaded article
+     */
     public function getCommentsCount(): int
     {
-        if (!isset($this->comments_count)) {
+        if (!isset($this->comments_count) && $this->loaded_with_comments) {
             $this->comments_count = 0;
-            /** @var Comment $comment */
-            foreach ($this->getComments() as $comment) {
-                if ($comment->status()) {
-                    $this->comments_count++;
-                }
+            foreach ($this->comments_data as $comment_data) {
+                $this->comments_count += $comment_data['status'] ?? 0;
             }
         }
-        return $this->comments_count;
+        return $this->comments_count ?? 0;
     }
 
-    /**
-     * @param \Blog\Request\ArticleRequest $request
-     */
-    public static function create(RequestPrototype $request, ?array $data = null): bool
+    public function title(): ?string
     {
-        $time = time();
-        $request->setDefaultValues([
-            'author' => 'mublog.site',
-            'alias' => kebabCase($request->title, true),
-            'updated' => $time,
-            'created' => $time,
-            'views' => 0
-        ]);
-        if (self::isAliasExists($request->alias)) {
-            $request->set('alias', $request->alias . '_' . self::getNewId());
-        }
-        $sql = sql_insert(self::ENTITY_TABLE);
-        $sql->set(
-            [$request->get('created'), $request->get('updated'), self::TYPE_ID],
-            ['created', 'updated', 'etid']
-        );
-        $sql->useFunction('created', 'FROM_UNIXTIME')
-            ->useFunction('updated', 'FROM_UNIXTIME');
-        sql()->startTransation();
-        $rollback = true;
-        if ($eid = $sql->exe()) {
-            $sql = sql_insert(self::ENTITY_DATA_TABLE);
-            $columns = self::ENTITY_DATA_COLUMNS;
-            $columns[] = 'eid';
-            $values = [
-                $request->title, $request->summary, $request->body,
-                $request->get('alias'), $request->status,
-                $request->preview_src, $request->preview_alt,
-                $request->get('author'), $request->get('views'), $eid
-            ];
-            foreach (['preview_src', 'preview_alt'] as $field) {
-                if ($request->get($field)) {
-                    continue;
-                }
-                $i = array_search($field, $columns);
-                unset($columns[$i], $values[$i]);
-            }
-            $sql->set($values, $columns);
-            if ($sql->exe(true)) {
-                $rollback = false;
-                $request->complete();
-            }
-        }
-        sql()->commit($rollback);
-        return !$rollback;
-    }
-
-    protected static function isAliasExists(string $alias): bool
-    {
-        $sql = sql_select(['eid'], self::ENTITY_DATA_TABLE);
-        $sql->where(['alias' => $alias]);
-        $result = $sql->exe();
-        return !empty($result);
-    }
-
-    public static function getSitemapPriority(): float
-    {
-        return self::SITEMAP_PRIORITY;
-    }
-
-    public static function getSitemapChangefreq(): string
-    {
-        return self::SITEMAP_CHANGEFREQ;
-    }
-
-    public static function getUrl(int $id): string
-    {
-        $self = new self($id);
-        return $self->url();
-    }
-
-    public function url(): string
-    {
-        if (!$this->exists()) {
-            return '';
-        } else if ($this->alias) {
-            return "/blog/{$this->alias}";
-        }
-        return "/blog/{$this->id()}";
-    }
-
-    public function title(): string
-    {
-        if (!$this->exists()) {
-            return '';
-        }
-        return $this->title;
+        return $this->get('title');
     }
 }
