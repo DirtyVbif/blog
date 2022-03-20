@@ -107,6 +107,19 @@ class Skill extends EntityPrototype
         }
     }
 
+    /**
+     * @param string $view_mode is name of view mode. Also named constants are available
+     */
+    public function setViewMode(
+        #[ExpectedValues(
+            self::VIEW_MODE_FULL,
+            self::VIEW_MODE_TEASER
+        )] string $view_mode
+    ): self {
+        $this->view_mode = $view_mode;
+        return $this;
+    }
+
     public function render()
     {
         $this->preprocessData();
@@ -121,9 +134,11 @@ class Skill extends EntityPrototype
     protected function preprocessData(): void
     {
         $this->data['body'] = new Markup($this->data['body'], CHARSET);
+        $url = $this->url();
         $this->data['url'] = [
-            'edit' => $this->url() . '/edit',
-            'delete' => $this->url() . '/delete'
+            'view' => $url ?? '#',
+            'edit' => $url ? "{$url}/edit" : '#',
+            'delete' => $url ? "{$url}/delete" : '#'
         ];
         $this->data['is_master'] = user()->verifyAccessLevel(User::ACCESS_LEVEL_MASTER);
         return;
