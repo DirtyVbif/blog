@@ -32,6 +32,21 @@ CREATE TABLE IF NOT EXISTS `comments` (
   KEY `fk_comment_user_id` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Дамп структуры для таблица mublog.entities_types
+DROP TABLE IF EXISTS `entities_types`;
+CREATE TABLE IF NOT EXISTS `entities_types` (
+  `etid` tinyint unsigned NOT NULL AUTO_INCREMENT COMMENT 'Entity type unique id',
+  `name` char(12) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Entity type name',
+  PRIMARY KEY (`etid`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Дамп данных таблицы mublog.entities_types: ~2 rows (приблизительно)
+INSERT INTO `entities_types` (`etid`, `name`) VALUES
+	(1, 'article'),
+	(2, 'feedback'),
+  (3, 'skill');
+
 -- Дамп структуры для таблица mublog.entities
 DROP TABLE IF EXISTS `entities`;
 CREATE TABLE IF NOT EXISTS `entities` (
@@ -45,7 +60,15 @@ CREATE TABLE IF NOT EXISTS `entities` (
 
 -- Дамп данных таблицы mublog.entities: ~4 rows (приблизительно)
 INSERT INTO `entities` (`eid`, `created`, `updated`, `etid`) VALUES
-	(1, '2022-02-10 00:02:16', '2022-03-02 15:47:45', 1);
+	(1, '2022-02-10 00:02:16', '2022-03-02 15:47:45', 1),
+  (2, '2022-03-17 20:55:29', '2022-03-17 20:55:29', 3),
+	(3, '2022-03-17 23:21:56', '2022-03-17 23:21:56', 3),
+	(4, '2022-03-18 13:04:58', '2022-03-18 13:04:58', 3),
+	(5, '2022-03-18 13:11:22', '2022-03-18 13:11:22', 3),
+	(6, '2022-03-18 13:13:15', '2022-03-18 13:13:15', 3),
+	(7, '2022-03-18 13:25:53', '2022-03-18 13:25:53', 3),
+	(8, '2022-03-18 13:27:11', '2022-03-18 13:27:11', 3),
+	(9, '2022-03-18 13:30:28', '2022-03-18 13:30:28', 3);
 
 -- Дамп структуры для таблица mublog.entities_article_data
 DROP TABLE IF EXISTS `entities_article_data`;
@@ -68,18 +91,6 @@ CREATE TABLE IF NOT EXISTS `entities_article_data` (
 INSERT INTO `entities_article_data` (`eid`, `title`, `summary`, `body`, `alias`, `status`, `preview_src`, `preview_alt`, `author`, `views`) VALUES
 	(1, 'Набор полезных навыков для веб-разработчика от Андреаса Мэлсена', 'Веб-разработчик из Германии Андреас Мэлсен создал сайт, на котором он собрал множество полезных инcтрументов для веб-разработчиков и поделился с нами.', '&lt;p&gt;Веб-разработчик из Германии &lt;a href=&quot;https://andreasbm.github.io/&quot; target=&quot;_blank&quot;&gt;Андреас Мэлсен&lt;/a&gt; создал очень полезный сайт, &lt;a href=&quot;https://andreasbm.github.io/web-skills/&quot; target=&quot;_blank&quot;&gt;Web Skills&lt;/a&gt;, на котором он собрал и представил множество полезных ссылок на документации и статьи для изучения различных инструментов, которые могут очень пригодиться и быть полезными в веб-разработке.&lt;/p&gt;\r\n\r\n&lt;a href=&quot;https://andreasbm.github.io/web-skills/&quot; target=&quot;_blank&quot;&gt;\r\n    &lt;img src=&quot;/images/content/220210-image-web-skills-demo.gif&quot; alt=&quot;Web Skills Demo&quot; width=&quot;800&quot; height=&quot;512&quot;&gt;\r\n&lt;/a&gt;\r\n\r\n&lt;p&gt;На данном сайте выполнено визуальное представление полезных навыков по мнению Андреаса. Он рассказывает, что собранные им инструменты - результат 10-летнего опыта в веб-разработке и с которыми он, так или иначе, сталкивался лично. Новичкам же автор не рекомендует воспринимать свою библиотеку знаний, как руководство к изучению всего, что там представлено, а воспринимать это скорее как то, что возможно им придётся изучить в будущем. Так же Андреас утверждает, что на его сайте собрано гораздо больше, чем может потребоваться в повседневной разработке проектов, по этому не стоит пугаться столь огромного количества представленных материалов.&lt;/p&gt;', 'nabor-poleznih-navikov-dlya-veb-razrabotchika-ot-andreasa-melsena', 1, '/images/content/220210-preview-01.webp', 'Web Skills', 'mublog.site', 0);
 
--- Дамп структуры для таблица mublog.entities_comments
-DROP TABLE IF EXISTS `entities_comments`;
-CREATE TABLE IF NOT EXISTS `entities_comments` (
-  `id` smallint unsigned NOT NULL AUTO_INCREMENT,
-  `eid` smallint unsigned NOT NULL COMMENT 'entity  unique id',
-  `cid` int unsigned NOT NULL COMMENT 'comment unique id',
-  `deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'is comment deleted',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `entity_comment` (`eid`,`cid`),
-  KEY `fk_entity_comment_id` (`cid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 -- Дамп структуры для таблица mublog.entities_feedback_data
 DROP TABLE IF EXISTS `entities_feedback_data`;
 CREATE TABLE IF NOT EXISTS `entities_feedback_data` (
@@ -92,19 +103,29 @@ CREATE TABLE IF NOT EXISTS `entities_feedback_data` (
   PRIMARY KEY (`eid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Дамп структуры для таблица mublog.entities_types
-DROP TABLE IF EXISTS `entities_types`;
-CREATE TABLE IF NOT EXISTS `entities_types` (
-  `etid` tinyint unsigned NOT NULL AUTO_INCREMENT COMMENT 'Entity type unique id',
-  `name` char(12) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Entity type name',
-  PRIMARY KEY (`etid`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- Дамп структуры для таблица mublog.entities_skill_data
+DROP TABLE IF EXISTS `entities_skill_data`;
+CREATE TABLE `entities_skill_data` (
+	`eid` SMALLINT(5) UNSIGNED NOT NULL,
+	`title` VARCHAR(256) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`body` TEXT NOT NULL COLLATE 'utf8mb4_general_ci',
+	`icon_src` VARCHAR(256) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`icon_alt` VARCHAR(256) NOT NULL COLLATE 'utf8mb4_general_ci',
+	PRIMARY KEY (`eid`) USING BTREE,
+	CONSTRAINT `fk_skill_entity_id` FOREIGN KEY (`eid`) REFERENCES `entities` (`eid`) ON UPDATE CASCADE ON DELETE CASCADE
+) COLLATE='utf8mb4_general_ci' ENGINE=InnoDB;
 
--- Дамп данных таблицы mublog.entities_types: ~2 rows (приблизительно)
-INSERT INTO `entities_types` (`etid`, `name`) VALUES
-	(1, 'article'),
-	(2, 'feedback');
+-- Дамп структуры для таблица mublog.entities_comments
+DROP TABLE IF EXISTS `entities_comments`;
+CREATE TABLE IF NOT EXISTS `entities_comments` (
+  `id` smallint unsigned NOT NULL AUTO_INCREMENT,
+  `eid` smallint unsigned NOT NULL COMMENT 'entity  unique id',
+  `cid` int unsigned NOT NULL COMMENT 'comment unique id',
+  `deleted` tinyint unsigned NOT NULL DEFAULT '0' COMMENT 'is comment deleted',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `entity_comment` (`eid`,`cid`),
+  KEY `fk_entity_comment_id` (`cid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Дамп структуры для таблица mublog.log
 DROP TABLE IF EXISTS `log`;
