@@ -33,13 +33,16 @@ abstract class EntityPrototype extends TemplateFacade
         }
     }
 
+    /**
+     * Getter method for entity data by data key
+     */
     public function get(string $name)
     {
         return $this->data[$name] ?? null;
     }
 
     /**
-     * Get entity id
+     * Getter method for entity id
      */
     public function id(): int
     {
@@ -47,6 +50,14 @@ abstract class EntityPrototype extends TemplateFacade
             $this->id = $this->data['id'] ?? 0;
         }
         return $this->id;
+    }
+
+    /**
+     * Getter method for entity type
+     */
+    public function type(): ?string
+    {
+        return $this->data['type_name'] ?? null;
     }
 
     /**
