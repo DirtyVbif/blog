@@ -61,4 +61,11 @@ class EntityFactory
             exit;
         }
     }
+
+    public static function delete(int $entity_id): bool
+    {
+        $sql = sql_delete(EntityPrototype::ENTITY_TABLE);
+        $sql->where(['eid' => $entity_id]);
+        return $sql->delete() > 0;
+    }
 }
