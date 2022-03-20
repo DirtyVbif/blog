@@ -51,21 +51,27 @@ trait AdminControllerPostRequest
         $title = $request->raw('title');
         if ($request->isValid()) {
             $title = $request->title;
-            if (!$id && $type === 'create') {
-                $result = Skill::create($request);
-            } else {
-                $result = Skill::edit($id, $request);
+            switch (true) {
+                case(!$id && $type === 'create'):
+                    $result = Skill::create($request);
+                    break;
+                case ($id && $type === 'edit'):
+                    $result = Skill::edit($id, $request);
+                    break;
             }
         }
         if ($result) {
             $request->complete();
             msgr()->notice(
                 t(
-                    'New entity &laquo;@name&raquo; of type &laquo;skill&raquo; successfully saved.',
+                    'Entity &laquo;@name&raquo; of type &laquo;skill&raquo; was successfully saved.',
                     ['name' => $title]
                 )
             );
-            app()->router()->redirect('/');
+            if ($id) {
+                app()->router()->redirect(sprintf(Skill::URL_MASK, $id));
+            }
+            app()->router()->redirect('<previous>');
         }
         msgr()->warning(
             t(
