@@ -22,16 +22,13 @@
         <footer class="{{ classlistToString(class, '', '__footer') }} hidden"
             data-item-project-remove-class="{{ classlistToString(class[1], '', '__body') }}, hidden">
             <ul class="{{ classlistToString(class, '', '__links') }}">
-                <li class="{{ classlistToString(class, '', '__links-item') }}">
-                    {{ link(url.edit)
-                        .label(t('edit'))
-                        .addClass(classlistToString(class, '', ['__link', '__link_edit'])) }}
-                </li>
-                <li class="{{ classlistToString(class, '', '__links-item') }}">
-                    {{ link(url.delete)
-                        .label(t('delete'))
-                        .addClass(classlistToString(class, '', ['__link', '__link_delete'])) }}
-                </li>
+                {% for key, path in url %}
+                    <li class="{{ classlistToString(class, '', '__links-item') }}">
+                        {{ link(path)
+                            .label(t(key))
+                            .addClass(classlistToString(class, '', ['__link', '__link_' ~ key])) }}
+                    </li>
+                {% endfor %}
             </ul>
         </footer>
     {% endif %}
