@@ -2,23 +2,33 @@
 
 namespace Blog\Database;
 
-use Exception;
+use Blog\Client\User;
+use DateTime;
 use PDO;
 use PDOStatement;
 
 class Bridge
 {
     private const LOGID = 'sql';
+    private const SESID = 'DB-Bridge';
 
     private object $config;
     private PDO $connection;
     private PDOStatement $statement;
-    private bool $transaction = false;
     private BridgeCacheAdapter $cache_adapter;
 
     public function __construct()
     {
         $this->config = (object)app()->env()->DB;
+        if (
+            $this->connect()->inTransaction()
+            && $time = session()->get(self::SESID . '/transaction/start')
+        ) {
+            msgr()->warning(
+                'Database is in transacrion now. Timestamp: ' . $time,
+                access_level: User::ACCESS_LEVEL_MASTER
+            );
+        }
         return $this;
     }
 
@@ -36,7 +46,7 @@ class Bridge
     private function cfg(string $key): string
     {
         $key = strtoupper($key);
-        return $this->config->$key;
+        return $this->config->{$key};
     }
     
     /**
@@ -162,9 +172,10 @@ class Bridge
 
     public function startTransation(): void
     {
-        if (!$this->transaction) {
-            $this->transaction = true;
-            $this->query('START TRANSACTION;');
+        if (!$this->connect()->inTransaction()) {
+            $date = DateTime::createFromFormat('U.u', microtime(true));
+            session()->set(self::SESID . '/transaction/start', $date->format('Y-m-d H:i:s.u'));
+            $this->connect()->beginTransaction();
             consoleLog(self::LOGID, 'Database transaction started;');
         }
         return;
@@ -174,9 +185,9 @@ class Bridge
     {
         if ($rollback) {
             $this->rollback();
-        } else if ($this->transaction) {
-            $this->transaction = false;
-            $this->query('COMMIT;');
+        } else if ($this->connect()->inTransaction()) {
+            session()->unset(self::SESID . '/transaction/start');
+            $this->connect()->commit();
             consoleLog(self::LOGID, 'Database transaction completed;');
         }
         return;
@@ -184,9 +195,9 @@ class Bridge
 
     public function rollback(): void
     {
-        if ($this->transaction) {
-            $this->transaction = false;
-            $this->query('ROLLBACK;');
+        if ($this->connect()->inTransaction()) {
+            session()->unset(self::SESID . '/transaction/start');
+            $this->connect()->rollBack();
             consoleLog(self::LOGID, 'Database transaction rolled back;');
         }
         return;
