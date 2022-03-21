@@ -24,6 +24,7 @@ $skill_card_h_m: 24px;
 
 // BLOCK -------------------------------------------------------------->
 .skill-card {
+    width: 100%;
     border-radius: 4px;
     padding: 15px;
     background-color: $bkgd;
@@ -43,8 +44,8 @@ $skill_card_h_m: 24px;
         }
 
         & img {
-            width: 100%;
-            height: auto;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
         }
     }
@@ -118,13 +119,13 @@ $skill_card_h_m: 24px;
             height: calc(#{$skill_card_h_m} + 5px * 2);
         }
 
+        &.projected {
+            background-color: $bkgd;
+        }
+
         &:hover {
             background-color: white;
             box-shadow: $shadow;
-        }
-
-        &.projected {
-            background-color: $bkgd;
         }
 
         // MODIFICATOR ELEMENTS --------------------------------------->
