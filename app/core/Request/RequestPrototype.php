@@ -31,7 +31,9 @@ class RequestPrototype
     public function __construct(
         protected array $_data = []
     ) {
-        $this->_data = empty($data) ? $_POST : $data;
+        if (empty($this->_data)) {
+            $this->_data = $_POST;
+        }
     }
 
     /**
@@ -133,7 +135,7 @@ class RequestPrototype
 
     protected function validateCsrfToken(): bool
     {
-        if (static::CSRF_SKIP || user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
+        if (static::CSRF_SKIP || user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN) || user()->hasMasterIp()) {
             return true;
         } else if (
             !isset($this->_data[Token::FORM_ID])
