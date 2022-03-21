@@ -25,7 +25,7 @@ class StringLength implements ValidatorInterface
         if ($length > $this->max_length) {
             return "Field `@field_name` value is longer than {$this->max_length} symbols.";
         } else if ($length < $this->min_length) {
-            return "Field `@field_name` value length is lesser than {$this->min_symbols} symbols.";
+            return "Field `@field_name` value length is lesser than {$this->min_length} symbols.";
         }
         return null;
     }
