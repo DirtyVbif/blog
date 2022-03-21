@@ -22,5 +22,5 @@ class LoginRequest extends RequestPrototype
 
     #[RequestPropertyLabelAttribute('Remember login session')]
     #[Validators\Type('bool')]
-    protected string $remember_me;
+    protected bool $remember_me;
 }
