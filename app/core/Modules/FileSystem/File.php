@@ -5,28 +5,28 @@ namespace Blog\Modules\FileSystem;
 class File
 {
     protected const LOGID = 'Filesystem';
-    protected const DEFAULT_FILE_PERMISIONS = 0644;
+    protected const DEFAULT_FILE_PERMISSIONS = 644;
 
     protected string $dir;
+    protected Folder $folder;
     protected string $name;
     protected string $extension;
     protected string $content;
     protected string $real_content;
     protected bool $exists = false;
     protected bool $rewrited = false;
-    protected int $permissions = 0644;
+    protected int $permissions = 644;
 
     /**
      * @var resource|false a file pointer resource on success, or false on error
      */
     protected $handle;
 
-    public function __construct(string $name, string $directory = \ROOTDIR, ?string $extension = null)
+    public function __construct(string $name, ?string $directory = null, ?string $extension = null)
     {
-        $this
-            ->name($name)
-            ->dir($directory)
-            ->extension($extension);
+        $this->dir($directory);
+        $this->extension($extension);
+        $this->name($name);
         $this->checkExistingFile();
         return $this;
     }
@@ -44,6 +44,19 @@ class File
     {
         if (!$name) {
             return $this->name ?? null;
+        }
+        if (preg_match('/(\\\|\/)+/', $name)) {
+            $parts = preg_split('/(\\\|\/)+/', $name);
+            foreach ($parts as $i => $part) {
+                if (!preg_replace('/\s+/', '', $part)) {
+                    unset($parts[$i]);
+                }
+            }
+            $name = array_pop($parts);
+            if (!empty($parts)) {
+                $directory = implode('/', $parts);
+                $this->dir($directory);
+            }
         }
         $this->name = $name;
         return $this;
@@ -75,9 +88,19 @@ class File
         if (is_null($directory)) {
             return $this->dir ?? null;
         } else if (!$directory) {
-            $directory = '.';
+            $directory = '';
         }
-        $this->dir = strSuffix($directory, '/', true);
+        $directory = preg_replace(
+            [
+                '/^' . strRegexQuote(\ROOTDIR) . '/i',
+                '/^\.+(\\\|\/)/'
+            ],
+            ['', ''],
+            $directory
+        );
+        $directory = strPrefix($directory, '/', true);
+        $this->dir = \ROOTDIR . strSuffix($directory, '/', true);
+        $this->folder = new Folder($this->dir);
         return $this;
     }
 
@@ -119,6 +142,9 @@ class File
     public function save(): self
     {
         $file = $this->filename();
+        if (!file_exists($this->dir())) {
+            $this->folder->create();
+        }
         $this->handle = fopen($file, 'w');
         if (!$this->handle) {
             msgr()->debug("Can't open/create \"{$file}\" file.");
@@ -173,7 +199,7 @@ class File
     public function permissions(?int $permissions = null): self|int
     {
         if (is_null($permissions)) {
-            return $this->permissions ?? self::DEFAULT_FILE_PERMISIONS;
+            return $this->permissions ?? self::DEFAULT_FILE_PERMISSIONS;
         }
         $this->permissions = $permissions;
         return $this;

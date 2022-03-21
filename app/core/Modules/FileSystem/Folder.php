@@ -4,7 +4,7 @@ namespace Blog\Modules\FileSystem;
 
 class Folder
 {
-    protected const DEFAULT_PERMISSIONS = 0755;
+    protected const DEFAULT_PERMISSIONS = 755;
 
     protected string $path;
     protected bool $exists;
