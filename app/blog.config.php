@@ -20,7 +20,8 @@ $__config['langcode'] = 'ru';
  * Webmaster contacts
  */
 $__config['webmaster'] = [
-    'mail' => 'info@mublog.site'
+    'mail' => 'info@mublog.site',
+    'ip' => '127.0.0.1'
 ];
 
 /**
