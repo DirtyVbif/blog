@@ -19,12 +19,7 @@ class CommandLineInterface
 
     public function width(): int
     {
-        $ansicon = $_SERVER['ANSICON'] ?? null;
-        if (!$ansicon) {
-            return 0;
-        }
-        $width = preg_replace('/^(\d+)(x\d+)(\s+\(\d+x\d+\))?$/', '$1', $ansicon);
-        return (int)$width;
+        return exec('tput cols');
     }
 
     public function outputNotice(string $output): string
