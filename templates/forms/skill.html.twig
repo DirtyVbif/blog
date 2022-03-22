@@ -1,4 +1,8 @@
 {% set class = 'form form_skill' %}
+{% set checked = ' checked' %}
+{% if status == 0 %}
+    {% set checked = null %}
+{% endif %}
 
 {{ wrapper.addClass('form-wrapper form-wrapper_skill').open() }}
     <form action="{{ action }}" method="POST" {{ id('form-skill', true) }} class="{{ class }}">
@@ -67,7 +71,7 @@
                         {{ id('form-blog-article--status', true) }}
                         name="status"
                         class="{{ classlistToString(class, '', '__checkbox') }}"
-                        value="1" checked>
+                        value="1"{{ checked }}>
                         Publish
                 </label>
             </div>

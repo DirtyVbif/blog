@@ -11,7 +11,7 @@ use Twig\Markup;
 class Skill extends EntityPrototype
 {
     public const ENTITY_DATA_TABLE = 'entities_skill_data';
-    public const ENTITY_DATA_COLUMNS = ['title', 'body', 'icon_src', 'icon_alt'];
+    public const ENTITY_DATA_COLUMNS = ['title', 'body', 'icon_src', 'icon_alt', 'status'];
     /** @var int entity type id (etid) specified in entities_types table */
     public const ENTITY_TYPE_ID = 3;        // skill
     public const VIEW_MODE_FULL = 'full';
@@ -68,8 +68,8 @@ class Skill extends EntityPrototype
         if ($entity_id = $sql->exe()) {
             $sql = sql_insert(self::ENTITY_DATA_TABLE);
             $sql->set(
-                [$entity_id, $request->title, $request->body, $request->icon_src, $request->icon_alt],
-                ['eid', 'title', 'body', 'icon_src', 'icon_alt']
+                [$entity_id, $request->title, $request->body, $request->icon_src, $request->icon_alt, $request->status],
+                ['eid', 'title', 'body', 'icon_src', 'icon_alt', 'status']
             );
             $result = $sql->exe(true);
             $rollback = $result ? false : true;
@@ -89,7 +89,8 @@ class Skill extends EntityPrototype
             'title' => $request->title,
             'icon_src' => $request->icon_src,
             'icon_alt' => $request->icon_alt,
-            'body' => $request->body
+            'body' => $request->body,
+            'status' => $request->status
         ]);
         $sql->where([self::ENTITY_PK => $id]);
         return (bool)$sql->update();
@@ -123,6 +124,12 @@ class Skill extends EntityPrototype
     public function render()
     {
         $this->preprocessData();
+        $admin_access = user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN);
+        if (!$this->status() && !$admin_access) {
+            return '';
+        } else if (!$this->status()) {
+            $this->tpl()->addClass('unpublished');
+        }
         $this->tpl()->setName('content/skill--' . $this->view_mode);
         $this->tpl()->setId('skill-' . $this->id());
         foreach ($this->data as $key => $value) {
@@ -150,5 +157,10 @@ class Skill extends EntityPrototype
             return sprintf(self::URL_MASK, $this->id());
         }
         return null;
+    }
+
+    public function status(): bool
+    {
+        return (int)($this->data['status'] ?? 0);
     }
 }

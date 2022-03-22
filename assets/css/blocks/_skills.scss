@@ -29,6 +29,10 @@ $skill_card_h_m: 24px;
     padding: 15px;
     background-color: $bkgd;
 
+    &.unpublished {
+        background-color: $unpublished;
+    }
+
     // ELEMENTS ------------------------------------------------------->
     &__icon {
         width: 100px;

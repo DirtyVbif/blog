@@ -112,6 +112,7 @@ CREATE TABLE `entities_skill_data` (
 	`body` TEXT NOT NULL COLLATE 'utf8mb4_general_ci',
 	`icon_src` VARCHAR(256) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`icon_alt` VARCHAR(256) NOT NULL COLLATE 'utf8mb4_general_ci',
+  `status` TINYINT(3) NOT NULL DEFAULT '0',
 	PRIMARY KEY (`eid`) USING BTREE,
 	CONSTRAINT `fk_skill_entity_id` FOREIGN KEY (`eid`) REFERENCES `entities` (`eid`) ON UPDATE CASCADE ON DELETE CASCADE
 ) COLLATE='utf8mb4_general_ci' ENGINE=InnoDB;
