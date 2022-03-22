@@ -1,4 +1,9 @@
 {% set class = 'form form_article' %}
+{% if status == 0 %}
+    {% set checked = null %}
+{% else %}
+    {% set checked = ' checked' %}
+{% endif %}
 
 {{ wrapper.addClass('form-wrapper form-wrapper_article').open() }}
     <form action="/blog" method="POST" {{ id('form-blog-article', true) }} class="{{ class }}">
@@ -95,10 +100,6 @@
         </div>
 
         <footer class="{{ classlistToString(class, '', '__footer') }}">
-            <div class="{{ classlistToString(class, '', ['__field', '__field_submit']) }}">
-                <input type="submit" value="Save" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
-            </div>
-
             <div class="{{ classlistToString(class, '', ['__field', '__field_checkbox']) }}">
                 <label for="form-blog-article--status"
                     class="{{ classlistToString(class, '', ['__label', '__label_checkbox']) }}">
@@ -106,9 +107,14 @@
                         {{ id('form-blog-article--status', true) }}
                         name="status"
                         class="{{ classlistToString(class, '', '__checkbox') }}"
-                        value="1" checked>
-                        Publish
+                        value="1"{{ checked }}>
+                        <span class="{{ classlistToString(class, '', '__checkbox-switcher') }}"></span>
+                        <span>Publish</span>
                 </label>
+            </div>
+
+            <div class="{{ classlistToString(class, '', ['__field', '__field_submit']) }}">
+                <input type="submit" value="Save" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
             </div>
         </footer>
     </form>

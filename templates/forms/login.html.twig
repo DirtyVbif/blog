@@ -26,10 +26,6 @@
                 required>
         </div>
         <footer class="form__footer form_login__footer">
-            <div class="{{ classlistToString(class, '', ['__field', '__field_submit']) }}">
-                <input type="submit" value="{{ t('Sign in') }}" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
-            </div>
-
             <div class="{{ classlistToString(class, '', ['__field', '__field_checkbox']) }}">
                 <label for="form-blog-article--status"
                     class="{{ classlistToString(class, '', ['__label', '__label_checkbox']) }}">
@@ -38,8 +34,13 @@
                         name="status"
                         class="{{ classlistToString(class, '', '__checkbox') }}"
                         value="1" checked>
-                        {{ t('Remember me') }}
+                        <span class="{{ classlistToString(class, '', '__checkbox-switcher') }}"></span>
+                        <span>{{ t('Remember me') }}</span>
                 </label>
+            </div>
+
+            <div class="{{ classlistToString(class, '', ['__field', '__field_submit']) }}">
+                <input type="submit" value="{{ t('Sign in') }}" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
             </div>
         </footer>
     </form>

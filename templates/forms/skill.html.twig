@@ -60,10 +60,6 @@
         </div>
 
         <footer class="{{ classlistToString(class, '', '__footer') }}">
-            <div class="{{ classlistToString(class, '', '__field') }} form_skill__field_submit">
-                <input type="submit" value="Save" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
-            </div>
-
             <div class="{{ classlistToString(class, '', ['__field', '__field_checkbox']) }}">
                 <label for="form-blog-article--status"
                     class="{{ classlistToString(class, '', ['__label', '__label_checkbox']) }}">
@@ -72,8 +68,13 @@
                         name="status"
                         class="{{ classlistToString(class, '', '__checkbox') }}"
                         value="1"{{ checked }}>
-                        Publish
+                        <span class="{{ classlistToString(class, '', '__checkbox-switcher') }}"></span>
+                        <span>Publish</span>
                 </label>
+            </div>
+
+            <div class="{{ classlistToString(class, '', '__field') }} form_skill__field_submit">
+                <input type="submit" value="Save" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
             </div>
         </footer>
     </form>
