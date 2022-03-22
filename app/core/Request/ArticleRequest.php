@@ -9,55 +9,58 @@ class ArticleRequest extends RequestPrototype
     protected const ACCESS_LEVEL = 4;
     protected const CSRF_SKIP = true;
 
-    #[RequestPropertyLabelAttribute('Article title')]
-    #[Validators\Type('string')]
-    #[Validators\StringLength(256)]
-    #[Validators\Required(true)]
-    protected string $title;
-    
-    #[RequestPropertyLabelAttribute('Alias path')]
-    #[Preproccessors\ArticleAlias]
-    #[Validators\Type('string')]
-    #[Validators\Pattern('/[\w\-]*/')]
-    #[Validators\StringLength(256)]
-    protected string $alias;
-
-    #[RequestPropertyLabelAttribute('Image preview src link')]
-    #[Preproccessors\DefaultValue(Article::DEFAULT_PREVIEW_SRC)]
-    #[Validators\Type('string')]
-    #[Validators\StringLength(256)]
-    protected string $preview_src;
-
-    #[RequestPropertyLabelAttribute('Image alt text')]
-    #[Preproccessors\DefaultValue(Article::DEFAULT_PREVIEW_ALT)]
-    #[Validators\Type('string')]
-    #[Validators\StringLength(256)]
-    protected string $preview_alt;
-
-    #[RequestPropertyLabelAttribute('Summary')]
-    #[Validators\Type('string')]
-    #[Validators\StringLength(512)]
-    #[Validators\Required(true)]
-    #[Formatters\PlainText]
-    protected string $summary;
-
-    #[RequestPropertyLabelAttribute('Article body')]
-    #[Validators\Type('string')]
-    #[Validators\Required(true)]
-    #[Formatters\HtmlText(
-        html_strategy: Formatters\HtmlText::STRATEGY_FULL,
-        allow_attributes: true
-    )]
-    protected string $body;
-
-    #[RequestPropertyLabelAttribute('Author')]
-    #[Preproccessors\DefaultValue(Article::DEFAULT_AUTHOR)]
-    #[Validators\Type('string')]
-    #[Validators\StringLength(48)]
-    protected string $author;
-
-    #[RequestPropertyLabelAttribute('Publishing status')]
-    #[Preproccessors\DefaultValue(0)]
-    #[Validators\Type('int')]
-    protected string $status;
+    public function rules(): array
+    {
+        return [
+            'title' => [
+                '#label' => 'Article label',
+                'validator:type' => 'string',
+                'validator:strlenmax' => 256,
+                'validator:required' => true
+            ],
+            'alias' => [
+                '#label' => 'Aliased path',
+                'preprocessor:article-alias' => 'title',
+                'validator:type' => 'string',
+                'validator:strlenmax' => 256,
+                'validator:pattern' => '/[\w\-]*/'
+            ],
+            'preview_src' => [
+                '#label' => 'Image preview src link',
+                'preprocessor:default-value' => Article::DEFAULT_PREVIEW_SRC,
+                'validator:type' => 'string',
+                'validator:strlenmax' => 256
+            ],
+            'preview_alt' => [
+                '#label' => 'Image alt text',
+                'preprocessor:default-value' => Article::DEFAULT_PREVIEW_ALT,
+                'validator:type' => 'string',
+                'validator:strlenmax' => 256
+            ],
+            'summary' => [
+                '#label' => 'Summary',
+                'validator:type' => 'string',
+                'validator:strlenmax' => 512,
+                'validator:required' => true,
+                'formatter:plain-text'
+            ],
+            'body' => [
+                '#label' => 'Article body',
+                'validator:type' => 'string',
+                'validator:required' => true,
+                'formatter:html' => 'full'
+            ],
+            'author' => [
+                '#label' => 'Article author',
+                'preprocessor:default-value' => Article::DEFAULT_AUTHOR,
+                'validator:type' => 'string',
+                'validator:strlenmax' => 48
+            ],
+            'status' => [
+                '#label' => 'Publishing status',
+                'preprocessor:default-value' => 0,
+                'validator:type' => 'int'
+            ]
+        ];
+    }
 }

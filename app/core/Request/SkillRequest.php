@@ -7,27 +7,38 @@ class SkillRequest extends RequestPrototype
     protected const ACCESS_LEVEL = 4;
     protected const CSRF_SKIP = true;
 
-    #[RequestPropertyLabelAttribute('Skill title')]
-    #[Validators\Type('string')]
-    #[Validators\StringLength(256)]
-    #[Validators\Required(true)]
-    protected string $title;
-
-    #[RequestPropertyLabelAttribute('Skill icon src link')]
-    #[Validators\Type('string')]
-    #[Validators\StringLength(256)]
-    #[Validators\Required(true)]
-    protected string $icon_src;
-
-    #[RequestPropertyLabelAttribute('Skill icon alt text')]
-    #[Validators\Type('string')]
-    #[Validators\StringLength(256)]
-    #[Validators\Required(true)]
-    protected string $icon_alt;
-
-    #[RequestPropertyLabelAttribute('Message')]
-    #[Validators\Type('string')]
-    #[Validators\Required(true)]
-    #[Formatters\HtmlText(Formatters\HtmlText::STRATEGY_FULL, true)]
-    protected string $body;
+    public function rules(): array
+    {
+        return [
+            'title' => [
+                '#label' => 'Skill label',
+                'validator:type' => 'string',
+                'validator:strlenmax' => 256,
+                'validator:required' => true
+            ],
+            'icon_src' => [
+                '#label' => 'Skill icon src link',
+                'validator:type' => 'string',
+                'validator:strlenmax' => 256,
+                'validator:required' => true
+            ],
+            'icon_alt' => [
+                '#label' => 'Skill icon alt text',
+                'validator:type' => 'string',
+                'validator:strlenmax' => 256,
+                'validator:required' => true
+            ],
+            'body' => [
+                '#label' => 'Skill body',
+                'validator:type' => 'string',
+                'validator:required' => true,
+                'formatter:html' => 'full'
+            ],
+            'status' => [
+                '#label' => 'Publishing status',
+                'preprocessor:default-value' => 0,
+                'validator:type' => 'int'
+            ]
+        ];
+    }
 }

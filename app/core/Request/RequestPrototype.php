@@ -4,8 +4,6 @@ namespace Blog\Request;
 
 use Blog\Modules\CSRF\Token;
 use Blog\Client\User;
-use ReflectionClass;
-use ReflectionProperty;
 
 /**
  * Each object remembers all provided values into session container and values must be cleared manualy.
@@ -13,7 +11,7 @@ use ReflectionProperty;
  * If request wouldn't be valid then form keeps filled values from session container.
  * To clear remembered values must be called @method complete() manualy.
  */
-class RequestPrototype
+abstract class RequestPrototype
 {
     public const SESSID = 'last-request-data';
     public const EMAIL_PATTERN = '/^[\w\-\.]+@[\w\-^_]+\.[a-z]{2,}$/i';
@@ -24,9 +22,8 @@ class RequestPrototype
     protected array $_errors = [];
     protected array $_validated_fields;
     protected bool $_validated;
-    protected ReflectionClass $_reflection;
-    /** @var ReflectionProperty[] $_reflection_properties */
-    protected array $_reflection_properties;
+
+    abstract function rules(): array;
     
     public function __construct(
         protected array $_data = []
@@ -117,16 +114,15 @@ class RequestPrototype
             return $this;
         }
         // set pre-validations status as TRUE
-        // if validation will be failed status will be changed to FALSE
         $this->_is_valid = true;
         // validate request CSRF-token
         if ($this->validateCsrfToken()) {
-            // preproccess request data values
-            $this->preproccess();
+            // preprocess request data values
+            $this->preprocessFields();
             // validate request data value
-            $this->validateAttributes();
+            $this->validateFields();
             // format request validated values
-            $this->postFormattersAttributes();
+            $this->formatFields();
         }
         // output validation errors
         $this->outputErrors();
@@ -135,7 +131,11 @@ class RequestPrototype
 
     protected function validateCsrfToken(): bool
     {
-        if (static::CSRF_SKIP || user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN) || user()->hasMasterIp()) {
+        if (
+            static::CSRF_SKIP
+            || user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)
+            || user()->hasMasterIp()
+        ) {
             return true;
         } else if (
             !isset($this->_data[Token::FORM_ID])
@@ -150,40 +150,46 @@ class RequestPrototype
         return true;
     }
 
-    protected function preproccess(): void
+    protected function parseAttribute(&$attr_key, &$attr_value, string $class): ?string
     {
-        foreach ($this->reflectionProperties() as $field_name => $property) {
-            $attributes = $property->getAttributes(
-                Preproccessors\PreproccessorInterface::class,
-                \ReflectionAttribute::IS_INSTANCEOF
-            );
-            foreach ($attributes as $attribute) {
-                /** @var Preproccessors\PreproccessorInterface $preproccessor */
-                $preproccessor = $attribute->newInstance();
-                $this->_data[$field_name] = $preproccessor->format($field_name, $this);
-            }
+        $pattern = '/^(' . $class . '\:+)([a-z][\w\-]+)/i';
+        if (!preg_match($pattern, $attr_key) && !preg_match($pattern, $attr_value)) {
+            return null;
+        } else if (is_numeric($attr_key)) {
+            $attr_key = $attr_value;
+            $attr_value = null;
         }
-        return;
+        return preg_replace($pattern, '$2', $attr_key);
     }
 
-    protected function validateAttributes(): void
+    protected function preprocessFields(): void
     {
-        foreach ($this->reflectionProperties() as $field_name => $property) {
-            $attributes = $property->getAttributes(
-                Validators\ValidatorInterface::class,
-                \ReflectionAttribute::IS_INSTANCEOF
-            );
-            if (empty($attributes)) {
-                continue;
-            } else if (!isset($this->_errors[$field_name])) {
+        foreach ($this->rules() as $field_name => $rules) {
+            foreach ($rules as $key => $argument) {
+                if ($method = $this->parseAttribute($key, $argument, 'preprocessor')) {
+                    $this->_data[$field_name] = $argument ?
+                        RequestPreprocessor::{$method}($argument, $field_name, $this)
+                        : RequestPreprocessor::{$method}($field_name, $this);
+                }
+            }
+        }
+    }
+
+    protected function validateFields(): void
+    {
+        foreach ($this->rules() as $field_name => $rules) {
+            if (!isset($this->_errors[$field_name])) {
                 $this->_errors[$field_name] = [];
             }
             $value = $this->raw($field_name);
-            foreach ($attributes as $attribute) {
-                /** @var Validators\ValidatorInterface $validator */
-                $validator = $attribute->newInstance();
-                if ($error = $validator->validate($value)) {
-                    $this->_errors[$field_name][] = $error;
+            foreach ($rules as $key => $argument) {
+                if ($method = $this->parseAttribute($key, $argument, 'validator')) {
+                    $error = $argument ?
+                        RequestValidator::{$method}($value, $argument)
+                        : RequestValidator::{$method}($value);
+                    if ($error) {
+                        array_push($this->_errors[$field_name], $error);
+                    }
                 }
             }
             if (empty($this->_errors[$field_name])) {
@@ -193,26 +199,22 @@ class RequestPrototype
                 $this->_is_valid = false;
             }
         }
-        return;
     }
 
-    protected function postFormattersAttributes(): void
+    protected function formatFields(): void
     {
         if (!$this->isValid()) {
             return;
         }
-        foreach ($this->reflectionProperties() as $field_name => $property) {
-            $attributes = $property->getAttributes(
-                Formatters\FormatterInterface::class,
-                \ReflectionAttribute::IS_INSTANCEOF
-            );
-            foreach ($attributes as $attribute) {
-                /** @var Formatters\FormatterInterface */
-                $formatter = $attribute->newInstance();
-                $this->{$field_name} = $formatter->format($this->{$field_name});
+        foreach ($this->rules() as $field_name => $rules) {
+            foreach ($rules as $key => $argument) {
+                if ($method = $this->parseAttribute($key, $argument, 'formatter')) {
+                    $this->{$field_name} = $argument ?
+                        RequestFormatter::{$method}($argument, $this->{$field_name})
+                        : RequestFormatter::{$method}($this->{$field_name});
+                }
             }
         }
-        return;
     }
 
     protected function outputErrors(): void
@@ -232,39 +234,8 @@ class RequestPrototype
 
     protected function getFieldName(string $name)
     {
-        if (!isset($this->{$name})) {
-            return $name;
-        }
-        $field = $this->reflection()->getProperty($name);
-        $attributes = $field->getAttributes(RequestPropertyLabelAttribute::class);
-        /** @var ?RequestPropertyLabelAttribute $label_attribute */
-        $label_attribute = ($attributes[0] ?? null)?->newInstance();
-        return $label_attribute?->get() ?? $name;
-    }
-
-    protected function reflection(): ReflectionClass
-    {
-        if (!isset($this->_reflection)) {
-            $this->_reflection = new ReflectionClass(static::class);
-        }
-        return $this->_reflection;
-    }
-
-    /**
-     * @return ReflectionProperty[]
-     */
-    protected function reflectionProperties(): array
-    {
-        if (!isset($this->_reflection_properties)) {
-            foreach ($this->reflection()->getProperties() as $property) {
-                if (empty($property->getAttributes())) {
-                    continue;
-                }
-                $field_name = $property->getName();
-                $this->_reflection_properties[$field_name] = $property;
-            }
-        }
-        return $this->_reflection_properties;
+        $rules = $this->rules();
+        return $rules[$name]['#label'] ?? $name;
     }
 
     protected function rememberValues(): void
