@@ -1,61 +1,75 @@
+{% set class = 'form form_skill' %}
+
 {{ wrapper.addClass('form-wrapper form-wrapper_skill').open() }}
-    <form action="{{ action }}" method="POST" {{ id('form-skill', true) }} class="form form_skill">
+    <form action="{{ action }}" method="POST" {{ id('form-skill', true) }} class="{{ class }}">
         <input type="hidden" name="type" value="{{ type }}">
 
-        <div class="form__field form_skill__field">
-            <label for="form-skill--title" class="form__field-label form_skill__field-label">Title:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-skill--title" class="{{ classlistToString(class, '', '__label') }}">Title:</label>
             <input
                 type="text"
                 {{ id('form-skill--title', true) }}
                 name="title"
                 max-length="256"
-                class="form__input form_skill__input"
+                class="{{ classlistToString(class, '', '__input') }}"
                 value="{{ title ? title : old('title') }}"
                 required>
         </div>
 
-        <div class="form__field form_skill__field">
-            <label for="form-skill--icon-src" class="form__field-label form_skill__field-label">Icon image</label>
-            <div class="form__input-line form_skill__input-line">
-                <label for="form-skill--icon-src" class="form__input-prefix form_skill__input-prefix">src:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-skill--icon-src" class="{{ classlistToString(class, '', '__label') }}">Icon image</label>
+            <div class="{{ classlistToString(class, '', '__line') }}">
+                <label for="form-skill--icon-src" class="{{ classlistToString(class, '', '__prefix') }}">src:</label>
                 <input
                     type="text"
                     {{ id('form-skill--icon-src', true) }}
                     name="icon_src"
                     max-length="256"
-                    class="form__input form_skill__input"
+                    class="{{ classlistToString(class, '', '__input') }}"
                     value="{{ icon_src ? icon_src : old('icon_src') }}"
                     required>
             </div>
-            <div class="form__input-line form_skill__input-line">
-                <label for="form-skill--icon-alt" class="form__input-prefix form_skill__input-prefix">alt:</label>
+            <div class="{{ classlistToString(class, '', '__line') }}">
+                <label for="form-skill--icon-alt" class="{{ classlistToString(class, '', '__prefix') }}">alt:</label>
                 <input
                     type="text"
                     {{ id('form-skill--icon-alt', true) }}
                     name="icon_alt"
                     max-length="256"
-                    class="form__input form_skill__input"
+                    class="{{ classlistToString(class, '', '__input') }}"
                     value="{{ icon_alt ? icon_alt : old('icon_alt') }}"
                     required>
             </div>
         </div>
         
-        <div class="form__field form_skill__field">
-            <label for="form-skill--body" class="form__field-label form_skill__field-label">Body:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-skill--body" class="{{ classlistToString(class, '', '__label') }}">Body:</label>
             <textarea
                 {{ id('form-skill--body', true) }}
                 name="body"
-                class="form__textarea form_skill__textarea form_skill__textarea_body"
+                class="{{ classlistToString(class, '', ['__textarea', '__textarea_body']) }}"
                 rows="8"
                 required>{{ body ? body : old('body') }}</textarea>
-            <div class="form__field-footer form_skill__field-footer">
+            <div class="{{ classlistToString(class, '', '__field-footer') }}">
                 {{ html_tags_autofill }}
             </div>
         </div>
 
-        <footer class="form__footer form_skill__footer">
-            <div class="form__field form_skill__field form_skill__field_submit">
-                <input type="submit" value="Save" class="btn btn_transparent form__submit form_skill__submit">
+        <footer class="{{ classlistToString(class, '', '__footer') }}">
+            <div class="{{ classlistToString(class, '', '__field') }} form_skill__field_submit">
+                <input type="submit" value="Save" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
+            </div>
+
+            <div class="{{ classlistToString(class, '', ['__field', '__field_checkbox']) }}">
+                <label for="form-blog-article--status"
+                    class="{{ classlistToString(class, '', ['__label', '__label_checkbox']) }}">
+                    <input type="checkbox"
+                        {{ id('form-blog-article--status', true) }}
+                        name="status"
+                        class="{{ classlistToString(class, '', '__checkbox') }}"
+                        value="1" checked>
+                        Publish
+                </label>
             </div>
         </footer>
     </form>

@@ -23,7 +23,7 @@
 
     // MODIFICATORS --------------------------------------------------->
     &_skill,
-    &_blog-article {
+    &_article {
         display: block;
     }
     // MODIFICATORS <---------------------------------------------------
@@ -45,7 +45,7 @@
         align-items: center;
     }
 
-    &__field-label {
+    &__label {
         width: 140px;
 
         @include vwMax($vwbp_s) {
@@ -58,7 +58,7 @@
         }
     }
 
-    &__field-anno {
+    &__annotation {
         width: 100%;
         font-size: 15px;
         color: $grey_strong;
@@ -66,6 +66,11 @@
         @include vwMax($vwbp_m) {
             font-size: 12px;
         }
+    }
+
+    &__prefix {
+        min-width: 45px;
+        margin-right: 5px;
     }
 
     &__textarea,
@@ -146,27 +151,18 @@
     }
     
     &_skill,
-    &_blog-article {
-        &__field {
-            &_checkbox {
-                margin-left: 1em;
-            }
-        }
+    &_article {
         
-        &__field-label {
+        &__label {
             &:not(&_checkbox) {
                 width: 100%;
             }
         }
 
-        &__input-line {
+        &__line {
             width: 100%;
             display: flex;
             align-items: center;
-        }
-
-        &__input-prefix {
-            width: 50px;
         }
 
         &__input {

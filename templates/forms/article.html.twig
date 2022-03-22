@@ -1,37 +1,39 @@
-{{ wrapper.addClass('form-wrapper form-wrapper_blog-article').open() }}
-    <form action="/blog" method="POST" {{ id('form-blog-article', true) }} class="form form_blog-article">
+{% set class = 'form form_article' %}
+
+{{ wrapper.addClass('form-wrapper form-wrapper_article').open() }}
+    <form action="/blog" method="POST" {{ id('form-blog-article', true) }} class="{{ class }}">
         <input type="hidden" name="type" value="blog-article-create">
 
-        <div class="form__field form_blog-article__field">
-            <label for="form-blog-article--title" class="form__field-label form_blog-article__field-label">Title:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-blog-article--title" class="{{ classlistToString(class, '', '__label') }}">Title:</label>
             <input
                 type="text"
                 {{ id('form-blog-article--title', true) }}
                 name="title"
                 max-length="256"
-                class="form__input form_blog-article__input"
+                class="{{ classlistToString(class, '', '__input') }}"
                 required{{ old('title', true) }}>
         </div>
 
-        <div class="form__field form_blog-article__field">
-            <label for="form-blog-article--alias" class="form__field-label form_blog-article__field-label">Alias path:</label>
-            <div class="form__input-line form_blog-article__input-line">
-                <span class="form__input-prefix"><code>/blog/</code></span>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-blog-article--alias" class="{{ classlistToString(class, '', '__label') }}">Alias path:</label>
+            <div class="{{ classlistToString(class, '', '__line') }}">
+                <span class="{{ classlistToString(class, '', '__prefix') }}"><code>/blog/</code></span>
                 <input
                     type="text"
                     {{ id('form-blog-article--alias', true) }}
                     name="alias"
                     max-length="256"
-                    class="form__input form_blog-article__input"
+                    class="{{ classlistToString(class, '', '__input') }}"
                     placeholder="You can specify alias manualy or it will be generated automatically"
                     {{ old('alias', true) }}>
             </div>
         </div>
 
-        <div class="form__field form_blog-article__field">
-            <label for="form-blog-article--preview-src" class="form__field-label form_blog-article__field-label">Preview image</label>
-            <div class="form__input-line form_blog-article__input-line">
-                <label for="form-blog-article--preview-src" class="form__input-prefix form_blog-article__input-prefix">
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-blog-article--preview-src" class="{{ classlistToString(class, '', '__label') }}">Preview image</label>
+            <div class="{{ classlistToString(class, '', '__line') }}">
+                <label for="form-blog-article--preview-src" class="{{ classlistToString(class, '', '__prefix') }}">
                     src:
                 </label>
                 <input
@@ -39,10 +41,10 @@
                     {{ id('form-blog-article--preview-src', true) }}
                     name="preview_src"
                     max-length="256"
-                    class="form__input form_blog-article__input"{{ old('preview_src', true) }}>
+                    class="{{ classlistToString(class, '', '__input') }}"{{ old('preview_src', true) }}>
             </div>            
-            <div class="form__input-line form_blog-article__input-line">
-                <label for="form-blog-article--preview-alt" class="form__input-prefix form_blog-article__input-prefix">
+            <div class="{{ classlistToString(class, '', '__line') }}">
+                <label for="form-blog-article--preview-alt" class="{{ classlistToString(class, '', '__prefix') }}">
                     alt:
                 </label>
                 <input
@@ -50,63 +52,62 @@
                     {{ id('form-blog-article--preview-alt', true) }}
                     name="preview_alt"
                     max-length="256"
-                    class="form__input form_blog-article__input"{{ old('preview_alt', true) }}>
+                    class="{{ classlistToString(class, '', '__input') }}"{{ old('preview_alt', true) }}>
             </div>
         </div>
         
-        <div class="form__field form_blog-article__field">
-            <label for="form-blog-article--summary" class="form__field-label form_blog-article__field-label">Article summary:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-blog-article--summary" class="{{ classlistToString(class, '', '__label') }}">Article summary:</label>
             <textarea
                 {{ id('form-blog-article--summary', true) }}
                 name="summary"
-                class="form__textarea form_blog-article__textarea form_blog-article__textarea_summary"
+                class="{{ classlistToString(class, '', ['__textarea', '__textarea_summary']) }}"
                 rows="3"
                 max-length="512"
                 required>{{ old('summary') }}</textarea>
         </div>
         
-        <div class="form__field form_blog-article__field">
-            <label for="form-blog-article--body" class="form__field-label form_blog-article__field-label">Body:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-blog-article--body" class="{{ classlistToString(class, '', '__label') }}">Body:</label>
             <textarea
                 {{ id('form-blog-article--body', true) }}
                 name="body"
-                class="form__textarea form_blog-article__textarea form_blog-article__textarea_body"
+                class="{{ classlistToString(class, '', ['__textarea', '__textarea_body']) }}"
                 rows="8"
                 required>{{ old('body') }}</textarea>
-            <div class="form__field-footer form_blog-article__field-footer">
+            <div class="{{ classlistToString(class, '', '__footer') }}">
                 {{ html_tags_autofill }}
             </div>
         </div>
 
-        <div class="form__field form_blog-article__field">
-            <label for="form-blog-article--author" class="form__field-label form_blog-article__field-label">Author:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-blog-article--author" class="{{ classlistToString(class, '', '__label') }}">Author:</label>
             <input
                 type="text"
                 {{ id('form-blog-article--author', true) }}
                 name="author"
                 max-length="50"
-                class="form__input form_blog-article__input"
+                class="{{ classlistToString(class, '', '__input') }}"
                 {% if old('author') %}
                     {{ old('author', true) }}
                 {% else %}value="{{ user_name }}"{% endif %}                
                 required>
         </div>
 
-        <footer class="form__footer form_blog-article__footer">
-            <div class="form__field form_blog-article__field form_blog-article__field_submit">
-                <input type="submit" value="Save" class="btn btn_transparent form__submit form_blog-article__submit">
+        <footer class="{{ classlistToString(class, '', '__footer') }}">
+            <div class="{{ classlistToString(class, '', ['__field', '__field_submit']) }}">
+                <input type="submit" value="Save" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
             </div>
 
-            <div class="form__field form__field_checkbox form_blog-article__field form_blog-article__field_checkbox">
-                <input
-                    type="checkbox"
-                    {{ id('form-blog-article--status', true) }}
-                    name="status"
-                    class="form__checkbox form_blog-article__checkbox"
-                    value="1" checked>
+            <div class="{{ classlistToString(class, '', ['__field', '__field_checkbox']) }}">
                 <label for="form-blog-article--status"
-                    class="form__field-label form__field-label_checkbox form_blog-article__field-label_checkbox">
-                    Publish
+                    class="{{ classlistToString(class, '', ['__label', '__label_checkbox']) }}">
+                    <input type="checkbox"
+                        {{ id('form-blog-article--status', true) }}
+                        name="status"
+                        class="{{ classlistToString(class, '', '__checkbox') }}"
+                        value="1" checked>
+                        Publish
                 </label>
             </div>
         </footer>
