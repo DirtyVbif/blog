@@ -10,7 +10,7 @@ use Blog\Modules\TemplateFacade\Form;
 
 class AdminController extends BaseController
 {
-    use Components\AdminControllerPostrequest;
+    use Components\AdminControllerPostRequest;
     
     public const ADMIN_ACCESS_LEVEL = User::ACCESS_LEVEL_ADMIN;
 
