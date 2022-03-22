@@ -3,7 +3,7 @@
         {{ csrf() }}
         <input type="hidden" name="type" value="feedback">
         <div class="form__field form_feedback__field">
-            <label for="form-feedback--name" class="form__field-label form_feedback__field-label">Ваше имя:</label>
+            <label for="form-feedback--name" class="form__label form_feedback__label">Ваше имя:</label>
             <input
                 type="text"
                 {{ id('form-feedback--name', true) }}
@@ -18,7 +18,7 @@
                 {% endif %}>
         </div>
         <div class="form__field form_feedback__field">
-            <label for="form-feedback--mail" class="form__field-label form_feedback__field-label">Ваш e-mail:</label>
+            <label for="form-feedback--mail" class="form__label form_feedback__label">Ваш e-mail:</label>
             <input
                 type="email"
                 {{ id('form-feedback--mail', true) }}
@@ -34,7 +34,7 @@
             <span class="form__field-anno form_feedback__field-anno">Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.</span>
         </div>
         <div class="form__field form_feedback__field">
-            <label for="form-feedback--subject" class="form__field-label form_feedback__field-label">Сообщение:</label>
+            <label for="form-feedback--subject" class="form__label form_feedback__label">Сообщение:</label>
             <textarea
                 {{ id('form-feedback--subject', true) }}
                 name="subject"

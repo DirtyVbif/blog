@@ -1,9 +1,10 @@
 <?php
 
-/**
- * Default application charset
- */
+/** @var string CHARSET Default application charset */
 const CHARSET = 'UTF-8';
+
+/** @var string PUBDIR absolute path to public (html, www) directory. Includes trailing slash `/` */
+const PUBDIR = ROOTDIR . 'public/';
 
 /**
  * Application config array
@@ -20,7 +21,8 @@ $__config['langcode'] = 'ru';
  * Webmaster contacts
  */
 $__config['webmaster'] = [
-    'mail' => 'info@mublog.site'
+    'mail' => 'info@mublog.site',
+    'ip' => '127.0.0.1'
 ];
 
 /**

@@ -1,40 +1,46 @@
+{% set class = 'form form_login' %}
+
 {{ wrapper.addClass('form-wrapper form-wrapper_login').open() }}
-    <form action="/user" method="POST" {{ id('form-login', true) }} class="form form_login">
+    <form action="/user" method="POST" {{ id('form-login', true) }} class="{{ class }}">
         {{ csrf() }}
         <input type="hidden" name="type" value="login">
-        <div class="form__field form_login__field">
-            <label for="form-login--mail" class="form__field-label form_login__field-label">Логин:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-login--mail" class="{{ classlistToString(class, '', '__label') }}">Логин:</label>
             <input
                 type="email"
                 {{ id('form-login--mail', true) }}
                 name="mail"
                 max-length="256"
-                class="form__input form_login__input"
+                class="{{ classlistToString(class, '', '__input') }}"
                 required>
         </div>
-        <div class="form__field form_login__field">
-            <label for="form-login--password" class="form__field-label form_login__field-label">Пароль:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-login--password" class="{{ classlistToString(class, '', '__label') }}">Пароль:</label>
             <input
                 type="password"
                 {{ id('form-login--password', true) }}
                 name="password"
                 min-length="8"
                 max-length="40"
-                class="form__input form_login__input"
+                class="{{ classlistToString(class, '', '__input') }}"
                 required>
         </div>
         <footer class="form__footer form_login__footer">
-            <div class="form__field form_login__field form_login__field_submit">
-                <input type="submit" value="Войти" class="btn btn_transparent form__submit form_login__submit">
+            <div class="{{ classlistToString(class, '', ['__field', '__field_checkbox']) }}">
+                <label for="form-blog-article--status"
+                    class="{{ classlistToString(class, '', ['__label', '__label_checkbox']) }}">
+                    <input type="checkbox"
+                        {{ id('form-blog-article--status', true) }}
+                        name="status"
+                        class="{{ classlistToString(class, '', '__checkbox') }}"
+                        value="1" checked>
+                        <span class="{{ classlistToString(class, '', '__checkbox-switcher') }}"></span>
+                        <span>{{ t('Remember me') }}</span>
+                </label>
             </div>
 
-            <div class="form__field form__field_checkbox form_login__field form_login__field_checkbox">
-                <input
-                    type="checkbox"
-                    {{ id('form-login--remember', true) }}
-                    name="remember_me"
-                    class="form__checkbox form_login__checkbox">
-                <label for="form-login--remember" class="form__field-label form__field-label_checkbox form_login__field-label">Запомнить меня</label>
+            <div class="{{ classlistToString(class, '', ['__field', '__field_submit']) }}">
+                <input type="submit" value="{{ t('Sign in') }}" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
             </div>
         </footer>
     </form>

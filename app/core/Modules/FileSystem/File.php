@@ -5,9 +5,10 @@ namespace Blog\Modules\FileSystem;
 class File
 {
     protected const LOGID = 'Filesystem';
-    protected const DEFAULT_FILE_PERMISIONS = 0644;
+    protected const DEFAULT_FILE_PERMISSIONS = 0644;
 
     protected string $dir;
+    protected Folder $folder;
     protected string $name;
     protected string $extension;
     protected string $content;
@@ -21,12 +22,11 @@ class File
      */
     protected $handle;
 
-    public function __construct(string $name, string $directory = \ROOTDIR, ?string $extension = null)
+    public function __construct(string $name, ?string $directory = null, ?string $extension = null)
     {
-        $this
-            ->name($name)
-            ->dir($directory)
-            ->extension($extension);
+        $this->dir($directory);
+        $this->extension($extension);
+        $this->name($name);
         $this->checkExistingFile();
         return $this;
     }
@@ -44,6 +44,20 @@ class File
     {
         if (!$name) {
             return $this->name ?? null;
+        }
+        if (preg_match('/(\\\|\/)+/', $name)) {
+            $name = str_replace('\\', '/', $name);
+            $parts = preg_split('/(\/)+/', $name);
+            foreach ($parts as $i => $part) {
+                if (!preg_replace('/\s+/', '', $part)) {
+                    unset($parts[$i]);
+                }
+            }
+            $name = array_pop($parts);
+            if (!empty($parts)) {
+                $directory = implode('/', $parts);
+                $this->dir($directory);
+            }
         }
         $this->name = $name;
         return $this;
@@ -75,9 +89,11 @@ class File
         if (is_null($directory)) {
             return $this->dir ?? null;
         } else if (!$directory) {
-            $directory = '.';
+            $directory = '';
         }
-        $this->dir = strSuffix($directory, '/', true);
+        $directory = str_replace('\\', '/', $directory);
+        $this->folder = new Folder($directory);
+        $this->dir = $this->folder->path();
         return $this;
     }
 
@@ -119,9 +135,12 @@ class File
     public function save(): self
     {
         $file = $this->filename();
-        $this->handle = fopen($file, 'w');
+        if (!file_exists($this->dir())) {
+            $this->folder->create();
+        }
+        $this->handle = fopen($file, 'w+');
         if (!$this->handle) {
-            msgr()->debug("Can't open/create \"{$file}\" file.");
+            pre("Can't open/create \"{$file}\" file.");
         } else {
             fwrite($this->handle, $this->content(read: false));
             if ($this->exists = fclose($this->handle)) {
@@ -129,7 +148,7 @@ class File
                 $this->rewrited = false;
                 $this->real_content = $this->content();
             } else {
-                msgr()->debug("Failed to save file \"{$file}\"", $this->handle);
+                pre("Failed to save file \"{$file}\"", $this->handle);
             }
         }
         return $this;
@@ -173,7 +192,7 @@ class File
     public function permissions(?int $permissions = null): self|int
     {
         if (is_null($permissions)) {
-            return $this->permissions ?? self::DEFAULT_FILE_PERMISIONS;
+            return $this->permissions ?? self::DEFAULT_FILE_PERMISSIONS;
         }
         $this->permissions = $permissions;
         return $this;
@@ -182,7 +201,7 @@ class File
     /**
      * Decode current content and return as array or object
      */
-    public function json_decode(bool $associative = true): array|object
+    public function json_decode(bool $associative = true): array|object|null
     {
         return json_decode($this->content(), $associative);
     }

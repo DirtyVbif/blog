@@ -137,7 +137,7 @@ function strpws(int $count): string
 function ffstr(string &...$args): void
 {
     foreach ($args as &$arg) {
-        if (preg_match('/^' . strRegexQuote(ROOTDIR) . '/', $arg)) {
+        if (preg_match('/^' . strRegexQuote(ROOTDIR) . '/i', $arg)) {
             continue;
         }
         $arg = preg_replace(

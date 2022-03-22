@@ -41,6 +41,8 @@
 '#403 Access denied': '#403 Доступ закрыт'
 'Error': 'Ошибка'
 'sitemap': 'карта сайта'
+'Remember me': 'Запомнить'
+'Sign in': 'Войти'
 
 'Field `@field_name` is required.': 'Поле `@field_name` обязательно для заполнения.'
 'Field `@field_name` length must be lesser than @n symbols.': 'Содержимое поля `@field_name` должно быть не более @n символов.'

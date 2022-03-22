@@ -21,5 +21,6 @@ public/sitemap.xml
 public/js
 public/css
 
-# some temporary files
+# development files
 test/
+update.php

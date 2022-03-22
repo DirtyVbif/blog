@@ -30,18 +30,12 @@ trait SetterAndGetter
         if (is_null($name)) {
             if (
                 $use_this
-                && (
-                    $rewrite
-                    || (!$rewrite && !isset($this->$var_name))
-                )
+                && ($rewrite || !isset($this->$var_name))
             ) {
                 $this->$var_name = $value;
             } else if (
                 !$use_this
-                && (
-                    $rewrite
-                    || (!isset($GLOBALS[$var_name]) && !$rewrite)
-                )
+                && ($rewrite || !isset($GLOBALS[$var_name]))
             ) {
                 $GLOBALS[$var_name] = $value;
             }
@@ -56,10 +50,10 @@ trait SetterAndGetter
                 }
                 $this->$var_name[$key] = setamdv($k, $this->$var_name[$key] ?? null, $value, $rewrite);
             } else {
-                if (!is_array($GLOBALS[$var_name]) && !$rewrite) {
+                if (!is_array($GLOBALS[$var_name] ?? null) && !$rewrite) {
                     return $this;
-                } else if (!is_array($GLOBALS[$var_name])) {
-                    $GLOBALS[$var_name] = [0 => $GLOBALS[$var_name]];
+                } else if (!is_array($GLOBALS[$var_name] ?? null)) {
+                    $GLOBALS[$var_name] = isset($GLOBALS[$var_name]) ? [0 => $GLOBALS[$var_name]] : [];
                 }
                 $GLOBALS[$var_name][$key] = setamdv($k, $GLOBALS[$var_name][$key] ?? null, $value, $rewrite);
             }

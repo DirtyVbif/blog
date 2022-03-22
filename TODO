@@ -44,10 +44,10 @@
     v Refactor Request::class to use Factory::pattern and Prototype::pattern;
 [ ] Refactor project for SOLID princip;
 [v] Add system log for webmaster;
-[ ] Refactor Database\Bridge::class for Adapter pattern
+[v] Refactor Database\Bridge::class for Adapter pattern
 [ ] Add events log for status messages and errors
 [ ] Convert TemplateFacade\Form::class to Factory::pattern and Prototype::pattern with Field::class objects for each field;
-[ ] Rebuild Database\Brige::transactions to use PDO::transactions;
+[v] Rebuild Database\Brige::transactions to use PDO::transactions;
 [ ] Add rating for articles;
 [ ] Add views for articles;
 [ ] Add image entity and use it in article;

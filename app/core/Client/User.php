@@ -300,6 +300,11 @@ class User
         return $_SERVER['REMOTE_ADDR'];
     }
 
+    public function hasMasterIp(): bool
+    {
+        return $this->ip() === app()->config('webmaster')->ip;
+    }
+
     public function mail(): ?string
     {
         return session()->get(User::SESSUID . '/udata/mail');

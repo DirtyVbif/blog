@@ -20,7 +20,7 @@ function t(string $text, array $variables = []): string
  */
 function f(
     string $name,
-    string $directory = ROOTDIR,
+    ?string $directory = null,
     ?string $extension = null,
     int $permissions = 0644
 ): \Blog\Modules\FileSystem\File {

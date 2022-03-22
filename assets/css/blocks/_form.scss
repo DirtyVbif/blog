@@ -23,7 +23,7 @@
 
     // MODIFICATORS --------------------------------------------------->
     &_skill,
-    &_blog-article {
+    &_article {
         display: block;
     }
     // MODIFICATORS <---------------------------------------------------
@@ -45,7 +45,7 @@
         align-items: center;
     }
 
-    &__field-label {
+    &__label {
         width: 140px;
 
         @include vwMax($vwbp_s) {
@@ -54,11 +54,21 @@
 
         &_checkbox {
             width: auto;
-            margin-left: 1em;
+            margin-right: 2em;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            transition: $transition;
+
+            &:hover {
+                color: $btn_blue_hover;
+            }
         }
     }
 
-    &__field-anno {
+    &__annotation {
         width: 100%;
         font-size: 15px;
         color: $grey_strong;
@@ -66,6 +76,11 @@
         @include vwMax($vwbp_m) {
             font-size: 12px;
         }
+    }
+
+    &__prefix {
+        min-width: 45px;
+        margin-right: 5px;
     }
 
     &__textarea,
@@ -111,10 +126,62 @@
     &__submit {
         outline: none;
         font: inherit;
+        font-size: 0.8em;
+        text-transform: uppercase;
         &:focus {
             border-color: $link_hover;
         }
     }
+
+    &__checkbox {
+        visibility: hidden;
+        position: absolute;
+        z-index: -999;
+        left: -9999px;
+    }
+
+    &__checkbox-switcher {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        border-radius: 12px;
+        box-shadow: 0 0 4px $grey_hard inset;
+        background-color: transparent;
+        transition: $transition;
+        margin-right: 0.5em;
+        flex-shrink: 0;
+
+        &::after {
+            content: "";
+            display: block;
+            position: absolute;
+            background-color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            left: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: $transition;
+        }
+    }
+
+    &__label_checkbox:hover &__checkbox-switcher {
+        background-color: $grey_light;
+    }
+
+    &__checkbox:checked ~ &__checkbox-switcher {
+        background-color: $blue_light;
+
+        &::after {
+            left: 21px;
+        }
+    }
+
+    &__label_checkbox:hover &__checkbox:checked ~ &__checkbox-switcher {
+        background-color: $blue_bright;
+    }
+
     // ELEMENTS <-------------------------------------------------------
 
     // MODIFICATORS --------------------------------------------------->
@@ -146,27 +213,18 @@
     }
     
     &_skill,
-    &_blog-article {
-        &__field {
-            &_checkbox {
-                margin-left: 1em;
-            }
-        }
+    &_article {
         
-        &__field-label {
+        &__label {
             &:not(&_checkbox) {
                 width: 100%;
             }
         }
 
-        &__input-line {
+        &__line {
             width: 100%;
             display: flex;
             align-items: center;
-        }
-
-        &__input-prefix {
-            width: 50px;
         }
 
         &__input {

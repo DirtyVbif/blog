@@ -1,18 +1,20 @@
+{% set class = 'form form_comment' %}
+
 {{ wrapper.addClass('section section_comment-form form-wrapper').open() }}
     <h2 class="section__header section_comment-form__header">Оставьте свой комментарий</h2>
-    <form action="{{ link('blog').raw() }}" method="POST" {{ id('form-comment', true) }} class="form form_comment">
+    <form action="{{ link('blog').raw() }}" method="POST" {{ id('form-comment', true) }} class="{{ class }}">
         {{ csrf() }}
         <input type="hidden" name="type" value="comment-add">
         <input type="hidden" name="parent_id" value="{{ parent_id }}">
         <input type="hidden" name="entity_id" value="{{ entity_id }}">
-        <div class="form__field form_comment__field">
-            <label for="form-comment--name" class="form__field-label form_comment__field-label">Ваше имя:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-comment--name" class="{{ classlistToString(class, '', '__label') }}">Ваше имя:</label>
             <input
                 type="text"
                 {{ id('form-comment--name', true) }}
                 name="name"
                 max-length="60"
-                class="form__input form_comment__input"
+                class="{{ classlistToString(class, '', '__input') }}"
                 required
                 {% if old('name') %}
                     {{ old('name', true) }}
@@ -20,33 +22,33 @@
                     {% if user_name %}value="{{ user_name }}"{% endif %}
                 {% endif %}>
         </div>
-        <div class="form__field form_comment__field">
-            <label for="form-comment--mail" class="form__field-label form_comment__field-label">Ваш e-mail:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-comment--mail" class="{{ classlistToString(class, '', '__label') }}">Ваш e-mail:</label>
             <input
                 type="email"
                 {{ id('form-comment--mail', true) }}
                 name="email"
                 max-length="256"
-                class="form__input form_comment__input"
+                class="{{ classlistToString(class, '', '__input') }}"
                 required
                 {% if old('email') %}
                     {{ old('email', true) }}
                 {% else %}
                     {% if user_mail %}value="{{ user_mail }}"{% endif %}
                 {% endif %}>
-            <span class="form__field-anno form_comment__field-anno">Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.</span>
+            <span class="{{ classlistToString(class, '', '__annotation') }}">Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.</span>
         </div>
-        <div class="form__field form_comment__field">
-            <label for="form-comment--subject" class="form__field-label form_comment__field-label">Комментарий:</label>
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <label for="form-comment--subject" class="{{ classlistToString(class, '', '__label') }}">Комментарий:</label>
             <textarea
                 {{ id('form-comment--subject', true) }}
                 name="subject"
-                class="form__textarea form_comment__textarea"
+                class="{{ classlistToString(class, '', '__textarea') }}"
                 rows="6"
                 required>{{ old('subject') }}</textarea>
         </div>
-        <div class="form__field form_comment__field">
-            <input type="submit" value="Отправить" class="btn btn_transparent form__submit form_comment__submit">
+        <div class="{{ classlistToString(class, '', '__field') }}">
+            <input type="submit" value="Отправить" class="btn btn_transparent {{ classlistToString(class, '', '__submit') }}">
         </div>
     </form>
 
