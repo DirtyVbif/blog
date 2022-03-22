@@ -10,8 +10,6 @@ define('COREDIR', APPDIR . 'core/');
 define('HELPERS', APPDIR . 'helpers/');
 /** @var string LIBDIR absolute path to libraries. Includes trailing slash `/` */
 define('LIBDIR', ROOTDIR . 'libraries/');
-/** @var string PUBDIR absolute path to public (html, www) directory. Includes trailing slash `/` */
-define('PUBDIR', ROOTDIR . 'public/');
 
 // include project helpers and utilities
 $helpers = [
