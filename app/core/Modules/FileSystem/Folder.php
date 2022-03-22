@@ -11,6 +11,7 @@ class Folder
     protected int $permissions;
 
     public function __construct(string $path) {
+        $path = str_replace('\\', '/', $path);
         $path = preg_replace('/^' . strRegexQuote(\ROOTDIR) . '/i', '', $path);
         $path = preg_replace('/^\.*(\\\|\/)+/', '', $path);
         $this->path = \ROOTDIR . strSuffix($path, '/');

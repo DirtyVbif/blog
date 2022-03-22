@@ -74,6 +74,7 @@ abstract class AbstractLibrary
     protected function verifyPublicSource(string $source_type): bool
     {
         $public_filename = $this->getSources()?->{$source_type}['public'];
+        $public_filename = PUBDIR . strPrefix($public_filename, '/', true);
         $public_file = f($public_filename);
         if (!$public_file->exists()) {
             return false;
@@ -90,8 +91,9 @@ abstract class AbstractLibrary
     {
         $get_method = 'get' . ucfirst(strtolower($source_type)) . 'SrcContent';
         if ($public_name = $this->getSources()?->{$source_type}['public'] ?? null) {
-            f($public_name, PUBDIR)
-                ->content($this->$get_method())
+            $public_name = PUBDIR . strPrefix($public_name, '/', true);
+            f($public_name)
+                ->content($this->{$get_method}())
                 ->save();
         }
         return;

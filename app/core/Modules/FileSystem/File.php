@@ -46,7 +46,8 @@ class File
             return $this->name ?? null;
         }
         if (preg_match('/(\\\|\/)+/', $name)) {
-            $parts = preg_split('/(\\\|\/)+/', $name);
+            $name = str_replace('\\', '/', $name);
+            $parts = preg_split('/(\/)+/', $name);
             foreach ($parts as $i => $part) {
                 if (!preg_replace('/\s+/', '', $part)) {
                     unset($parts[$i]);
@@ -90,6 +91,7 @@ class File
         } else if (!$directory) {
             $directory = '';
         }
+        $directory = str_replace('\\', '/', $directory);
         $this->folder = new Folder($directory);
         $this->dir = $this->folder->path();
         return $this;

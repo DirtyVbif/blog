@@ -1,7 +1,7 @@
 <?php
 
 /** @var string ROOTDIR absolute path to the project folder on server. Includes trailing slash `/` */
-define('ROOTDIR', preg_replace('/(\\\|\/)app$/i', '/', __DIR__));
+define('ROOTDIR', str_replace('\\', '/', preg_replace('/(\\\|\/)app$/i', '/', __DIR__)));
 /** @var string APPDIR absolute path to the php application root folder. Includes trailing slash `/` */
 define('APPDIR', ROOTDIR . 'app/');
 /** @var string COREDIR absolute path to the php application core folder. Includes trailing slash `/` */
