@@ -5,7 +5,7 @@ namespace Blog\Modules\FileSystem;
 class File
 {
     protected const LOGID = 'Filesystem';
-    protected const DEFAULT_FILE_PERMISSIONS = 644;
+    protected const DEFAULT_FILE_PERMISSIONS = 0644;
 
     protected string $dir;
     protected Folder $folder;
@@ -15,7 +15,7 @@ class File
     protected string $real_content;
     protected bool $exists = false;
     protected bool $rewrited = false;
-    protected int $permissions = 644;
+    protected int $permissions = 0644;
 
     /**
      * @var resource|false a file pointer resource on success, or false on error
@@ -90,17 +90,8 @@ class File
         } else if (!$directory) {
             $directory = '';
         }
-        $directory = preg_replace(
-            [
-                '/^' . strRegexQuote(\ROOTDIR) . '/i',
-                '/^\.+(\\\|\/)/'
-            ],
-            ['', ''],
-            $directory
-        );
-        $directory = strPrefix($directory, '/', true);
-        $this->dir = \ROOTDIR . strSuffix($directory, '/', true);
-        $this->folder = new Folder($this->dir);
+        $this->folder = new Folder($directory);
+        $this->dir = $this->folder->path();
         return $this;
     }
 
@@ -145,9 +136,9 @@ class File
         if (!file_exists($this->dir())) {
             $this->folder->create();
         }
-        $this->handle = fopen($file, 'w');
+        $this->handle = fopen($file, 'w+');
         if (!$this->handle) {
-            msgr()->debug("Can't open/create \"{$file}\" file.");
+            pre("Can't open/create \"{$file}\" file.");
         } else {
             fwrite($this->handle, $this->content(read: false));
             if ($this->exists = fclose($this->handle)) {
@@ -155,7 +146,7 @@ class File
                 $this->rewrited = false;
                 $this->real_content = $this->content();
             } else {
-                msgr()->debug("Failed to save file \"{$file}\"", $this->handle);
+                pre("Failed to save file \"{$file}\"", $this->handle);
             }
         }
         return $this;
