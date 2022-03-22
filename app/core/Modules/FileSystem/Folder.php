@@ -4,14 +4,16 @@ namespace Blog\Modules\FileSystem;
 
 class Folder
 {
-    protected const DEFAULT_PERMISSIONS = 755;
+    protected const DEFAULT_PERMISSIONS = 0755;
 
     protected string $path;
     protected bool $exists;
     protected int $permissions;
 
     public function __construct(string $path) {
-        $this->path = strSuffix($path, '/');
+        $path = preg_replace('/^' . strRegexQuote(\ROOTDIR) . '/i', '', $path);
+        $path = preg_replace('/^\.*(\\\|\/)+/', '', $path);
+        $this->path = \ROOTDIR . strSuffix($path, '/');
         $this->checkStatus();
     }
 
