@@ -96,7 +96,7 @@ class CacheSql
 
     protected function importData(string $json_data): array
     {
-        return json_decode($json_data, true);
+        return json_decode($json_data, true) ?? [];
     }
 
     protected function getData(): array
