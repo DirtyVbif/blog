@@ -201,7 +201,7 @@ class File
     /**
      * Decode current content and return as array or object
      */
-    public function json_decode(bool $associative = true): array|object
+    public function json_decode(bool $associative = true): array|object|null
     {
         return json_decode($this->content(), $associative);
     }
