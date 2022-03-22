@@ -4,24 +4,6 @@ use Blog\Request\RequestFactory;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Кусок кода для воспроизведения ошибки
-// возникающей при вызове метода ReflectionAttribute::newInstance()
-$request = RequestFactory::get('login', [
-    'mail' => 'admin@mublog.site',
-    'password' => 'AfzqufyrX24D',
-    'remember_me' => true
-]);
-try {
-    $request->validate();
-} catch (\Throwable $th) {
-    pre($e);
-    exit;
-}
-pre($request);
-exit;
-// Далее идёт код идентичный коду /home/d/dirtymike/mublog.site/public_html/index.php
-// необходимый для функционирования сайта
-
 app()->run();
 
 msgr()->warning(
