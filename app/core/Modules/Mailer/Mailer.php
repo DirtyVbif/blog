@@ -22,7 +22,7 @@ class Mailer extends AbstractModule implements ModuleInterface
     public function sendFeedback(FeedbackRequest $request): void
     {
         $timestamp = time();
-        $to = app()->manifest()->webmaster->email;
+        $to = app()->config('webmaster')->mail;
         $from = $request->email;
         $subject = 'Сообщение с сайта от пользователя ' . date('m.d H:i', $timestamp);
         $data = [

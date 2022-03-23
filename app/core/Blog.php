@@ -12,11 +12,29 @@ class Blog
         Components\Translator,
         Components\BlogModules;
 
+    private const PROTECTED_PROPERTIES = ['env'];
     private BaseController $controller;
 
     public function __toString()
     {
         return (string)$this->response()->render();
+    }
+
+    public function __serialize(): array
+    {
+        $array = [];
+        foreach ($this as $name => $value) {
+            if (in_array($name, self::PROTECTED_PROPERTIES)) {
+                continue;
+            }
+            $array[$name] = $value;
+        }
+        return $array;
+    }
+
+    public function __debugInfo()
+    {
+        return $this->__serialize();
     }
 
     public function run(): void
