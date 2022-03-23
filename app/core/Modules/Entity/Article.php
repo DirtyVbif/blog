@@ -5,6 +5,7 @@ namespace Blog\Modules\Entity;
 use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
+use Blog\Request\ArticleRequest;
 use Blog\Request\RequestPrototype;
 use JetBrains\PhpStorm\ExpectedValues;
 use Twig\Markup;
@@ -88,13 +89,21 @@ class Article extends EntityPrototype implements SitemapInterface
         return $self->url();
     }
 
+    public static function shortLink(int $id): string
+    {
+        return sprintf(self::URL_MASK, $id);
+    }
+
     /**
      * Check provided article alias for uniqueness
      */
-    public static function isAliasExists(string $alias): bool
+    public static function isAliasExists(string $alias, ?int $id = null): bool
     {
         $sql = sql_select(['eid'], self::ENTITY_DATA_TABLE);
         $sql->where(['alias' => $alias]);
+        if (!is_null($id)) {
+            $sql->where(['eid' => $id], not: true);
+        }
         $result = $sql->exe();
         return !empty($result);
     }
@@ -132,6 +141,34 @@ class Article extends EntityPrototype implements SitemapInterface
         }
         sql()->commit($rollback);
         return !$rollback;
+    }
+
+    /**
+     * @param ArticleRequest $request
+     */
+    public static function edit(int $id, RequestPrototype $request): bool
+    {
+        $sql = sql_update(table: self::ENTITY_DATA_TABLE);
+        $sql->set([
+            'title' => $request->title,
+            'alias' => $request->alias,
+            'preview_src' => $request->preview_src,
+            'preview_alt' => $request->preview_alt,
+            'summary' => $request->summary,
+            'body' => $request->body,
+            'author' => $request->author,
+            'status' => $request->status
+        ]);
+        $sql->where([self::ENTITY_PK => $id]);
+        $result = (bool)$sql->update();
+        if (!$result) {
+            pre([
+                'error' => 'there was no changes by following sql request:',
+                'SQL-QUERY' => htmlspecialchars($sql->raw('bind')),
+                'SQL STATEMENT' => $sql
+            ]);
+        }
+        return $result;
     }
 
     /**
@@ -275,7 +312,6 @@ class Article extends EntityPrototype implements SitemapInterface
             $this->data = $data[0];
             $this->id = $this->data['id'];
             $this->comments_data = $this->setLoadedCommentsData($data);
-            
         }
         $this->exists = !empty($this->data);
         $this->loaded = true;
