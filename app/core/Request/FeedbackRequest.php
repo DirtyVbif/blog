@@ -26,4 +26,9 @@ class FeedbackRequest extends RequestPrototype
             ]
         ];
     }
+
+    public function label(): string
+    {
+        return 'Feedback from ' . $this->raw('email');
+    }
 }

@@ -28,4 +28,9 @@ class LoginRequest extends RequestPrototype
             ]
         ];
     }
+
+    public function label(): string
+    {
+        return 'Login as ' . $this->raw('mail');
+    }
 }

@@ -24,6 +24,7 @@ abstract class RequestPrototype
     protected bool $_validated;
 
     abstract function rules(): array;
+    abstract function label(): string;
     
     public function __construct(
         protected array $_data = []
@@ -159,7 +160,8 @@ abstract class RequestPrototype
             $attr_key = $attr_value;
             $attr_value = null;
         }
-        return preg_replace($pattern, '$2', $attr_key);
+        $method = preg_replace($pattern, '$2', $attr_key);
+        return lcfirst(pascalCase($method));
     }
 
     protected function preprocessFields(): void
@@ -167,7 +169,7 @@ abstract class RequestPrototype
         foreach ($this->rules() as $field_name => $rules) {
             foreach ($rules as $key => $argument) {
                 if ($method = $this->parseAttribute($key, $argument, 'preprocessor')) {
-                    $this->_data[$field_name] = $argument ?
+                    $this->_data[$field_name] = !is_null($argument) ?
                         RequestPreprocessor::{$method}($argument, $field_name, $this)
                         : RequestPreprocessor::{$method}($field_name, $this);
                 }
@@ -184,7 +186,7 @@ abstract class RequestPrototype
             $value = $this->raw($field_name);
             foreach ($rules as $key => $argument) {
                 if ($method = $this->parseAttribute($key, $argument, 'validator')) {
-                    $error = $argument ?
+                    $error = !is_null($argument) ?
                         RequestValidator::{$method}($value, $argument)
                         : RequestValidator::{$method}($value);
                     if ($error) {
@@ -209,7 +211,7 @@ abstract class RequestPrototype
         foreach ($this->rules() as $field_name => $rules) {
             foreach ($rules as $key => $argument) {
                 if ($method = $this->parseAttribute($key, $argument, 'formatter')) {
-                    $this->{$field_name} = $argument ?
+                    $this->{$field_name} = !is_null($argument) ?
                         RequestFormatter::{$method}($argument, $this->{$field_name})
                         : RequestFormatter::{$method}($this->{$field_name});
                 }

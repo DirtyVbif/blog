@@ -35,4 +35,9 @@ class CommentRequest extends RequestPrototype
             ]
         ];
     }
+
+    public function label(): string
+    {
+        return 'Comment from ' . $this->raw('email');
+    }
 }

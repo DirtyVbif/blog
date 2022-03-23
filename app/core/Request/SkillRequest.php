@@ -32,7 +32,7 @@ class SkillRequest extends RequestPrototype
                 '#label' => 'Skill body',
                 'validator:type' => 'string',
                 'validator:required' => true,
-                'formatter:html' => 'full'
+                'formatter:html-text' => 'full'
             ],
             'status' => [
                 '#label' => 'Publishing status',
@@ -40,5 +40,10 @@ class SkillRequest extends RequestPrototype
                 'validator:type' => 'int'
             ]
         ];
+    }
+
+    public function label(): string
+    {
+        return $this->raw('title');
     }
 }
