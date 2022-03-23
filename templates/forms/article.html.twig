@@ -17,7 +17,7 @@
                 type="text"
                 {{ id('form-blog-article--title', true) }}
                 name="title"
-                max-length="256"
+                maxlength="256"
                 class="{{ classlistToString(class, '', '__input') }}"
                 value="{{- article ? article.get('title') : old('title') -}}"
                 required>
@@ -31,7 +31,7 @@
                     type="text"
                     {{ id('form-blog-article--alias', true) }}
                     name="alias"
-                    max-length="256"
+                    maxlength="256"
                     class="{{ classlistToString(class, '', '__input') }}"
                     placeholder="You can specify alias manualy or it will be generated automatically"
                     value="{{- article ? article.get('alias') : old('alias') -}}">
@@ -48,7 +48,7 @@
                     type="text"
                     {{ id('form-blog-article--preview-src', true) }}
                     name="preview_src"
-                    max-length="256"
+                    maxlength="256"
                     class="{{ classlistToString(class, '', '__input') }}"
                     value="{{- article ? article.get('preview_src') : old('preview_src') -}}">
             </div>            
@@ -60,7 +60,7 @@
                     type="text"
                     {{ id('form-blog-article--preview-alt', true) }}
                     name="preview_alt"
-                    max-length="256"
+                    maxlength="256"
                     class="{{ classlistToString(class, '', '__input') }}"
                     value="{{- article ? article.get('preview_alt') : old('preview_alt') -}}">
             </div>
@@ -73,7 +73,7 @@
                 name="summary"
                 class="{{ classlistToString(class, '', ['__textarea', '__textarea_summary']) }}"
                 rows="3"
-                max-length="512"
+                maxlength="512"
                 required>{{- article ? article.get('summary') : old('summary') -}}</textarea>
         </div>
         
@@ -104,7 +104,7 @@
                 type="text"
                 {{ id('form-blog-article--author', true) }}
                 name="author"
-                max-length="50"
+                maxlength="50"
                 class="{{ classlistToString(class, '', '__input') }}"
                 value="{{- author_name -}}"
                 required>

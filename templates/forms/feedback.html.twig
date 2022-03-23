@@ -8,7 +8,7 @@
                 type="text"
                 {{ id('form-feedback--name', true) }}
                 name="name"
-                max-length="60"
+                maxlength="60"
                 class="form__input form_feedback__input"
                 required
                 {% if old('name') %}
@@ -23,7 +23,7 @@
                 type="email"
                 {{ id('form-feedback--mail', true) }}
                 name="email"
-                max-length="256"
+                maxlength="256"
                 class="form__input form_feedback__input"
                 required
                 {% if old('email') %}

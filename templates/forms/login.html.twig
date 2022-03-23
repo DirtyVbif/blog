@@ -10,7 +10,7 @@
                 type="email"
                 {{ id('form-login--mail', true) }}
                 name="mail"
-                max-length="256"
+                maxlength="256"
                 class="{{ classlistToString(class, '', '__input') }}"
                 required>
         </div>
@@ -20,8 +20,8 @@
                 type="password"
                 {{ id('form-login--password', true) }}
                 name="password"
-                min-length="8"
-                max-length="40"
+                minlength="8"
+                maxlength="40"
                 class="{{ classlistToString(class, '', '__input') }}"
                 required>
         </div>
