@@ -3,6 +3,7 @@
 namespace Blog\Modules\Cache;
 
 use Blog\Client\User;
+use Blog\Mediators\AjaxResponse;
 use Blog\Modules\FileSystem\Folder;
 
 class CacheSystem implements \Blog\Components\AjaxModule
@@ -28,13 +29,13 @@ class CacheSystem implements \Blog\Components\AjaxModule
     /**
      * @return int status code
      */
-    public function clear(?string $cache_entity_name = null): array
+    public function clear(?string $cache_entity_name = null): AjaxResponse
     {
+        $response = new AjaxResponse('cache cleared');
         if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_MASTER)) {
-            return [
-                'status' => 403,
-                'output' => 'access denied'
-            ];
+            $response->setCode(403);
+            $response->setResponse('access denied');
+            return $response;
         }
         if (app()->config('twig')->config['cache'] ?? false) {
             $folder = new Folder(app()->twig()->getCache());
@@ -43,27 +44,18 @@ class CacheSystem implements \Blog\Components\AjaxModule
         foreach (app()->config()->cache as $name => $data) {
             $this->entity($name)->clear();
         }
-        return [
-            'status' => 200,
-            'output' => 'cache cleared'
-        ];
+        return $response;
     }
 
-    public function ajaxRequest(): array
+    public function ajaxRequest(): AjaxResponse
     {
-        $response = [
-            'output' => null,
-            'status' => 200
-        ];
+        $response = new AjaxResponse();
         $method = $_GET['fn'] ?? null;
         $key = $_GET['key'] ?? null;
         if (is_null($method) || !method_exists($this, $method)) {
-            $response['status'] = 404;
+            $response->setCode(404);
             return $response;
         }
-        $result = $this->$method($key);
-        $result['output'] ??= null;
-        $result['status'] ??= $response['status'];
-        return $result;
+        return $this->$method($key);
     }
 }

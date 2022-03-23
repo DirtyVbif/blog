@@ -3,11 +3,12 @@
 namespace Blog\Controller;
 
 use Blog\Components\AjaxModule;
+use Blog\Mediators\AjaxResponse;
 
 class AjaxController extends BaseController
 {
-    protected array $response;
-
+    protected AjaxResponse $response;
+    
     public function prepare(): void
     {
         $this->prepareResponse();
@@ -19,19 +20,22 @@ class AjaxController extends BaseController
         return;
     }
 
+    protected function response(): AjaxResponse
+    {
+        if (!isset($this->response)) {
+            $this->response = new AjaxResponse;
+        }
+        return $this->response;
+    }
+
     protected function prepareResponse(): void
     {
-        $this->response = [
-            'status' => 200,
-            'output' => null
-        ];
         $this->parseRequest();
     }
 
     protected function getResponse(): string
     {
-        $response = $this->response ?? null;
-        return json_encode($response);
+        return $this->response()->send();
     }
 
     protected function parseRequest(): void
@@ -40,13 +44,15 @@ class AjaxController extends BaseController
             $module_name = strtolower($module_name);
             if (method_exists(app(), $module_name) && (app()->$module_name() instanceof AjaxModule)) {
                 /** @var \Blog\Components\AjaxModule $module */
-                $module = app()->$module_name();
-                $this->response = $module->ajaxRequest();
+                $module = app()->{$module_name}();
+                /** @var \Blog\Mediators\AjaxResponse $response */
+                $response = $module->ajaxRequest();
+                $this->response()->set($response);
             } else {
-                $this->response['status'] = 404;
+                $this->response()->setCode(404);
             }
         } else {
-            $this->response['status'] = 404;
+            $this->response()->setCode(404);
         }
         return;
     }
@@ -59,7 +65,7 @@ class AjaxController extends BaseController
 
     protected function status(): int
     {
-        return $this->response['status'] ?? 200;
+        return $this->response()->getCode();
     }
 
     protected function isStatus400(): bool

@@ -4,6 +4,7 @@ namespace Blog\Client;
 
 use Blog\Components\AjaxModule;
 use Blog\Components\Singletone;
+use Blog\Mediators\AjaxResponse;
 
 class CookiesFacade implements AjaxModule
 {
@@ -58,18 +59,15 @@ class CookiesFacade implements AjaxModule
         return session()->get(self::COOKIESACCEPTED) ?? false;
     }
 
-    public function ajaxRequest(): array
+    public function ajaxRequest(): AjaxResponse
     {
-        $response = [
-            'status' => 200,
-            'output' => null
-        ];
+        $response = new AjaxResponse();
         if (($_POST['cookie-agreement'] ?? false) == 1) {
             $this->setCookiesAccepted();
-            $response['output'] = 'cookies accepted successfully';
+            $response->setResponse('cookies accepted successfully');
         } else {
-            $response['status'] = 400;
-            $response['output'] = 'Error 400. Bad request.';
+            $response->setCode(400);
+            $response->setResponse('Error 400. Bad request.');
         }
         return $response;
     }
