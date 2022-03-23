@@ -4,13 +4,13 @@ namespace Blog\Controller;
 
 use Blog\Client\User;
 use Blog\Modules\Entity\EntityFactory;
-use Blog\Modules\Entity\Skill;
 use Blog\Modules\Messenger\Logger;
-use Blog\Modules\TemplateFacade\Form;
 
 class AdminController extends BaseController
 {
-    use Components\AdminControllerPostRequest;
+    use Components\AdminControllerPostRequest,
+        Components\AdminControllerArticleRequest,
+        Components\AdminControllerSkillRequest;
     
     public const ADMIN_ACCESS_LEVEL = User::ACCESS_LEVEL_ADMIN;
 
@@ -35,21 +35,36 @@ class AdminController extends BaseController
             $this->status = 403;
             return false;
         }
-        $argument = app()->router()->arg(2);
-        $method = 'getRequest' . pascalCase($argument ?? '');
-        if (method_exists($this, $method)) {
-            return $this->$method();
-        } else if (!$argument) {
+        $type = app()->router()->arg(2);
+        $argument = app()->router()->arg(3);
+        $action = app()->router()->arg(4);
+        $method = null;
+        $result = false;
+        if (!$type) {
             $this->viewAdminPage();
             return true;
+        } else if ($argument && !is_numeric($argument)) {
+            $method = 'get' . pascalCase("request {$type} {$argument}");
+        } else if ($argument) {
+            $action ??= 'view';
+            $method = 'get' . pascalCase("request {$type} {$action}");
+        } else if ($type) {
+            $method = 'get' . pascalCase("request {$type}");
         }
-        $this->status = 404;
-        return false;
+        if ($method && method_exists($this, $method)) {
+            $result = $this->{$method}();
+        } else if ($action === 'delete') {
+            $result = $this->getRequestEntityDelete();
+        }
+        $this->status = $result ? $this->status : 404;
+        return $result;
     }
 
     protected function viewAdminPage(): void
     {
+        msgr()->warning('View for main administrative page is incomplete.');
         $this->getTitle()->set('Administrative page');
+        // TODO: complete view for main administrative page
         return;
     }
 
@@ -61,86 +76,10 @@ class AdminController extends BaseController
         return true;
     }
 
-    protected function getRequestSkill(): bool
+    protected function getRequestEntityDelete(): bool
     {
-        $argument = app()->router()->arg(3);
-        $result = false;
-        if ($argument === 'create') {
-            $result = $this->getRequestSkillCreate();
-        } else if (is_numeric($argument)) {
-            $action = app()->router()->arg(4) ?? 'view';
-            $method = 'get' . pascalCase('request skill' . $action);
-            $result = method_exists($this, $method) ? $this->{$method}($argument) : false;
-        }
-        if (!$result) {
-            $this->status = 404;
-        }
-        return $result;
-    }
-
-    protected function getRequestSkillForm(): Form
-    {
-        $form = new Form('skill');
-        /** @var \BlogLibrary\HtmlTagsAutofill\HtmlTagsAutofill $html_tags_autofill */
-        $html_tags_autofill = app()->library('html-tags-autofill');
-        $html_tags_autofill->use();
-        $form->tpl()->set('html_tags_autofill', $html_tags_autofill->getTemplate('form-skill--body'));
-        return $form;
-    }
-
-    protected function getRequestSkillCreate(): bool
-    {
-        $this->getTitle()->set('Создание нового материала типа &laquo;навык&raquo;');
-        $form = $this->getRequestSkillForm();
-        $form->tpl()->set('type', 'create');
-        $form->tpl()->set('action', '/admin/skill');
-        app()->page()->addContent($form);
-        return true;
-    }
-
-    protected function getRequestSkillView(int $id): bool
-    {
-        /** @var \Blog\Modules\Entity\Skill $skill */
-        $skill = EntityFactory::load($id, 'skill');
-        if (!$skill?->exists()) {
-            return false;
-        }
-        $skill->setViewMode(Skill::VIEW_MODE_FULL);
-        $this->getTitle()->set(
-            "View of entity #{$skill->id()} &laquo;" . $skill->get('title') . '&raquo;'
-        );
-        app()->page()->addContent($skill);
-        app()->page()->useCss('css/skills.min');
-        return true;
-    }
-
-    protected function getRequestSkillEdit(int $id): bool
-    {
-        /** @var \Blog\Modules\Entity\Skill $skill */
-        $skill = EntityFactory::load($id, 'skill');
-        if (!$skill?->exists()) {
-            return false;
-        }
-        $this->getTitle()->set(
-            "Редактирование материала типа &laquo;навык&raquo; - #{$skill->id()} " . $skill->get('title')
-        );
-        $form = $this->getRequestSkillForm();
-        $form->tpl()->set('type', 'create');
-        $form->tpl()->set('action', '/admin/skill');
-        $form->tpl()->set('title', $skill->get('title'));
-        $form->tpl()->set('icon_src', $skill->get('icon_src'));
-        $form->tpl()->set('icon_alt', $skill->get('icon_alt'));
-        $form->tpl()->set('body', $skill->get('body'));
-        $form->tpl()->set('status', $skill->get('status'));
-        $form->tpl()->set('id', $skill->id());
-        $form->tpl()->set('action', $skill->url());
-        $form->tpl()->set('type', 'edit');
-        app()->page()->addContent($form);
-        return true;
-    }
-
-    protected function getRequestSkillDelete(int $id): bool
-    {
+        /** @var int $id current entity id */
+        $id = app()->router()->arg(3);
         $result = EntityFactory::delete($id);
         if ($result) {
             $method = 'notice';

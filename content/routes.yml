@@ -16,19 +16,19 @@ blog_comments: {
   sitemap_changefreq: 'daily'
 }
 blog_article_create: {
-  url: '/blog/create',
+  url: '/admin/article/create',
   label: '+ article',
   access_level: 4,
   sitemap_exclude: true
 }
 blog_article_edit: {
-  url: '/blog/edit/{$id}',
+  url: '/admin/article/{$id}/edit',
   label: 'edit',
   access_level: 4,
   sitemap_exclude: true
 }
 blog_article_delete: {
-  url: '/blog/delete/{$id}',
+  url: '/admin/article/{$id}/delete',
   label: 'delete',
   access_level: 4,
   sitemap_exclude: true

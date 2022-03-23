@@ -1,13 +1,15 @@
 {% set class = 'form form_article' %}
-{% if status == 0 %}
+{% set checked = ' checked' %}
+{% if article and article.get('status') == 0 %}
     {% set checked = null %}
-{% else %}
-    {% set checked = ' checked' %}
+{% endif %}
+{% if article == null and old('status') == 0 %}
+    {% set checked = null %}
 {% endif %}
 
 {{ wrapper.addClass('form-wrapper form-wrapper_article').open() }}
-    <form action="/blog" method="POST" {{ id('form-blog-article', true) }} class="{{ class }}">
-        <input type="hidden" name="type" value="blog-article-create">
+    <form action="{{ form_action }}" method="POST" {{ id('form-blog-article', true) }} class="{{ class }}">
+        <input type="hidden" name="type" value="{{ form_type }}">
 
         <div class="{{ classlistToString(class, '', '__field') }}">
             <label for="form-blog-article--title" class="{{ classlistToString(class, '', '__label') }}">Title:</label>
@@ -17,7 +19,8 @@
                 name="title"
                 max-length="256"
                 class="{{ classlistToString(class, '', '__input') }}"
-                required{{ old('title', true) }}>
+                value="{{- article ? article.get('title') : old('title') -}}"
+                required>
         </div>
 
         <div class="{{ classlistToString(class, '', '__field') }}">
@@ -31,7 +34,7 @@
                     max-length="256"
                     class="{{ classlistToString(class, '', '__input') }}"
                     placeholder="You can specify alias manualy or it will be generated automatically"
-                    {{ old('alias', true) }}>
+                    value="{{- article ? article.get('alias') : old('alias') -}}">
             </div>
         </div>
 
@@ -46,7 +49,8 @@
                     {{ id('form-blog-article--preview-src', true) }}
                     name="preview_src"
                     max-length="256"
-                    class="{{ classlistToString(class, '', '__input') }}"{{ old('preview_src', true) }}>
+                    class="{{ classlistToString(class, '', '__input') }}"
+                    value="{{- article ? article.get('preview_src') : old('preview_src') -}}">
             </div>            
             <div class="{{ classlistToString(class, '', '__line') }}">
                 <label for="form-blog-article--preview-alt" class="{{ classlistToString(class, '', '__prefix') }}">
@@ -57,7 +61,8 @@
                     {{ id('form-blog-article--preview-alt', true) }}
                     name="preview_alt"
                     max-length="256"
-                    class="{{ classlistToString(class, '', '__input') }}"{{ old('preview_alt', true) }}>
+                    class="{{ classlistToString(class, '', '__input') }}"
+                    value="{{- article ? article.get('preview_alt') : old('preview_alt') -}}">
             </div>
         </div>
         
@@ -69,7 +74,7 @@
                 class="{{ classlistToString(class, '', ['__textarea', '__textarea_summary']) }}"
                 rows="3"
                 max-length="512"
-                required>{{ old('summary') }}</textarea>
+                required>{{- article ? article.get('summary') : old('summary') -}}</textarea>
         </div>
         
         <div class="{{ classlistToString(class, '', '__field') }}">
@@ -79,7 +84,7 @@
                 name="body"
                 class="{{ classlistToString(class, '', ['__textarea', '__textarea_body']) }}"
                 rows="8"
-                required>{{ old('body') }}</textarea>
+                required>{{- article ? article.get('body') : old('body') -}}</textarea>
             <div class="{{ classlistToString(class, '', '__footer') }}">
                 {{ html_tags_autofill }}
             </div>
@@ -87,15 +92,21 @@
 
         <div class="{{ classlistToString(class, '', '__field') }}">
             <label for="form-blog-article--author" class="{{ classlistToString(class, '', '__label') }}">Author:</label>
+            {% set author_name = user_name %}
+            {% if article and article.get('author') %}
+                {% set author_name = article.get('author') %}
+            {% else %}
+                {% if old('author') %}
+                    {% set author_name = old('author') %}
+                {% endif %}
+            {% endif %}            
             <input
                 type="text"
                 {{ id('form-blog-article--author', true) }}
                 name="author"
                 max-length="50"
                 class="{{ classlistToString(class, '', '__input') }}"
-                {% if old('author') %}
-                    {{ old('author', true) }}
-                {% else %}value="{{ user_name }}"{% endif %}                
+                value="{{- author_name -}}"
                 required>
         </div>
 
