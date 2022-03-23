@@ -7,7 +7,11 @@ use Blog\Modules\Entity\Article;
 
 class Sitemap
 {
-    protected const SRCPATH = 'app/core/Modules/Sitemap/src/';
+    protected static function getSelfPath(): string
+    {
+        $class = parseClassname(static::class);
+        return COREDIR . $class->namespace . '/';
+    }
 
     public static function generate(): void
     {
@@ -39,7 +43,7 @@ class Sitemap
             }
         }
         // generate sitemap.xml content from template
-        $loader = new \Twig\Loader\FilesystemLoader(ROOTDIR . self::SRCPATH);
+        $loader = new \Twig\Loader\FilesystemLoader(self::getSelfPath() . 'src/');
         $twig = new \Twig\Environment($loader, [
             'cache' => false,
         ]);
@@ -51,9 +55,16 @@ class Sitemap
             }
             $links[$i]['priority'] = number_format($link['priority'], 1);
         }
+        // generate sitemap file content from template
         $sitemap_content = $twig->render('sitemap.html.twig', ['items' => $links]);
-        $sitemap_content = preg_replace('/[\r\n\t]+|\>\s+\</', '><', $sitemap_content);
-        f('sitemap', '.', 'xml')->addContent($sitemap_content)->save();
+        // minify sitemap file content
+        $sitemap_content = preg_replace(
+            ['/[\r\n\t]+/', '/\>\s+/', '/\s+\</'],
+            ['', '>', '<'],
+            $sitemap_content
+        );
+        // save sitemap.xml file
+        f('sitemap', PUBDIR, 'xml')->addContent($sitemap_content)->save();
         return;
     }
 }
