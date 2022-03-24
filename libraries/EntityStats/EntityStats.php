@@ -39,7 +39,7 @@ class EntityStats extends \Blog\Modules\Library\AbstractLibrary
         $tpl->setAttr('data-entity-id', $entity_id);
         $tpl->setAttr('data-entity-type', $entity_type);
         if (user()->hasMasterIp() || user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
-            // $tpl->setAttr('data-entity-disable', 'views');
+            $tpl->setAttr('data-entity-disable', 'views');
         }
     }
 }

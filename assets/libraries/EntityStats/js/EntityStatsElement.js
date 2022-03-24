@@ -77,37 +77,30 @@ class EntityStatsElement
      */
     async makeRequest(parameters)
     {
-        let query_string = [];
-        for (const [name, value] of Object.entries(parameters)) {
-            if (name && value) {
-                query_string.push(name + '=' + value);
-            } else if (name) {
-                query_string.push(name);
-            } else if (value) {
-                query_string.push(value);
-            }
-        }
-        if (query_string.length < 1) {
-            return;
-        }
-        query_string.push('entity_id=' + this.id);
-        query_string.push('entity_type=' + this.type);
-        let url = '/ajax/entity?' + query_string.join('&');
-        await this._sendRequest(url);
-        return;
+        parameters.id = this.id;
+        parameters.type = this.type;
+        parameters.method = 'update';
+        return await this._sendRequest(parameters);
     }
 
-    async _sendRequest(url)
+    async _sendRequest(parameters)
     {
-        await fetch(url)
-            .then(response => response.json())
+        let result = false;
+        await fetch('/ajax/entity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(parameters)
+            }).then(response => response.json())
             .then(response => {
                 if (!response.status || response.status < 200 || response.status > 299) {
                     console.warn(response);
+                } else {
+                    result = true;
                 }
             })
             .catch(error => { console.warn(error); });
-
-        return;
+        return result;
     }
 }

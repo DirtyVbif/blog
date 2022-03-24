@@ -41,8 +41,7 @@ class EntityStatsViews
             return;
         }
         let parameters = {
-            fn: 'update',
-            key: 'views'
+            argument: 'views'
         };
         this._updateViewTime();
         this.ctl.makeRequest(parameters);

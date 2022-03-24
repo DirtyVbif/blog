@@ -162,6 +162,7 @@ class EntityStatsRating
             // console.log('already voted with same result');
             return;
         }
+        let vote_result = this.vote_result;
         this._lockVoting();
         if (increment > 0) {
             this.vote_result += increment;
@@ -171,8 +172,14 @@ class EntityStatsRating
             // console.log('voting down');
         }
         this._setVotingClass(this.vote_result);
-        await this._updateRating(increment);
-        localStorage.setItem(this.id, this.vote_result);
+        let result = await this._updateRating(increment);
+        if (result) {
+            // console.log('vote accepted');
+            localStorage.setItem(this.id, this.vote_result);
+        } else {
+            // console.log('vote declined');
+            this.vote_result = vote_result;
+        }
         this._completeVoting();
         return;
     }
@@ -182,14 +189,16 @@ class EntityStatsRating
      */
     async _updateRating(increment)
     {
-        this.count += increment;
-        this._setRatingNumber(this.count);
         let parameters = {
-            fn: 'update',
-            key: 'rating',
+            argument: 'rating',
             increment: increment
         };
-        await this.ctl.makeRequest(parameters);
+        let result = await this.ctl.makeRequest(parameters);
+        if (result) {
+            this.count += increment;
+            this._setRatingNumber(this.count);
+        }
+        return result;
     }
 
     _completeVoting()
