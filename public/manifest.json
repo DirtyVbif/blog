@@ -20,7 +20,8 @@
     "theme_color": "#f7f7f7",
     "background_color": "#f7f7f7",
     "display": "standalone",
-    "webmaster": {
+    "author": {
+        "name": "Michael Uspensky",
         "email": "funkybboy@mail.ru"
     }
 }
