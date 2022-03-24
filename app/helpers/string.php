@@ -172,7 +172,9 @@ function ffpath(string &...$args): void
 }
 
 /**
- * Convert input string into PascalCaseString
+ * Convert input string `example input string` into PascalCase `ExampleInputString`
+ * 
+ * All non-word and non-number symbols will be trimmed.
  */
 function pascalCase(string $string): string
 {
@@ -185,7 +187,20 @@ function pascalCase(string $string): string
 }
 
 /**
- * Formats any string to `kebab-case-style-string`
+ * Convert input string `example input string` into camelCase `exampleInputString`
+ * 
+ * All non-word and non-number symbols will be trimmed.
+ */
+function camelCase(string $string): string
+{
+    $string = pascalCase($string);
+    return lcfirst($string);
+}
+
+/**
+ * Convert input string `example input string` into kebab-case `example-input-string`
+ * 
+ * All non-word and non-number symbols will be trimmed.
  */
 function kebabCase(string $string, bool $transliterate = false, string $langcode = 'ru'): string
 {
