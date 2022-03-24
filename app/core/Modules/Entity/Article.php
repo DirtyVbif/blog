@@ -2,6 +2,7 @@
 
 namespace Blog\Modules\Entity;
 
+use Blog\Client\User;
 use Blog\Database\SQLSelect;
 use Blog\Mediators\AjaxResponse;
 use Blog\Modules\DateFormat\DateFormat;
@@ -23,7 +24,6 @@ class Article extends EntityPrototype implements SitemapInterface
         'c_body' => 'body', 'c_status' => 'status',
         'c_ip' => 'ip'
     ];
-    public const SESSION_VOTE_KEY = 'entity-id-%d-vote-result';
     
     /**
      * Article entity type id is 1
@@ -54,6 +54,9 @@ class Article extends EntityPrototype implements SitemapInterface
      * Default value for article author
      */
     public const DEFAULT_AUTHOR = 'mublog.site';
+    public const VIEWS_INTERVAL = 3600 * 3;
+    public const SESSION_VOTE_KEY = 'entity-id-%d-vote-result';
+    public const COOKIE_VIEW_KEY = 'entity-id-%d-view-updated';
 
     protected string $view_mode;
     protected SQLSelect $sql;
@@ -134,10 +137,32 @@ class Article extends EntityPrototype implements SitemapInterface
         return $result;
     }
 
-    public static function updateViews(int $id, array $data, ?AjaxResponse $response = null): bool
+    public static function updateViews(int $id): bool
     {
+        if (
+            user()->hasMasterIp()
+            || user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)
+        ) {
+            return true;
+        }
         $result = false;
-        // TODO: complete article views updated
+        $key = sprintf(self::COOKIE_VIEW_KEY, $id);
+        $timestamp = cookies()->get($key) ?? 0;
+        $t_passed = time() - $timestamp;
+        if (self::VIEWS_INTERVAL > $t_passed) {
+            // views count update timeout doesn't expired
+            return $result;
+        }
+        $sql = sql_update(
+            ['views' => '{{`views` + 1}}'],
+            self::ENTITY_DATA_TABLE
+        );
+        $sql->where([self::ENTITY_PK => $id]);
+        $result = $sql->update();
+        if ($result) {
+            $t = time();
+            cookies()->set($key, $t, $t + self::VIEWS_INTERVAL);
+        }
         return $result;
     }
 

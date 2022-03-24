@@ -46,7 +46,7 @@ class BlogController extends BaseController
                 $this->status = 404;
                 return false;
             }
-            if (Blog::viewBlogArticle($argument)) {
+            if (Blog::viewArticle($argument)) {
                 return true;
             }
             $this->status = 404;

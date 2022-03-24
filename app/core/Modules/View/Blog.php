@@ -12,7 +12,11 @@ class Blog extends BaseView
 {
     protected const ITEMS_PER_PAGE = 12;
 
-    public static function viewBlogArticle(string|int $argument): bool
+    /**
+     * @param string $argument - article path alias
+     * @param int $argument - article id
+     */
+    public static function viewArticle(string|int $argument): bool
     {
         $article = null;
         // check if argument is article id
@@ -54,17 +58,20 @@ class Blog extends BaseView
         app()->page()->addContent($article_menu);
         // view loaded blog article
         app()->page()->addContent($article);
+        app()->page()->content()->addClass('container_article');
+        // load comments form for article
         $comment_form = new Form('comment', 'section');
         $comment_form->tpl()->set('entity_id', $article->id());
         $comment_form->tpl()->set('parent_id', 0);
         $comment_form->tpl()->useGlobals(true);
         app()->page()->addContent($comment_form);
-        app()->page()->content()->addClass('container_article');
-        // pre($article->getComments());
+        // load article comments
         $comments = new Element('section');
         $comments->setName('blocks/article--comments');
         $comments->set('items', $article->getComments());
         app()->page()->addContent($comments);
+        // update article views count
+        Article::updateViews($article->id());
         return true;
     }
 
