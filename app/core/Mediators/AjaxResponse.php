@@ -5,31 +5,51 @@ namespace Blog\Mediators;
 class AjaxResponse
 {
     protected string $response;
-    protected int $code = 200;
+    protected array $data;
 
     /**
      * @param string $response ajax response message text
      */
     public function __construct(
-        ?string $response = null
+        ?string $response = null,
+        protected int $code = 200
     ) {
         $this->setResponse($response);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string)$this->send();
     }
 
+    public function send(): string
+    {
+        $output = [
+            'status' => $this->getCode(),
+            'response' => $this->getResponse()
+        ];
+        $data = $this->getData();
+        if (!empty($data)) {
+            $output['data'] = $data;
+        }
+        return json_encode($output);
+    }
+
+    public function set(AjaxResponse $response): void
+    {
+        $this->setCode($response->getCode());
+        $this->setResponse($response->getResponse());
+        $this->setData($response->getData());
+    }
+    
     /**
      * @param string $response ajax response message text
      */
-    public function setResponse(?string $response)
+    public function setResponse(?string $response): void
     {
         if (!is_null($response)) {
             $this->response = $response;
         }
-        return;
     }
 
     public function getResponse(): ?string
@@ -54,18 +74,13 @@ class AjaxResponse
         return $this->code;
     }
 
-    public function send(): string
+    public function setData(array $data): void
     {
-        return json_encode([
-            'status' => $this->getCode(),
-            'response' => $this->getResponse()
-        ]);
+        $this->data = $data;
     }
 
-    public function set(AjaxResponse $response): void
+    public function getData(): array
     {
-        $this->setCode($response->getCode());
-        $this->setResponse($response->getResponse());
-        return;
+        return $this->data ?? [];
     }
 }
