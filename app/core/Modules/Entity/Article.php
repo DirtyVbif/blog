@@ -34,7 +34,7 @@ class Article extends EntityPrototype implements SitemapInterface
      * Article entity data table name that contains article data
      */
     public const ENTITY_DATA_TABLE = 'entities_article_data';
-    public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'status', 'preview_src', 'preview_alt', 'author', 'views'];
+    public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'status', 'preview_src', 'preview_alt', 'author', 'views', 'rating'];
     public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
     
@@ -94,6 +94,36 @@ class Article extends EntityPrototype implements SitemapInterface
         return sprintf(self::URL_MASK, $id);
     }
 
+    protected static function getRating(int $id): ?int
+    {
+        $sql = sql_select(['rating'], self::ENTITY_DATA_TABLE);
+        $sql->where([self::ENTITY_PK => $id]);
+        $result = $sql->first();
+        return $result['rating'] ?? null;
+    }
+
+    public static function rateUp(int $id): bool
+    {
+        return self::changeRating($id, 1);
+    }
+
+    public static function rateDown(int $id): bool
+    {
+        return self::changeRating($id, -1);
+    }
+
+    protected static function changeRating(int $id, int $increment): bool
+    {
+        $rating = self::getRating($id);
+        if (is_null($rating)) {
+            return false;
+        }
+        $rating += $increment;
+        $sql = sql_update(['rating' => $rating], self::ENTITY_DATA_TABLE);
+        $sql->where([self::ENTITY_PK => $id]);
+        return $sql->update();
+    }
+
     /**
      * Check provided article alias for uniqueness
      */
@@ -114,6 +144,7 @@ class Article extends EntityPrototype implements SitemapInterface
     public static function create(RequestPrototype $request, ?array $data = null): bool
     {
         $time = time();
+        $rollback = true;
         $sql = sql_insert(self::ENTITY_TABLE);
         $sql->set(
             [$time, $time, self::ENTITY_TYPE_ID],
@@ -122,17 +153,21 @@ class Article extends EntityPrototype implements SitemapInterface
         $sql->useFunction('created', 'FROM_UNIXTIME')
             ->useFunction('updated', 'FROM_UNIXTIME');
         sql()->startTransation();
-        $rollback = true;
         if ($eid = $sql->exe()) {
             $sql = sql_insert(self::ENTITY_DATA_TABLE);
+            // get entity data columns
             $columns = self::ENTITY_DATA_COLUMNS;
+            // unset columns that has automatically generated values
+            unset($columns['views'], $columns['rating']);
+            // set array with new values
+            $values = [];
+            foreach ($columns as $name) {
+                $values[] = $request->{$name};
+            }
+            // add new entity id into SQL INSERT STATEMENT
             $columns[] = 'eid';
-            $values = [
-                $request->title, $request->summary,
-                $request->body, $request->alias, $request->status,
-                $request->preview_src, $request->preview_alt,
-                $request->author, 0, $eid
-            ];
+            $values[] = $eid;
+            // make SQL INSERT QUERY
             $sql->set($values, $columns);
             if ($sql->exe(true)) {
                 $rollback = false;
@@ -272,6 +307,12 @@ class Article extends EntityPrototype implements SitemapInterface
     public function render()
     {
         $this->tpl()->setName('content/article--' . $this->view_mode);
+        /** @var \BlogLibrary\EntityStats\EntityStats $lib_stats */
+        $lib_stats = app()->library('entity-stats');
+        $lib_stats->prepareTemplate($this->tpl(), $this->id(), $this->get('type_name'));
+        if ($this->view_mode === self::VIEW_MODE_FULL) {
+            $lib_stats->use();
+        }
         foreach ($this->data as $key => $value) {
             if ($key === 'body') {
                 $value = new Markup($value, CHARSET);
@@ -387,5 +428,10 @@ class Article extends EntityPrototype implements SitemapInterface
     public function title(): ?string
     {
         return $this->get('title');
+    }
+
+    public function rating(): int
+    {
+        return $this->get('rating');
     }
 }

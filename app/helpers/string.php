@@ -150,6 +150,28 @@ function ffstr(string &...$args): void
 }
 
 /**
+ * Formats Filename Path to absolute path on server
+ * 
+ * If directory name provided then formated path would have trailing slash `/`
+ * 
+ * @param string &...$args
+ * @return void all provided pathes recives changes by reference
+ */
+function ffpath(string &...$args): void
+{
+    foreach ($args as &$path) {
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('/^' . strRegexQuote(ROOTDIR) . '/i', '', $path);
+        $path = preg_replace('/^\.?\/+/', '', $path);
+        if (!preg_match('/\w+\.[a-z0-9]+/i', $path)) {
+            $path = strSuffix($path, '/');
+        }
+        $path = ROOTDIR . $path;
+    }
+    return;
+}
+
+/**
  * Convert input string into PascalCaseString
  */
 function pascalCase(string $string): string

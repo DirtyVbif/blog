@@ -43,6 +43,7 @@
     }
 
     &__date,
+    &__views,
     &__comments {
         font-size: 0.8em;
         color: $grey;
@@ -67,6 +68,82 @@
             margin-right: .5em;
         }
     }
+
+    &__views {
+        display: flex;
+        align-items: center;
+        margin-left: 1em;
+        &::before {
+            content: "";
+            display: inline-block;
+            background: url('/images/icons/eye.svg');
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            opacity: 0.8;
+            margin-right: 6px;
+        }
+    }
+
+    &__rating {
+        color: $grey_strong;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    &__rating-number {
+        margin: 0 .5em;
+    }
+
+    &__rating-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        background: none;
+        
+        & svg {
+            fill: $blue_light;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            transition: $transition;
+            opacity: 0.7;
+        }
+
+        &_up {
+            &.voted,
+            &:hover {
+                & svg {
+                    fill: $green;
+                    opacity: 1;
+                }
+            }
+        }
+
+        &_down {
+            & svg {
+                transform: rotateZ(180deg);
+            }
+            &.voted,
+            &:hover {
+                & svg {
+                    fill: $red_hover;
+                    opacity: 1;
+                }
+            }
+        }
+
+        &:disabled {
+            & svg {
+                fill: $grey_light;
+            }
+        }
+    }
     // ELEMENTS <-------------------------------------------------------
 
     // MODIFICATORS --------------------------------------------------->
@@ -77,6 +154,7 @@
         &__header,
         &__footer {
             padding: 15px 0;
+            align-items: center;
         }
 
         &__body {
@@ -89,7 +167,7 @@
 
         &__footer {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
         }
         // MODIFICATOR ELEMENTS <---------------------------------------
     }
