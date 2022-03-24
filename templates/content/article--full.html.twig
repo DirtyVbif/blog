@@ -6,14 +6,17 @@
     <header class="{{ classlistToString(class, '', '__header') }}">
         <span class="{{ classlistToString(class, '', '__date') }}">{{ date }}</span>
         <span class="js-entity__views {{ classlistToString(class, '', '__views') }}"
-            title="{{ t('views count') }}">{{ views }}</span>
+            title="{{ t('Views') }}">
+            {{ usesvg('/images/icons/eye.svg#svg-icon-eye') }}
+            <span>{{ views }}</span>
+        </span>
     </header>
 
     <div class="{{ classlistToString(class, '', '__body') }}">{{ body }}</div>
     
     <footer class="{{ classlistToString(class, '', '__footer') }}">
         <span class="js-entity__rating {{ classlistToString(class, '', '__rating') }}"
-                title="{{ t('article rating') }}">{{ rating }}</span>
+                title="{{ t('Rating') }}">{{ rating }}</span>
         <span class="{{ classlistToString(class, '', '__author') }}">{{ author }}</span>
     </footer>
 {{ wrapper.close() }}

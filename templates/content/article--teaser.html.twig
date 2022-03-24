@@ -1,10 +1,25 @@
-{{ wrapper.addClass('article article_teaser').open() }}
-    <a href="{{ url }}" title="Читать подробнее про &laquo;{{ title }}&raquo;" class="article__header article_teaser__header">
-        <div class="article__image-wrapper article_teaser__image-wrapper">
-            {{ img(preview_src).alt(preview_alt ?? title).addClass('article__img article_teaser__img') }}
+{% set class = 'article article_teaser' %}
+
+{{ wrapper.addClass(class).open() }}
+    <a href="{{ url }}"
+        title="Читать подробнее про &laquo;{{ title }}&raquo;"
+        class="{{ classlistToString(class, '', '__header') }}">
+        <div class="{{ classlistToString(class, '', '__preview') }}">
+            {{ img(preview_src).alt(preview_alt ?? title).addClass(classlistToString(class, '', '__img')) }}
         </div>
-        <h4 class="article__title article_teaser__title">{{ title }}</h4>
+        <h4 class="{{ classlistToString(class, '', '__title') }}">{{ title }}</h4>
     </a>
-    <p class="article__summary article_teaser__summary">{{ summary }}</p>
-    <div class="article__date article_teaser__date">{{ date }}</div>
+    <p class="{{ classlistToString(class, '', '__summary') }}">{{ summary }}</p>
+    <footer class="{{ classlistToString(class, '', '__footer') }}">
+        <span class="{{ classlistToString(class, '', '__rating') }}"
+            title="{{ t('Rating') }}">
+            {% if rating < 0 %}
+            {{ usesvg('/images/icons/heart-broken.svg#svg-icon-heart-broken', {class: 'broken'}) }}
+            {% else %}
+            {{ usesvg('/images/icons/heart.svg#svg-icon-heart') }}
+            {% endif %}
+            <span>{{ rating > 0 ? '+' ~ rating : rating }}</span>
+        </span>    
+        <span class="{{ classlistToString(class, '', '__date') }}">{{ date }}</span>
+    </footer>
 {{ wrapper.close() }}
