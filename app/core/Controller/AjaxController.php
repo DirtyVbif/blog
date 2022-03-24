@@ -11,12 +11,8 @@ class AjaxController extends BaseController
     
     public function prepare(): void
     {
-        $this->prepareResponse();
-        if ($this->isStatus400()) {
-            app()->controller('error')->prepare($this->status());
-            return;
-        }
-        app()->response()->set($this->getResponse());
+        $this->parseRequest();
+        app()->response()->set($this->response());
         return;
     }
 
@@ -26,16 +22,6 @@ class AjaxController extends BaseController
             $this->response = new AjaxResponse;
         }
         return $this->response;
-    }
-
-    protected function prepareResponse(): void
-    {
-        $this->parseRequest();
-    }
-
-    protected function getResponse(): string
-    {
-        return $this->response()->send();
     }
 
     protected function parseRequest(): void
@@ -54,22 +40,11 @@ class AjaxController extends BaseController
         } else {
             $this->response()->setCode(404);
         }
-        return;
     }
 
     public function postRequest(): void
     {
         $this->prepare();
         return;
-    }
-
-    protected function status(): int
-    {
-        return $this->response()->getCode();
-    }
-
-    protected function isStatus400(): bool
-    {
-        return preg_match('/4\d\d/', $this->status());
     }
 }
