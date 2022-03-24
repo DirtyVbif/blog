@@ -37,6 +37,10 @@
     background-color: $bkgd;
     transition: $transition;
 
+    &.unpublished {
+        background-color: $unpublished;
+    }
+
     // ELEMENTS ------------------------------------------------------->
     &__header {
         display: flex;
@@ -156,6 +160,10 @@
                     margin-left: 2em;
                 }
             }
+            & code {
+                white-space: pre-wrap;
+                font: 14px/1.2;
+            }
         }
 
         &__footer {
@@ -238,6 +246,7 @@
         &__footer {
             justify-content: space-between;
             padding: 0 15px 10px;
+            margin-top: auto;
         }
         // MODIFICATOR ELEMENTS <---------------------------------------
     }
