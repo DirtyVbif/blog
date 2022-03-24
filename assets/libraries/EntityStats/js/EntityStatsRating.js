@@ -98,16 +98,19 @@ class EntityStatsRating
 
     _createButtons()
     {
+        let svg = '<svg><use href="/images/icons/thumbs.svg#svg-thumbs-icon"></use></svg>';
         this.rup = document.createElement('button');
         for (let cls of this.classlist.suffix(['-btn', '-btn_up'])) {
             this.rup.classList.add(cls);
         }
-        this.rup.innerText = "+";
+        this.rup.innerHTML = svg;
+        this.rup.title = 'Vote up';
         this.rdwn = document.createElement('button');
         for (let cls of this.classlist.suffix(['-btn', '-btn_down'])) {
             this.rdwn.classList.add(cls);
         }
-        this.rdwn.innerText = "-";
+        this.rdwn.innerHTML = svg;
+        this.rdwn.title = 'Vote down';
         this._setVotingClass(this.vote_result);
     }
 
