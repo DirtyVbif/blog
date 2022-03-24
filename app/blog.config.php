@@ -2,9 +2,10 @@
 
 /** @var string CHARSET Default application charset */
 const CHARSET = 'UTF-8';
-
+/** @var string PUBNAME name of public directory on server */
+const PUBNAME = 'public';
 /** @var string PUBDIR absolute path to public (html, www) directory. Includes trailing slash `/` */
-const PUBDIR = ROOTDIR . 'public/';
+const PUBDIR = ROOTDIR . PUBNAME . '/';
 
 /**
  * @var array<string, string|array<string, mixed>> $__config Application config array

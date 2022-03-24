@@ -11,16 +11,13 @@ class Folder
     protected int $permissions;
 
     public function __construct(string $path) {
-        $path = str_replace('\\', '/', $path);
-        $path = preg_replace('/^' . strRegexQuote(\ROOTDIR) . '/i', '', $path);
-        $path = preg_replace('/^\.*(\\\|\/)+/', '', $path);
-        $this->path = \ROOTDIR . strSuffix($path, '/');
+        ffpath($path);
+        $this->path = strSuffix($path, '/');
         $this->checkStatus();
     }
 
     protected function checkStatus(): void
     {
-        ffstr($this->path);
         $this->exists = is_dir($this->path);
         return;
     }
@@ -105,7 +102,7 @@ class Folder
 
     public static function clearRecursively(string $path): void
     {
-        ffstr($path);
+        ffpath($path);
         if (is_dir($path)) {
             $path = strSuffix($path, '/');
             foreach (scandir($path) as $filename) {

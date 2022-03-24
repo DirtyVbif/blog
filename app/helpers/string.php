@@ -161,9 +161,10 @@ function ffpath(string &...$args): void
 {
     foreach ($args as &$path) {
         $path = str_replace('\\', '/', $path);
-        $path = preg_replace('/^' . strRegexQuote(ROOTDIR) . '/i', '', $path);
+        $base = strPrefix(ROOTDIR, '/', true);
+        $path = preg_replace('/^\/?' . strRegexQuote($base) . '/i', '', $path);
         $path = preg_replace('/^\.?\/+/', '', $path);
-        if (!preg_match('/\w+\.[a-z0-9]+/i', $path)) {
+        if (!preg_match('/\w+\.[a-z0-9]+$/i', $path)) {
             $path = strSuffix($path, '/');
         }
         $path = ROOTDIR . $path;
@@ -223,7 +224,6 @@ function strTrimServDir(string $directory): string
 function transliterate(string $input, string $langcode = 'ru'): string
 {
     $source = APPDIR . 'translations/' . $langcode . '/transliteration.yml';
-    ffstr($source);
     $t = Yaml::parseFile($source);
     $output = str_replace($t[$langcode], $t['en'], $input);
     return $output;

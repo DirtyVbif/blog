@@ -30,7 +30,7 @@
 [v] Add blog view for all blog comments;
 [v] Complete ErrorController::class output;
 [v] Rebuild User\Agent::class information collecting:
-    - replace using of get_browser() with js tool;
+    x replace using of get_browser() with js tool;
 [v] Add sitemap;
 [v] Add text tokenizer and site info variables;
 [v] Fix debug message output on authorization by saved in cookie user token when updating usser sesion in storage;
@@ -48,7 +48,8 @@
 [ ] Add events log for status messages and errors
 [ ] Convert TemplateFacade\Form::class to Factory::pattern and Prototype::pattern with Field::class objects for each field;
 [v] Rebuild Database\Brige::transactions to use PDO::transactions;
-[ ] Add rating for articles;
-[ ] Add views for articles;
+[v] Add rating for articles;
+[v] Add views for articles;
 [ ] Add image entity and use it in article;
 [ ] Add ability to close opened sessions for users;
+[ ] Add smooth scrolling for hash links;
