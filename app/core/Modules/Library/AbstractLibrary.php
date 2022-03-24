@@ -74,27 +74,26 @@ abstract class AbstractLibrary
     protected function verifyPublicSource(string $source_type): bool
     {
         $public_filename = $this->getSources()?->{$source_type}['public'];
-        $public_filename = PUBDIR . strPrefix($public_filename, '/', true);
+        $public_filename = PUBDIR . strPrefix($public_filename, '/');
         $public_file = f($public_filename);
         if (!$public_file->exists()) {
             return false;
         }
-        $get_method = 'get' . ucfirst(strtolower($source_type)) . 'SrcContent';
+        $get_method = camelCase("get {$source_type} src content");
         return hash_equals(
             md5($this->$get_method()),
             md5($public_file->realContent())
         );
-        return false;
     }
 
     protected function makeSourcePublic(string $source_type): void
     {
-        $get_method = 'get' . ucfirst(strtolower($source_type)) . 'SrcContent';
+        $get_method = camelCase("get {$source_type} src content");
         if ($public_name = $this->getSources()?->{$source_type}['public'] ?? null) {
-            $public_name = PUBDIR . strPrefix($public_name, '/', true);
-            f($public_name)
-                ->content($this->{$get_method}())
-                ->save();
+            $public_name = PUBDIR . strPrefix($public_name, '/');
+            $public_file = f($public_name);
+            $public_file->content($this->{$get_method}());
+            $public_file->save();
         }
         return;
     }
