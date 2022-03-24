@@ -43,6 +43,11 @@
 'sitemap': 'карта сайта'
 'Remember me': 'Запомнить'
 'Sign in': 'Войти'
+'Rating': 'Рейтинг'
+'Views': 'Просмотры'
+'Comments': 'Комментарии'
+'Vote up': 'Понравилось'
+'Vote down': 'Не понравилось'
 
 'Field `@field_name` is required.': 'Поле `@field_name` обязательно для заполнения.'
 'Field `@field_name` length must be lesser than @n symbols.': 'Содержимое поля `@field_name` должно быть не более @n символов.'

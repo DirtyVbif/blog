@@ -19,9 +19,10 @@ use Blog\Modules\{
     Router\Router,
     Template\Page,
     View\BaseView,
-    Cache\CacheSystem
+    Cache\CacheSystem,
+    Messenger\Logger,
+    Entity\EntityModule
 };
-use Blog\Modules\Messenger\Logger;
 
 trait BlogModules
 {
@@ -40,6 +41,8 @@ trait BlogModules
     private array $libraries;
     private CacheSystem $cache;
     private Logger $logger;
+    private EntityModule $entity;
+    private array $mediators;
 
     public function response(): Response
     {
@@ -170,5 +173,28 @@ trait BlogModules
             $this->logger = new Logger;
         }
         return $this->logger;
+    }
+
+    public function entity(): EntityModule
+    {
+        if (!isset($this->entity)) {
+            $this->entity = new EntityModule;
+        }
+        return $this->entity;
+    }
+
+    /**
+     * @return Blog\Mediators\Class::object|null
+     */
+    public function mediator(string $name)
+    {
+        if (!isset($this->mediators[$name])) {
+            $classname = '\\Blog\\Mediators\\' . pascalCase($name);
+            if (!class_exists($classname)) {
+                return null;
+            }
+            $this->mediators[$name] = new $classname;
+        }
+        return $this->mediators[$name];
     }
 }

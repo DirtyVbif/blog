@@ -80,6 +80,10 @@ class Page extends BaseTemplate
     public function render()
     {
         $this->useGlobals(true);
+        if (!empty($this->content)) {
+            $this->content()->setContent(implode($this->content));
+            $this->data['page']['content'] = $this->content();
+        }
         $this->data['meta'] = $this->meta;
         $this->data['title'] = $this->meta_title ?? null;
         $this->data['attributes'] = $this->attributes();
@@ -88,10 +92,6 @@ class Page extends BaseTemplate
         $this->data['js'] = $this->getJsSrc();
         $this->data['page']['title'] = $this->getTitle();
         $this->data['page']['modal'] = $this->getModal();
-        if (!empty($this->content)) {
-            $this->content()->setContent(implode($this->content));
-            $this->data['page']['content'] = $this->content();
-        }
         $this->data['page']['messenger'] = msgr();
         $this->data['system_log'] = app()->logger();
         return parent::render();

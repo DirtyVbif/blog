@@ -13,10 +13,10 @@
     <h3 class="{{ classlistToString(class, '', '__title') }}"
         data-item-project-remove-class="skill-card_teaser__title">{{ title }}</h3>
 
-    <main class="{{ classlistToString(class, '', '__body') }} hidden"
+    <div class="{{ classlistToString(class, '', '__body') }} hidden"
         data-item-project-remove-class="{{ classlistToString(class[1], '', '__body') }}, hidden">
         {{ body }}
-    </main>
+    </div>
 
     {% if is_master %}
         <footer class="{{ classlistToString(class, '', '__footer') }} hidden"

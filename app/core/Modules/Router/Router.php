@@ -131,6 +131,11 @@ class Router
 
     public function domain(): string
     {
+        return $this->get('domain');
+    }
+
+    public function host(): string
+    {
         return $this->get('scheme') . '://' . $this->get('domain');
     }
 

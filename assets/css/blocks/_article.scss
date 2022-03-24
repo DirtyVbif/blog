@@ -42,12 +42,6 @@
         display: flex;
     }
 
-    &__date,
-    &__comments {
-        font-size: 0.8em;
-        color: $grey;
-    }
-
     &__summary {
         margin-top: 0;
     }
@@ -57,14 +51,90 @@
         align-items: center;
     }
 
-    &__comments {
+    &__date,
+    &__views,
+    &__comments,
+    &__rating {
+        font-size: 0.8em;
+        color: $grey;
+    }
+
+    &__comments,
+    &__views,
+    &__rating {
         display: flex;
         align-items: center;
-        & img {
-            height: 24px;
-            width: auto;
+        margin-left: 2em;
+        &>svg {
+            fill: $blue;
+            height: 22px;
+            width: 30px;
             object-fit: contain;
-            margin-right: .5em;
+            &.broken {
+                fill: $red_hover;
+            }
+        }
+        &>span {
+            min-width: 2.4em;
+            text-align: center;
+        }
+    }
+
+    &__rating-number {
+        min-width: auto;
+        text-align: center;
+        margin: 0 .5em;
+
+        &.negative {
+            color: $red_medium;
+        }
+    }
+
+    &__rating-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        background: none;
+        
+        & svg {
+            fill: $blue_light;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            transition: $transition;
+            opacity: 0.7;
+        }
+
+        &_up {
+            &.voted,
+            &:hover {
+                & svg {
+                    fill: $green;
+                    opacity: 1;
+                }
+            }
+        }
+
+        &_down {
+            & svg {
+                transform: rotateZ(180deg);
+            }
+            &.voted,
+            &:hover {
+                & svg {
+                    fill: $red_hover;
+                    opacity: 1;
+                }
+            }
+        }
+
+        &:disabled {
+            & svg {
+                fill: $grey_light;
+            }
         }
     }
     // ELEMENTS <-------------------------------------------------------
@@ -77,6 +147,7 @@
         &__header,
         &__footer {
             padding: 15px 0;
+            align-items: center;
         }
 
         &__body {
@@ -89,7 +160,18 @@
 
         &__footer {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+        }
+        
+        &__rating {
+            color: $grey_strong;
+            font-size: 18px;
+            font-weight: 600;
+            margin-left: 0;
+        }
+
+        &__author {
+            font-style: italic;
         }
         // MODIFICATOR ELEMENTS <---------------------------------------
     }
@@ -114,7 +196,7 @@
         height: 100%;
 
         // MODIFICATOR ELEMENTS --------------------------------------->
-        &__image-wrapper {
+        &__preview {
             overflow: hidden;
             width: 100%;
             height: 210px;
@@ -149,8 +231,13 @@
             margin: 8px 0;
         }
 
-        &__date {
-            margin: auto 15px 15px auto;
+        &__rating {
+            margin-left: 0;
+        }
+
+        &__footer {
+            justify-content: space-between;
+            padding: 0 15px 10px;
         }
         // MODIFICATOR ELEMENTS <---------------------------------------
     }

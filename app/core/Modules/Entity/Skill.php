@@ -83,7 +83,6 @@ class Skill extends EntityPrototype
      */
     public static function edit(int $id, RequestPrototype $request): bool
     {
-        
         $sql = sql_update(table: self::ENTITY_DATA_TABLE);
         $sql->set([
             'title' => $request->title,

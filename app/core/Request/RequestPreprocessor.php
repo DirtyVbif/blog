@@ -11,7 +11,7 @@ class RequestPreprocessor
         $alias = $request->raw($field_target_name) ?
             $request->raw($field_target_name)
             : kebabCase($request->raw($field_support_name), true);
-        if (Article::isAliasExists($alias)) {
+        if (Article::isAliasExists($alias, $request->raw('entity_id'))) {
             $alias .= '_' . Article::getNewId();
         }
         return $alias;

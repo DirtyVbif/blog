@@ -2,9 +2,12 @@
 
 namespace Blog\Modules\Entity;
 
+use Blog\Client\User;
 use Blog\Database\SQLSelect;
+use Blog\Mediators\AjaxResponse;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
+use Blog\Request\ArticleRequest;
 use Blog\Request\RequestPrototype;
 use JetBrains\PhpStorm\ExpectedValues;
 use Twig\Markup;
@@ -33,7 +36,7 @@ class Article extends EntityPrototype implements SitemapInterface
      * Article entity data table name that contains article data
      */
     public const ENTITY_DATA_TABLE = 'entities_article_data';
-    public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'status', 'preview_src', 'preview_alt', 'author', 'views'];
+    public const ENTITY_DATA_COLUMNS = ['title', 'summary', 'body', 'alias', 'status', 'preview_src', 'preview_alt', 'author', 'views', 'rating'];
     public const SITEMAP_PRIORITY = 0.3;
     public const SITEMAP_CHANGEFREQ = 'monthly';
     
@@ -51,6 +54,9 @@ class Article extends EntityPrototype implements SitemapInterface
      * Default value for article author
      */
     public const DEFAULT_AUTHOR = 'mublog.site';
+    public const VIEWS_INTERVAL = 3600 * 3;
+    public const SESSION_VOTE_KEY = 'entity-id-%d-vote-result';
+    public const COOKIE_VIEW_KEY = 'entity-id-%d-view-updated';
 
     protected string $view_mode;
     protected SQLSelect $sql;
@@ -88,13 +94,88 @@ class Article extends EntityPrototype implements SitemapInterface
         return $self->url();
     }
 
+    public static function shortLink(int $id): string
+    {
+        return sprintf(self::URL_MASK, $id);
+    }
+
+    protected static function changeRating(int $id, int $increment): bool
+    {
+        if (!$increment) {
+            return false;
+        }
+        $sql = sql_update(['rating' => "{{`rating` + " . $increment . "}}"], self::ENTITY_DATA_TABLE);
+        $sql->where([self::ENTITY_PK => $id]);
+        return $sql->update();
+    }
+
+    public static function updateRating(int $id, array $data, ?AjaxResponse $response = null): bool
+    {
+        $result = false;
+        $session_key = sprintf(self::SESSION_VOTE_KEY, $id);
+        $increment = ($data['increment'] ?? false) ? (int)$data['increment'] : null;
+        $new_vote_result = ($data['vote_result'] ?? false) ? (int)$data['vote_result'] : null;
+        $vote_result = (int)session()->get($session_key);
+        if (is_null($increment) && !is_null($new_vote_result)) {
+            $result = true;
+        } else if (!is_null($increment) || $vote_result) {
+            $increment ??= 0;
+            if (
+                ($increment > 0 && $vote_result <= 0)
+                || ($increment < 0 && $vote_result >= 0)
+            ) {
+                $result = self::changeRating($id, $increment);
+                $new_vote_result = $vote_result + $increment;
+            }
+        }
+        if ($result) {
+            session()->set($session_key, $new_vote_result);
+        } else if ($response) {
+            $response->setResponse("New rating for article #{$id} is not acceptable.");
+            $response->setCode(406);
+        }
+        return $result;
+    }
+
+    public static function updateViews(int $id): bool
+    {
+        if (
+            user()->hasMasterIp()
+            || user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)
+        ) {
+            return true;
+        }
+        $result = false;
+        $key = sprintf(self::COOKIE_VIEW_KEY, $id);
+        $timestamp = cookies()->get($key) ?? 0;
+        $t_passed = time() - $timestamp;
+        if (self::VIEWS_INTERVAL > $t_passed) {
+            // views count update timeout doesn't expired
+            return $result;
+        }
+        $sql = sql_update(
+            ['views' => '{{`views` + 1}}'],
+            self::ENTITY_DATA_TABLE
+        );
+        $sql->where([self::ENTITY_PK => $id]);
+        $result = $sql->update();
+        if ($result) {
+            $t = time();
+            cookies()->set($key, $t, $t + self::VIEWS_INTERVAL);
+        }
+        return $result;
+    }
+
     /**
      * Check provided article alias for uniqueness
      */
-    public static function isAliasExists(string $alias): bool
+    public static function isAliasExists(string $alias, ?int $id = null): bool
     {
         $sql = sql_select(['eid'], self::ENTITY_DATA_TABLE);
         $sql->where(['alias' => $alias]);
+        if (!is_null($id)) {
+            $sql->where(['eid' => $id], not: true);
+        }
         $result = $sql->exe();
         return !empty($result);
     }
@@ -105,6 +186,7 @@ class Article extends EntityPrototype implements SitemapInterface
     public static function create(RequestPrototype $request, ?array $data = null): bool
     {
         $time = time();
+        $rollback = true;
         $sql = sql_insert(self::ENTITY_TABLE);
         $sql->set(
             [$time, $time, self::ENTITY_TYPE_ID],
@@ -113,17 +195,21 @@ class Article extends EntityPrototype implements SitemapInterface
         $sql->useFunction('created', 'FROM_UNIXTIME')
             ->useFunction('updated', 'FROM_UNIXTIME');
         sql()->startTransation();
-        $rollback = true;
         if ($eid = $sql->exe()) {
             $sql = sql_insert(self::ENTITY_DATA_TABLE);
+            // get entity data columns
             $columns = self::ENTITY_DATA_COLUMNS;
+            // unset columns that has automatically generated values
+            unset($columns['views'], $columns['rating']);
+            // set array with new values
+            $values = [];
+            foreach ($columns as $name) {
+                $values[] = $request->{$name};
+            }
+            // add new entity id into SQL INSERT STATEMENT
             $columns[] = 'eid';
-            $values = [
-                $request->title, $request->summary,
-                $request->body, $request->alias, $request->status,
-                $request->preview_src, $request->preview_alt,
-                $request->author, 0, $eid
-            ];
+            $values[] = $eid;
+            // make SQL INSERT QUERY
             $sql->set($values, $columns);
             if ($sql->exe(true)) {
                 $rollback = false;
@@ -132,6 +218,34 @@ class Article extends EntityPrototype implements SitemapInterface
         }
         sql()->commit($rollback);
         return !$rollback;
+    }
+
+    /**
+     * @param ArticleRequest $request
+     */
+    public static function edit(int $id, RequestPrototype $request): bool
+    {
+        $sql = sql_update(table: self::ENTITY_DATA_TABLE);
+        $sql->set([
+            'title' => $request->title,
+            'alias' => $request->alias,
+            'preview_src' => $request->preview_src,
+            'preview_alt' => $request->preview_alt,
+            'summary' => $request->summary,
+            'body' => $request->body,
+            'author' => $request->author,
+            'status' => $request->status
+        ]);
+        $sql->where([self::ENTITY_PK => $id]);
+        $result = (bool)$sql->update();
+        if (!$result) {
+            pre([
+                'error' => 'there was no changes by following sql request:',
+                'SQL-QUERY' => htmlspecialchars($sql->raw('bind')),
+                'SQL STATEMENT' => $sql
+            ]);
+        }
+        return $result;
     }
 
     /**
@@ -235,6 +349,12 @@ class Article extends EntityPrototype implements SitemapInterface
     public function render()
     {
         $this->tpl()->setName('content/article--' . $this->view_mode);
+        /** @var \BlogLibrary\EntityStats\EntityStats $lib_stats */
+        $lib_stats = app()->library('entity-stats');
+        $lib_stats->prepareTemplate($this->tpl(), $this->id(), $this->get('type_name'));
+        if ($this->view_mode === self::VIEW_MODE_FULL) {
+            $lib_stats->use();
+        }
         foreach ($this->data as $key => $value) {
             if ($key === 'body') {
                 $value = new Markup($value, CHARSET);
@@ -275,7 +395,6 @@ class Article extends EntityPrototype implements SitemapInterface
             $this->data = $data[0];
             $this->id = $this->data['id'];
             $this->comments_data = $this->setLoadedCommentsData($data);
-            
         }
         $this->exists = !empty($this->data);
         $this->loaded = true;
@@ -351,5 +470,10 @@ class Article extends EntityPrototype implements SitemapInterface
     public function title(): ?string
     {
         return $this->get('title');
+    }
+
+    public function rating(): int
+    {
+        return $this->get('rating');
     }
 }

@@ -7,6 +7,9 @@ use Symfony\Component\Yaml\Yaml;
 
 trait BlogConfig
 {
+    /**
+     * @var array<string, string,array<string, mixed>> $config
+     */
     private array $config;
     private bool $config_loaded = false;
     private bool $env_loaded = false;
@@ -23,6 +26,11 @@ trait BlogConfig
         return;
     }
 
+    /**
+     * @return object if @var `string $config_name` is null;
+     * @return mixed if @var `string $config_name` specified for config name
+     * @return null if no config for provided @var `string $config_name`
+     */
     public function config(?string $config_name = null)
     {
         if (!$this->config_loaded) {

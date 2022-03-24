@@ -3,7 +3,7 @@
 namespace Blog\Controller\Components;
 
 use Blog\Controller\AdminController;
-use Blog\Modules\Entity\Skill;
+use Blog\Modules\Entity\EntityFactory;
 use Blog\Request\RequestFactory;
 
 trait AdminControllerPostRequest
@@ -13,7 +13,7 @@ trait AdminControllerPostRequest
         if (!user()->verifyAccessLevel(AdminController::ADMIN_ACCESS_LEVEL)) {
             // if access denied
             $this->status = 403;
-            /** @var ErrorController $err_c */
+            /** @var ErrorController $conerr */
             $conerr = app()->controller('error');
             $conerr->prepare($this->status);
             return;
@@ -41,42 +41,69 @@ trait AdminControllerPostRequest
      */
     protected function postRequestSkill(): bool
     {
+        return $this->postRequestEntity('skill');
+    }
+
+    /**
+     * Called when POST request on `/admin/article/*`
+     */
+    protected function postRequestArticle(): bool
+    {
+        return $this->postRequestEntity('article');
+    }
+
+    protected function postRequestEntity(string $entity_type): bool
+    {
         $id = app()->router()->arg(3);
         $type = $_POST['type'] ?? null;
         if (!is_numeric($id) && !$type) {
             return false;
         }
-        $request = RequestFactory::get('skill');
-        $result = false;
-        $title = $request->raw('title');
+        $request = RequestFactory::get($entity_type);
+        if ($id) {
+            $request->set('entity_id', $id);
+        }
+        $title = $request->label();
         if ($request->isValid()) {
             $title = $request->title;
             switch (true) {
                 case(!$id && $type === 'create'):
-                    $result = Skill::create($request);
+                    $result = EntityFactory::create($entity_type, $request);
                     break;
                 case ($id && $type === 'edit'):
-                    $result = Skill::edit($id, $request);
+                    $result = EntityFactory::edit($id, $entity_type, $request);
                     break;
+                default:
+                    $result = false;
             }
         }
+        $entity_id = $id ? ' @id' : '';
         if ($result) {
             $request->complete();
             msgr()->notice(
                 t(
-                    'Entity &laquo;@name&raquo; of type &laquo;skill&raquo; was successfully saved.',
-                    ['name' => $title]
+                    'Entity' . $entity_id . ' &laquo;@name&raquo; of type &laquo;@type&raquo; was successfully saved.',
+                    [
+                        'name' => $title,
+                        'type' => $entity_type,
+                        'id' => $id ?? ''
+                    ]
                 )
             );
             if ($id) {
-                app()->router()->redirect(sprintf(Skill::URL_MASK, $id));
+                app()->router()->redirect("/admin/{$entity_type}/{$id}");
             }
             app()->router()->redirect('<previous>');
         }
+        $while_action = $type === 'create' ? 'creating new' : 'editing';
         msgr()->warning(
             t(
-                'There was an error while creating new entity &laquo;@name&raquo; of type &laquo;skill&raquo;.',
-                ['name' => $title]
+                'There was an error while ' . $while_action . ' entity' . $entity_id . ' &laquo;@name&raquo; of type &laquo;@type&raquo;.',
+                [
+                    'name' => $title,
+                    'type' => $entity_type,
+                    'id' => $id ?? ''
+                ]
             )
         );
         app()->router()->redirect('<previous>');

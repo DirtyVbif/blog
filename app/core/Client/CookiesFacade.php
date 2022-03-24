@@ -4,6 +4,7 @@ namespace Blog\Client;
 
 use Blog\Components\AjaxModule;
 use Blog\Components\Singletone;
+use Blog\Mediators\AjaxResponse;
 
 class CookiesFacade implements AjaxModule
 {
@@ -14,7 +15,7 @@ class CookiesFacade implements AjaxModule
     /**
      * Get cookie by name
      */
-    public function get(string $name)
+    public function get(string $name): ?string
     {
         return $_COOKIE[$name] ?? null;
     }
@@ -23,10 +24,16 @@ class CookiesFacade implements AjaxModule
      * Send a cookie. Same as setcookie() function.
      * @see setcookie() documentation at @link https://php.net/manual/en/function.setcookie.php
      */
-    public function set(string $name, $value, $expires_or_options = 0, $path = '/', $domain = '', $secure = false, $httponly = false)
-    {        
-        setcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
-        return $this;
+    public function set(
+        string $name,
+        string $value,
+        int $expires_or_options = 0,
+        string $path = '/',
+        string $domain = '',
+        bool $secure = false,
+        bool $httponly = false
+    ): bool {
+        return setcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
     }
 
     /**
@@ -58,18 +65,15 @@ class CookiesFacade implements AjaxModule
         return session()->get(self::COOKIESACCEPTED) ?? false;
     }
 
-    public function ajaxRequest(): array
+    public function ajaxRequest(): AjaxResponse
     {
-        $response = [
-            'status' => 200,
-            'output' => null
-        ];
+        $response = new AjaxResponse();
         if (($_POST['cookie-agreement'] ?? false) == 1) {
             $this->setCookiesAccepted();
-            $response['output'] = 'cookies accepted successfully';
+            $response->setResponse('cookies accepted successfully');
         } else {
-            $response['status'] = 400;
-            $response['output'] = 'Error 400. Bad request.';
+            $response->setCode(400);
+            $response->setResponse('Error 400. Bad request.');
         }
         return $response;
     }

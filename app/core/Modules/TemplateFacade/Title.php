@@ -28,7 +28,7 @@ class Title extends TemplateFacade
 
     public function render()
     {
-        if (!isset($this->content) || !$this->content) {
+        if (!(string)($this->content ?? '')) {
             $this->renderable = false;
         } else {
             $this->tpl()->setContent($this->content);

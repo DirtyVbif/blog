@@ -7,8 +7,7 @@ const CHARSET = 'UTF-8';
 const PUBDIR = ROOTDIR . 'public/';
 
 /**
- * Application config array
- * @var array
+ * @var array<string, string|array<string, mixed>> $__config Application config array
  */
 $__config = [];
 

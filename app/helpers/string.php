@@ -150,7 +150,31 @@ function ffstr(string &...$args): void
 }
 
 /**
- * Convert input string into PascalCaseString
+ * Formats Filename Path to absolute path on server
+ * 
+ * If directory name provided then formated path would have trailing slash `/`
+ * 
+ * @param string &...$args
+ * @return void all provided pathes recives changes by reference
+ */
+function ffpath(string &...$args): void
+{
+    foreach ($args as &$path) {
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('/^' . strRegexQuote(ROOTDIR) . '/i', '', $path);
+        $path = preg_replace('/^\.?\/+/', '', $path);
+        if (!preg_match('/\w+\.[a-z0-9]+/i', $path)) {
+            $path = strSuffix($path, '/');
+        }
+        $path = ROOTDIR . $path;
+    }
+    return;
+}
+
+/**
+ * Convert input string `example input string` into PascalCase `ExampleInputString`
+ * 
+ * All non-word and non-number symbols will be trimmed.
  */
 function pascalCase(string $string): string
 {
@@ -163,7 +187,20 @@ function pascalCase(string $string): string
 }
 
 /**
- * Formats any string to `kebab-case-style-string`
+ * Convert input string `example input string` into camelCase `exampleInputString`
+ * 
+ * All non-word and non-number symbols will be trimmed.
+ */
+function camelCase(string $string): string
+{
+    $string = pascalCase($string);
+    return lcfirst($string);
+}
+
+/**
+ * Convert input string `example input string` into kebab-case `example-input-string`
+ * 
+ * All non-word and non-number symbols will be trimmed.
  */
 function kebabCase(string $string, bool $transliterate = false, string $langcode = 'ru'): string
 {

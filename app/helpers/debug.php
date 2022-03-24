@@ -10,20 +10,28 @@ function debugFileCalled(): string
  * Main application debug helper with pre HTML-tag. Permanently prints debug output.
  * 
  * Can recieve multiple values;
- * Use `--v` flag in arguments for more verbosity;
+ * > `--v` (verbouse) flag in arguments for more verbosity;
+ * > `--q` (quit) flag for exit on complete;
+ * > `--html` flag for encoding html chars in output;
  * 
  * @return void permanently prints debug output
+ * @return never if flag `--q` provided
  */
 function pre(): void
 {
-    $verbouse = false;
+    $options = [
+        'verbouse' => '--v',
+        'html' => '--html',
+        'quit' => '--q'
+    ];
     $arguments = func_get_args();
-    $i = array_search('--v', $arguments, true);
-    if ($i || $i === 0) {
-        unset($arguments[$i]);
-        $verbouse = true;
+    foreach ($options as $opt_name => $opt_arg) {
+        $i = array_search($opt_arg, $arguments, true);
+        $$opt_name = ($i || $i === 0);
+        if ($$opt_name) {
+            unset($arguments[$i]);
+        }
     }
-
     print "<pre style=\"color:#272727;font-weight:200;font-size:14px;padding:1px 10px;background:#e7e7e7;margin:0;white-space:pre-wrap;\"><code>";
     print "<hr><i>debug from: " . debugFileCalled() . "</i><br>";
     foreach ($arguments as $data) {
@@ -31,9 +39,12 @@ function pre(): void
         ob_start();
         $verbouse ? var_dump($data) : print_r($data);
         $output = ob_get_clean();
-        print "<div>$output</div>";
+        print '<span>' . ($html ? htmlspecialchars($output) : $output) . '</span>';
     }
     print "<hr></code></pre>";
+    if ($quit) {
+        exit;
+    }
     return;
 }
 

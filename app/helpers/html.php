@@ -95,3 +95,13 @@ function strip_attributes(string $html): string
     $pattern = '/<([a-z][a-z0-9]*)([^>]*?)(\/?)>/si';
     return preg_replace($pattern, '<$1$3>', $html);
 }
+
+function usesvg(string $href, array $options = [])
+{
+    $class = ($options['class'] ?? false) ? ' class="' . $options['class'] . '"' : '';
+    $output = '<svg' . $class . '><use href="' . $href . '"></use></svg>';
+    if ($options['markup'] ?? true) {
+        $output = new \Twig\Markup($output, CHARSET);
+    }
+    return $output;
+}

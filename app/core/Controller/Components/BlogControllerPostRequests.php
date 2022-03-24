@@ -2,9 +2,7 @@
 
 namespace Blog\Controller\Components;
 
-use Blog\Modules\Entity\Article;
 use Blog\Modules\Entity\Comment;
-use Blog\Client\User;
 use Blog\Request\RequestFactory;
 
 trait BlogControllerPostRequests
@@ -19,7 +17,7 @@ trait BlogControllerPostRequests
             }
         }
         pre([
-            'error' => 'no method for BlogController::postRequest()',
+            'error' => 'Unknown request type for ' . static::class . '::postRequest()',
             'data' => $_POST
         ]);
         exit;
@@ -40,30 +38,5 @@ trait BlogControllerPostRequests
         }
         app()->router()->redirect('<previous>');
         return;
-    }
-
-    protected function postRequestBlogArticleCreate(): void
-    {
-        // verify user access level
-        if (!app()->user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN)) {
-            $this->status = 403;
-            msgr()->error('Данная операция доступна только администратору сайта.');
-            app()->router()->redirect('<previous>');
-            return;
-        }
-        $request = RequestFactory::get('article');
-        if ($request->isValid()) {
-            $result = Article::create($request);
-        } else {
-            $result = null;
-        }
-        if ($result) {
-            msgr()->notice(t('New entity &laquo;@name&raquo; of type &laquo;article&raquo; successfully saved.', ['name' => $request->title]));
-            app()->router()->redirect('<current>');
-        } else {
-            msgr()->warning(t('There was an error while creating new entity &laquo;@name&raquo; of type &laquo;skill&raquo;.', ['name' => $request->raw('title')]));
-            app()->router()->redirect('<previous>');
-        }
-        exit;
     }
 }

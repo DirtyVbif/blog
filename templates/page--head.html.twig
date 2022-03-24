@@ -4,17 +4,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     {% for item in meta %}
-        {{ item }}
+    {{ item }}
     {% endfor %}
-    {% if css_internal|length %}
-        <style type="text/css">
-            {% for item in css_internal %}
-                {% set internal_css = '@import "' ~ item ~ '";' %}
-                {{ internal_css|raw }}
-            {% endfor %}
-        </style>
+    {% if css_internal|length %}    
+    <style>
+    {% for item in css_internal %}
+        {% set internal_css = '@import "' ~ item ~ '";' %}
+        {{ internal_css|raw }}
+    {% endfor %}
+    </style>
     {% endif %}
     {% for item in css %}
-        <link rel="stylesheet" href="{{ item }}">
+    <link rel="stylesheet" href="{{ item }}">
     {% endfor %}
 </head>

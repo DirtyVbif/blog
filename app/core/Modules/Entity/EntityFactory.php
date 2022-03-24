@@ -2,10 +2,16 @@
 
 namespace Blog\Modules\Entity;
 
+use Blog\Request\RequestPrototype;
 use JetBrains\PhpStorm\ExpectedValues;
 
 class EntityFactory
 {
+    public static function getClassName(string $entity_type): string
+    {
+        return "\\Blog\\Modules\\Entity\\" . pascalCase($entity_type);
+    }
+
     public static function getNewId(): int
     {
         $schema = app()->env()->DB['SCHEMA'] ?? app()->env()->DB['NAME'];
@@ -31,9 +37,9 @@ class EntityFactory
     public static function load(int $entity_id, ?string $entity_type = null): ?EntityPrototype
     {
         $entity_type ??= self::getTypeById($entity_id);
-        $class = '\\Blog\\Modules\\Entity\\' . pascalCase($entity_type);
+        $class = self::getClassName($entity_type);
         if (class_exists($class)) {
-            /** @var EntityPrototype $class */
+            /** @return EntityPrototype */
             return new $class($entity_id);
         }
         return null;
@@ -49,9 +55,9 @@ class EntityFactory
         string $entity_type,
         array $options = []
     ): array {
-        $class = '\\Blog\\Modules\\Entity\\' . pascalCase($entity_type);
+        $class = self::getClassName($entity_type);
         if (class_exists($class) && method_exists($class, 'loadList')) {
-            /** @var EntityPrototype $class */
+            /** @var EntityPrototype::class $class */
             return $class::loadList($options);
         } else {
             // TODO: set throwable error
@@ -60,6 +66,24 @@ class EntityFactory
             ]);
             exit;
         }
+    }
+
+    public static function create(string $type, RequestPrototype $request): bool
+    {
+        $class = self::getClassName($type);
+        if (class_exists($class)) {
+            return $class::create($request);
+        }
+        return false;
+    }
+
+    public static function edit(int $id, string $type, RequestPrototype $request): bool
+    {
+        $class = self::getClassName($type);
+        if (class_exists($class)) {
+            return $class::edit($id, $request);
+        }
+        return false;
     }
 
     public static function delete(int $entity_id): bool

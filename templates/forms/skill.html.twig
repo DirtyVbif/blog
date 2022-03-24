@@ -14,7 +14,7 @@
                 type="text"
                 {{ id('form-skill--title', true) }}
                 name="title"
-                max-length="256"
+                maxlength="256"
                 class="{{ classlistToString(class, '', '__input') }}"
                 value="{{ title ? title : old('title') }}"
                 required>
@@ -28,7 +28,7 @@
                     type="text"
                     {{ id('form-skill--icon-src', true) }}
                     name="icon_src"
-                    max-length="256"
+                    maxlength="256"
                     class="{{ classlistToString(class, '', '__input') }}"
                     value="{{ icon_src ? icon_src : old('icon_src') }}"
                     required>
@@ -39,7 +39,7 @@
                     type="text"
                     {{ id('form-skill--icon-alt', true) }}
                     name="icon_alt"
-                    max-length="256"
+                    maxlength="256"
                     class="{{ classlistToString(class, '', '__input') }}"
                     value="{{ icon_alt ? icon_alt : old('icon_alt') }}"
                     required>

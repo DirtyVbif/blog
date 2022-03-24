@@ -48,7 +48,7 @@ class ArticleRequest extends RequestPrototype
                 '#label' => 'Article body',
                 'validator:type' => 'string',
                 'validator:required' => true,
-                'formatter:html' => 'full'
+                'formatter:html-text' => 'full'
             ],
             'author' => [
                 '#label' => 'Article author',
@@ -62,5 +62,10 @@ class ArticleRequest extends RequestPrototype
                 'validator:type' => 'int'
             ]
         ];
+    }
+
+    public function label(): string
+    {
+        return $this->raw('title');
     }
 }

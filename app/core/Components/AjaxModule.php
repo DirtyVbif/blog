@@ -2,6 +2,8 @@
 
 namespace Blog\Components;
 
+use Blog\Mediators\AjaxResponse;
+
 interface AjaxModule
 {
     /**
@@ -9,5 +11,5 @@ interface AjaxModule
      * 'output' => 'ajax response output'
      * 'status' => 'response status code'
      */
-    public function ajaxRequest(): array;
+    public function ajaxRequest(): AjaxResponse;
 }
