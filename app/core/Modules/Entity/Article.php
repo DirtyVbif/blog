@@ -250,29 +250,32 @@ class Article extends EntityPrototype implements SitemapInterface
 
     /**
      * @param array $options recieves SQL QUERY SELECT options:
-     * * array key @var int 'limit'
-     * * array key @var int 'offset'
-     * * array key @var string 'order' => ASC or DESC
-     * * array key @var string 'view_mode'
-     * * array key @var bool 'load_with_comments' => load article with or without comments data
+     * * `array key @var int 'limit'`
+     * * `array key @var int 'offset'`
+     * * `array key @var string 'order'` => ASC or DESC
+     * * `array key @var string 'view_mode'`
+     * * `array key @var bool 'load_with_comments'` => load article with or without comments data
+     * * `array key @var int 'status'` => required status. `0` by default to load article without status requirements
      * @return Article[]
      */
     public static function loadList(array $options = []): array
     {
-        $sql = sql_select(columns: ['eid'], from: self::ENTITY_TABLE);
+        $status = $options['status'] ?? 0;
+        $sql = sql_select(from: ['e' => self::ENTITY_TABLE]);
         $sql->limit($options['limit'] ?? null);
         $sql->limitOffset($options['offset'] ?? null);
-        $sql->order('created', ($options['order'] ?? 'ASC'));
-        $sql->where(['etid' => self::ENTITY_TYPE_ID]);
+        $sql->order('e.created', ($options['order'] ?? 'ASC'));
+        $sql->where(['e.etid' => self::ENTITY_TYPE_ID]);
+        $sql->columns(['e' => ['eid']]);
+        if ($status) {
+            $sql->join(table: ['a' => self::ENTITY_DATA_TABLE], using: 'eid');
+            $sql->where(['a.status' => $status]);
+        }
         $view_mode = $options['view_mode'] ?? self::VIEW_MODE_FULL;
         $articles = [];
         foreach ($sql->all() as $row) {
-            if (isset($options['load_with_comments'])) {
-                $article = new self(0, $view_mode);
-                $article->load($row['eid'], $options['load_with_comments']);
-            } else {
-                $article = new self($row['eid'], $view_mode);
-            }
+            $article = new self(0, $view_mode);
+            $article->load($row['eid'], $options);
             $articles[$row['eid']] = $article;
         }
         return $articles;
@@ -354,6 +357,8 @@ class Article extends EntityPrototype implements SitemapInterface
         $lib_stats->prepareTemplate($this->tpl(), $this->id(), $this->get('type_name'));
         if ($this->view_mode === self::VIEW_MODE_FULL) {
             $lib_stats->use();
+        } else if (!$this->status()) {
+            $this->tpl()->addClass('unpublished');
         }
         foreach ($this->data as $key => $value) {
             if ($key === 'body') {
@@ -364,14 +369,18 @@ class Article extends EntityPrototype implements SitemapInterface
         return parent::render();
     }
 
-    public function load(?int $id = null, bool $load_comments = true): void
+    /**
+     * @param array $options:
+     * * `@var bool 'load_with_comments'` => load article with comments or not
+     */
+    public function load(?int $id = null, array $options = []): void
     {
-        $this->loaded_with_comments = $load_comments;
+        $this->loaded_with_comments = $options['load_with_comment'] ?? true;;
         if (!is_null($id)) {
             $this->id = $id;
         }
         if ($this->id()) {
-            $sql = $load_comments ? self::sqlJoinComments() : self::sql();
+            $sql = $this->loaded_with_comments ? self::sqlJoinComments() : self::sql();
             $sql->where(condition: ['e.eid' => $this->id()]);
             $this->setLoadedData($sql->all());
         }
@@ -475,5 +484,10 @@ class Article extends EntityPrototype implements SitemapInterface
     public function rating(): int
     {
         return $this->get('rating');
+    }
+
+    public function status(): bool
+    {
+        return $this->get('status');
     }
 }

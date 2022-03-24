@@ -2,6 +2,7 @@
 
 namespace Blog\Modules\View;
 
+use Blog\Client\User;
 use Blog\Modules\Entity\Article;
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Form;
@@ -89,12 +90,15 @@ class Blog extends BaseView
      */
     public function preview(int $limit, string $view_format = Article::VIEW_MODE_TEASER): array
     {
-        $items = Article::loadList([
+        $status = user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN) ? 0 : 1;
+        $options = [
             'limit' => $limit,
             'order' => 'DESC',
             'view_mode' => $view_format,
-            'load_with_comments' => false
-        ]);
+            'load_with_comments' => false,
+            'status' => $status
+        ];
+        $items = Article::loadList($options);
         return $items;
     }
     
@@ -104,9 +108,12 @@ class Blog extends BaseView
             'items' => [],
             'pager' => null
         ];
+        $status = user()->verifyAccessLevel(User::ACCESS_LEVEL_ADMIN) ? 0 : 1;
         $current_page = isset($_GET['page']) ? max((int)$_GET['page'], 0) : 0;
         $sql = sql_select(['eid'], ['a' => Article::ENTITY_DATA_TABLE]);
-        $sql->where(['status' => 1]);
+        if ($status) {
+            $sql->where(['status' => $status]);
+        }
         $sql->useFunction('a.eid', 'COUNT', 'count');
         $result = $sql->first();
         $total_items = $result['count'];
@@ -119,7 +126,8 @@ class Blog extends BaseView
             'offset' => $offset,
             'order' => 'DESC',
             'view_mode' => Article::VIEW_MODE_PREVIEW,
-            'load_with_comments' => true
+            'load_with_comments' => true,
+            'status' => $status
         ]);
         return $view;
     }
