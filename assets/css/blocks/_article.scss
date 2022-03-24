@@ -95,6 +95,10 @@
 
     &__rating-number {
         margin: 0 .5em;
+
+        &.negative {
+            color: $red_medium;
+        }
     }
 
     &__rating-btn {

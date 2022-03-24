@@ -3,6 +3,7 @@
 namespace Blog\Modules\Entity;
 
 use Blog\Database\SQLSelect;
+use Blog\Mediators\AjaxResponse;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Request\ArticleRequest;
@@ -22,6 +23,7 @@ class Article extends EntityPrototype implements SitemapInterface
         'c_body' => 'body', 'c_status' => 'status',
         'c_ip' => 'ip'
     ];
+    public const SESSION_VOTE_KEY = 'entity-id-%d-vote-result';
     
     /**
      * Article entity type id is 1
@@ -94,34 +96,49 @@ class Article extends EntityPrototype implements SitemapInterface
         return sprintf(self::URL_MASK, $id);
     }
 
-    protected static function getRating(int $id): ?int
-    {
-        $sql = sql_select(['rating'], self::ENTITY_DATA_TABLE);
-        $sql->where([self::ENTITY_PK => $id]);
-        $result = $sql->first();
-        return $result['rating'] ?? null;
-    }
-
-    public static function rateUp(int $id): bool
-    {
-        return self::changeRating($id, 1);
-    }
-
-    public static function rateDown(int $id): bool
-    {
-        return self::changeRating($id, -1);
-    }
-
     protected static function changeRating(int $id, int $increment): bool
     {
-        $rating = self::getRating($id);
-        if (is_null($rating)) {
+        if (!$increment) {
             return false;
         }
-        $rating += $increment;
-        $sql = sql_update(['rating' => $rating], self::ENTITY_DATA_TABLE);
+        $sql = sql_update(['rating' => "{{`rating` + " . $increment . "}}"], self::ENTITY_DATA_TABLE);
         $sql->where([self::ENTITY_PK => $id]);
         return $sql->update();
+    }
+
+    public static function updateRating(int $id, array $data, ?AjaxResponse $response = null): bool
+    {
+        $result = false;
+        $session_key = sprintf(self::SESSION_VOTE_KEY, $id);
+        $increment = ($data['increment'] ?? false) ? (int)$data['increment'] : null;
+        $new_vote_result = ($data['vote_result'] ?? false) ? (int)$data['vote_result'] : null;
+        $vote_result = (int)session()->get($session_key);
+        if (is_null($increment) && !is_null($new_vote_result)) {
+            $result = true;
+        } else if (!is_null($increment) || $vote_result) {
+            $increment ??= 0;
+            if (
+                ($increment > 0 && $vote_result <= 0)
+                || ($increment < 0 && $vote_result >= 0)
+            ) {
+                $result = self::changeRating($id, $increment);
+                $new_vote_result = $vote_result + $increment;
+            }
+        }
+        if ($result) {
+            session()->set($session_key, $new_vote_result);
+        } else if ($response) {
+            $response->setResponse("New rating for article #{$id} is not acceptable.");
+            $response->setCode(406);
+        }
+        return $result;
+    }
+
+    public static function updateViews(int $id, array $data, ?AjaxResponse $response = null): bool
+    {
+        $result = false;
+        // TODO: complete article views updated
+        return $result;
     }
 
     /**

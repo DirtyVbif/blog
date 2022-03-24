@@ -52,12 +52,16 @@ class EntityStatsRating
         return null;
     }
 
-    init()
+    async init()
     {
+        this._loadGui();
+        if (this.vote_result != 0) {
+            await this._makeVote(0);;
+        }
         if (!this.status) {
             return;
         }
-        this._loadGui();
+        this._createVotingEvent();
     }
 
     _loadGui()
@@ -73,13 +77,19 @@ class EntityStatsRating
         this.element.append(this.rdwn);
         this.element.append(this.rating);
         this.element.append(this.rup);
-        this._createVotingEvent();
     }
 
     _setRatingNumber(number)
     {
-        if (number > 0) {
-            number = "+" + number;
+        if (number >= 0) {
+            number = number > 0 ? "+" + number : number;
+            if (this.rating.classList.contains('negative')) {
+                this.rating.classList.remove('negative')
+            }
+        } else if (number < 0) {
+            if (!this.rating.classList.contains('negative')) {
+                this.rating.classList.add('negative')
+            }
         }
         this.rating.innerText = number;
     }
@@ -111,11 +121,11 @@ class EntityStatsRating
         }
         this.rdwn.innerHTML = svg;
         this.rdwn.title = 'Vote down';
-        this._setVotingClass(this.vote_result);
     }
 
     _setVotingClass(increment)
     {
+        // console.log('setting voting class for increment: ' + increment);
         if (increment <= 0) {
             if (this.rup.classList.contains(this.s.vote_class)) {
                 this.rup.classList.remove(this.s.vote_class);
@@ -164,19 +174,12 @@ class EntityStatsRating
         }
         let vote_result = this.vote_result;
         this._lockVoting();
-        if (increment > 0) {
+        if (increment != 0) {
             this.vote_result += increment;
             // console.log('voting up');
-        } else if (increment < 0) {
-            this.vote_result += increment;
-            // console.log('voting down');
         }
-        this._setVotingClass(this.vote_result);
         let result = await this._updateRating(increment);
-        if (result) {
-            // console.log('vote accepted');
-            localStorage.setItem(this.id, this.vote_result);
-        } else {
+        if (!result) {
             // console.log('vote declined');
             this.vote_result = vote_result;
         }
@@ -190,26 +193,37 @@ class EntityStatsRating
     async _updateRating(increment)
     {
         let parameters = {
-            argument: 'rating',
-            increment: increment
-        };
+                argument: 'rating',
+                vote_result: this.vote_result
+            },
+            sessid = cookie.get('PHPSESSID'),
+            sessid_vote_result = localStorage.getItem(this.id + '-session');
+        if (increment != 0) {
+            parameters.increment = increment;
+        } else if (sessid == sessid_vote_result) {
+            return false;
+        }
         let result = await this.ctl.makeRequest(parameters);
         if (result) {
+            // console.log('vote accepted');
             this.count += increment;
             this._setRatingNumber(this.count);
+            localStorage.setItem(this.id + '-session', sessid);
+            localStorage.setItem(this.id, this.vote_result);
         }
         return result;
     }
 
-    _completeVoting()
+    _completeVoting(skip_timeout = false)
     {
         let t = Date.now() - this.voting_started;
-        if (t < this.s.timeout) {
+        if (t < this.s.timeout && !skip_timeout) {
             setTimeout(() => {
-                this._clearVotingLockStatus();
+                this._completeVoting(true);
             }, this.s.timeout - t);
-            return;    
+            return;
         }
+        this._setVotingClass(this.vote_result);
         this._clearVotingLockStatus();
     }
 
