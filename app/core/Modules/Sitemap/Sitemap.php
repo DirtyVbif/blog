@@ -10,7 +10,9 @@ class Sitemap
     protected static function getSelfPath(): string
     {
         $class = parseClassname(static::class);
-        return COREDIR . $class->namespace . '/';
+        $path = COREDIR . $class->namespace;
+        ffpath($path);
+        return $path;
     }
 
     public static function generate(): void
@@ -42,8 +44,10 @@ class Sitemap
                 ];
             }
         }
+        // stimemap source template directory
+        $directory = self::getSelfPath() . 'src/';
         // generate sitemap.xml content from template
-        $loader = new \Twig\Loader\FilesystemLoader(self::getSelfPath() . 'src/');
+        $loader = new \Twig\Loader\FilesystemLoader($directory);
         $twig = new \Twig\Environment($loader, [
             'cache' => false,
         ]);
