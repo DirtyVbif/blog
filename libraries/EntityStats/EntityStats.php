@@ -11,7 +11,6 @@ class EntityStats extends \Blog\Modules\Library\AbstractLibrary
         'js' => [
             'stack' => [
                 'js/EntityStatsRating.min.js',
-                'js/EntityStatsViews.min.js',
                 'js/EntityStatsElement.min.js',
                 'js/EntityController.min.js',
                 'js/script.min.js'

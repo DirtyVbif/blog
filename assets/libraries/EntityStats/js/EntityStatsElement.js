@@ -4,8 +4,6 @@ class EntityStatsElement
     get s() {
         return {
             /** @type {string} */
-            trigger_views: '.js-entity__views',
-            /** @type {string} */
             trigger_rating: '.js-entity__rating',
             /** @var {object} data - entity data attribute names */
             data: {
@@ -30,8 +28,6 @@ class EntityStatsElement
         this.id;
         /** @type {string} entity type name */
         this.type;
-        /** @type {EntityStatsViews} */
-        this.views;
         /** @type {EntityStatsRating} */
         this.rating;
         /** @type {string[]} array with name of disabled stats */
@@ -44,7 +40,6 @@ class EntityStatsElement
         this.id = parseInt(this.element.getAttribute(this.s.data.id));
         this.type = this.element.getAttribute(this.s.data.type);
         this.controller = this.element.getAttribute(this.s.data.ctrl);
-        this.views = new EntityStatsViews(this);
         this.rating = new EntityStatsRating(this);
     }
 
@@ -68,7 +63,6 @@ class EntityStatsElement
 
     onload()
     {
-        this.views.update();
         this.rating.init();
     }
 
