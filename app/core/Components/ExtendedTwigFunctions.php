@@ -9,7 +9,8 @@ class ExtendedTwigFunctions
 {
     protected array $functions = [];
     protected array $function_names = [
-        't', 'link', 'url', 'html id', 'img', 'csrf', 'classlist to string', 'old', 'import file content'
+        't', 'link', 'url', 'html id', 'img', 'csrf', 'use svg',
+        'classlist to string', 'old', 'import file content'
     ];
 
     public function __construct()
@@ -88,5 +89,10 @@ class ExtendedTwigFunctions
             }
             return null;
         });
+    }
+
+    protected function initFunctionUseSvg(): TwigFunction
+    {
+        return new TwigFunction('usesvg', 'usesvg');
     }
 }
