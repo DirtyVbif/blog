@@ -57,7 +57,7 @@ function url(string $path, array $parameters = []): string
 
 function fullUrlTo(string $offset = '/'): string
 {
-    return app()->router()->domain() . strPrefix($offset, '/');
+    return app()->router()->host() . strPrefix($offset, '/');
 }
 
 function msgr(): \Blog\Modules\Messenger\Messenger
