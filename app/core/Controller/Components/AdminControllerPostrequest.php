@@ -18,9 +18,9 @@ trait AdminControllerPostRequest
             $conerr->prepare($this->status);
             return;
         } else if ($method = app()->router()->arg(2)) {
-            $method = 'postRequest' . pascalCase($method);
+            $method = camelCase("post request {$method}");
         } else if ($type = $_POST['type'] ?? null) {
-            $method = 'postRequest' . pascalCase($type);
+            $method = camelCase("post request {$type}");
         }
         if (
             isset($method)

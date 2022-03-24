@@ -15,7 +15,7 @@ trait AdminControllerArticleRequest
         /** @var \BlogLibrary\HtmlTagsAutofill\HtmlTagsAutofill $html_tags_autofill */
         $html_tags_autofill = app()->library('html-tags-autofill');
         $html_tags_autofill->use();
-        $form->tpl()->set('html_tags_autofill', $html_tags_autofill->getTemplate('form-skill--body'));
+        $form->tpl()->set('html_tags_autofill', $html_tags_autofill->getTemplate('form-blog-article--body'));
         return $form;
     }
 
@@ -23,8 +23,8 @@ trait AdminControllerArticleRequest
     {
         app()->controller()->getTitle()->set('Создание нового материала для блога');
         $form = $this->getRequestArticleForm();
-        $form->tpl()->set('type', 'create');
-        $form->tpl()->set('action', '/admin/article');
+        $form->tpl()->set('form_type', 'create');
+        $form->tpl()->set('form_action', '/admin/article');
         app()->page()->addContent($form);
         return true;
     }

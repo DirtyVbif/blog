@@ -60,6 +60,16 @@ class ArticleRequest extends RequestPrototype
                 '#label' => 'Publishing status',
                 'preprocessor:default-value' => 0,
                 'validator:type' => 'int'
+            ],
+            'views' => [
+                '#label' => 'Views count',
+                'preprocessor:default-value' => 1,
+                'validator:type' => 'int'
+            ],
+            'rating' => [
+                '#label' => 'Article rating',
+                'preprocessor:default-value' => 1,
+                'validator:type' => 'int'
             ]
         ];
     }
