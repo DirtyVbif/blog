@@ -39,7 +39,7 @@ class CommandLineInterface
 
     protected function outputString(string $output, string $type = 'notice'): string
     {
-        return $this->wrapOutput($output, $type, 0);
+        return $this->wrapOutput($output, $type, 0) . PHP_EOL;
     }
 
     protected function outputColor(string $type): string
