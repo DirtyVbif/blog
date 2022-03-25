@@ -3,7 +3,6 @@
 namespace Blog\Modules\Entity;
 
 use Blog\Client\User;
-use Blog\Modules\Template\Element;
 use Blog\Request\RequestPrototype;
 use JetBrains\PhpStorm\ExpectedValues;
 use Twig\Markup;
@@ -11,7 +10,7 @@ use Twig\Markup;
 class Skill extends EntityPrototype
 {
     public const ENTITY_DATA_TABLE = 'entities_skill_data';
-    public const ENTITY_DATA_COLUMNS = ['title', 'body', 'icon_src', 'icon_alt', 'status'];
+    public const ENTITY_DATA_COLUMNS = ['title', 'body', 'icon_src', 'icon_alt', 'status', 'weight'];
     /** @var int entity type id (etid) specified in entities_types table */
     public const ENTITY_TYPE_ID = 3;        // skill
     public const VIEW_MODE_FULL = 'full';
@@ -46,6 +45,7 @@ class Skill extends EntityPrototype
         $skills = [];
         $sql = self::sql();
         $sql->where(['et.etid' => self::ENTITY_TYPE_ID]);
+        $sql->order('e_s.weight', 'ASC');
         $sql->order('e.created', $options['order'] ?? 'ASC');
         $sql->limit($options['limit'] ?? null);
         $sql->limitOffset($options['offset'] ?? null);

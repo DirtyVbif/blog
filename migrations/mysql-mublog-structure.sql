@@ -76,7 +76,8 @@ CREATE TABLE `entities_skill_data` (
   `body` text COLLATE utf8mb4_general_ci NOT NULL,
   `icon_src` varchar(256) COLLATE utf8mb4_general_ci NOT NULL,
   `icon_alt` varchar(256) COLLATE utf8mb4_general_ci NOT NULL,
-  `status` tinyint NOT NULL DEFAULT '0',
+  `status` TINYINT(3) unsigned NOT NULL DEFAULT '0',
+	`weight` TINYINT(4) NOT NULL DEFAULT '0' COMMENT 'weight sorting order',
   PRIMARY KEY (`eid`),
   CONSTRAINT `fk_skill_entity_id` FOREIGN KEY (`eid`) REFERENCES `entities` (`eid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -53,3 +53,10 @@
 [ ] Add image entity and use it in article;
 [ ] Add ability to close opened sessions for users;
 [ ] Add smooth scrolling for hash links;
+[ ] Improve cache interface to correspondes with PSR-6;
+[ ] Improve logger intereface to corresponeds with PSR-3;
+[ ] Improve router and controllers to correspondes with PSR-7;
+[ ] Add entity ability for self-updating with set method;
+[ ] Create migration interface for entities;
+[ ] Create admin content page for entities;
+[ ] Create sorting interface for entities;
