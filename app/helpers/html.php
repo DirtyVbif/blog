@@ -105,3 +105,19 @@ function usesvg(string $href, array $options = [])
     }
     return $output;
 }
+
+/**
+ * Converts string to BEM-model modificator `_mod-name`
+ */
+function bemmod(string $mod): string
+{
+    return '_' . kebabCase($mod);
+}
+
+/**
+ * Converts string to BEM-model element `__element-name`
+ */
+function bemelem(string $element): string
+{
+    return '__' . kebabCase($element);
+}
