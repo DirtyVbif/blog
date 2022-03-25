@@ -167,13 +167,17 @@ class UserToken
         return false;
     }
 
-    public function verify(): bool
+    public function verify(bool $skip_timeout = false): bool
     {
         $utoken = $this->utoken();
         $remembered_utoken = $this->getCookieUToken();
         if (!$utoken && !$remembered_utoken) {
             return false;
-        } else if (!$this->verifyTokenLifetime($utoken) && !$this->verifyTokenLifetime($remembered_utoken)) {
+        } else if (
+            !$skip_timeout
+            && !$this->verifyTokenLifetime($utoken)
+            && !$this->verifyTokenLifetime($remembered_utoken)
+        ) {
             return false;
         }
         if ($utoken) {

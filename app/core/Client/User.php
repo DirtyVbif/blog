@@ -18,6 +18,7 @@ class User
     public const LOGID = 'user';
     public const TBL_STATUSES = 'users_statuses';
     public const TBL_STATUS_ACCESS = 'users_status_access_levels';
+    public const SESSIONS_TABLE = 'users_sessions';
 
     protected array $status_list = [];
     protected array $access_levels = [];
@@ -227,6 +228,13 @@ class User
         return $this;
     }
 
+    public function verifySession(): void
+    {
+        if (!$this->token()->verify(true)) {
+            $this->setDefaultStatus();
+        }
+    }
+
     public function isAuthorized(): bool
     {
         $this->initialize();
@@ -316,7 +324,7 @@ class User
             $this->opened_sessions = [];
         } else if (!isset($this->opened_sessions)) {
             $sql = sql_select(from: 'users_sessions');
-            $sql->columns(['token', 'browser', 'platform', 'updated', 'ip']);
+            $sql->columns(['sesid', 'token', 'browser', 'platform', 'updated', 'ip']);
             $sql->where(['uid' => $this->id()]);
             $sql->useFunction('users_sessions.updated', 'UNIX_TIMESTAMP', 'updated');
             $this->opened_sessions = $sql->all();
