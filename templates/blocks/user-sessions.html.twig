@@ -13,6 +13,16 @@
             <span>{{ item.platform }}</span>
             <span>{{ item.date }}</span>
             <span>{{ item.ip }}</span>
+            <form action="/user" method="POST">
+                <input type="hidden" name="type" value="close-session" required>
+                <input type="hidden" name="sesid" value="{{ item.sesid }}" required>
+                <input type="hidden" name="title" required
+                    value="{{ item.browser ~ ' ' ~ item.platform ~ ' (' ~ item.ip ~ ')' }}">
+                <button class="profile-sessions__close">
+                    <input type="submit" class="profile-sessions__submit" value="" title="{{ t('Close session') }}">
+                    {{ usesvg('/images/icons/cross.svg#svg-icon-cross') }}
+                </button>
+            </form>
         </li>
         {% endfor %}
     </ul>

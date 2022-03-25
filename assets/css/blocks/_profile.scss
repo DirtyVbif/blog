@@ -5,8 +5,9 @@
     &__item {
         @include card();
         display: grid;
-        grid-template-columns: 3fr repeat(2, 2fr) 1fr;
+        grid-template-columns: 3fr repeat(2, 2fr) 1fr 18px;
         margin-bottom: 10px;
+        align-items: center;
 
         &_header {
             background-color: transparent;
@@ -16,5 +17,46 @@
                 box-shadow: none;
             }
         }
+
+        & form {
+            display: flex;
+        }
+    }
+
+    &__submit,
+    &__close {
+        position: relative;
+        border: none;
+        background: none;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+    }
+
+    &__close {
+        & svg {
+            width: 100%;
+            height: 100%;
+            fill: $red;
+            z-index: 1;
+            transition: $transition;
+        }
+        &:hover {
+            & svg {
+                transform: scale(1.2);
+            }
+        }
+        &:active {
+            & svg {
+                transform: scale(0.9);
+                fill: $red_hover;
+            }
+        }
+    }
+
+    &__submit {
+        position: absolute;
+        z-index: 2;
+        cursor: pointer;
     }
 }
