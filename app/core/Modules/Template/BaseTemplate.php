@@ -80,11 +80,10 @@ class BaseTemplate
         if (is_null($usage)) {
             /** @return bool */
             return $this->use_globals;
-        } else {
-            /** @return void */
-            $this->use_globals = $usage;
-            return;
         }
+        /** @return void */
+        $this->use_globals = $usage;
+        return;
     }
 
     protected function setGlobals()

@@ -60,7 +60,7 @@ class TemplateWrapper extends BaseTemplateElement
     }
 
     /**
-     * Checks if current HTML-element needs closing tag and contant
+     * Checks if current HTML-element needs closing tag and content
      * 
      * @return true|false
      * * `true` - if element has no need to be closed and can't have any content (such as <img> <input> <link> etc.);

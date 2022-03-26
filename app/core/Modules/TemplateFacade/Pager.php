@@ -30,11 +30,8 @@ class Pager extends TemplateFacade
         $this->total_pages = ceil($count);
         return;
     }
-
-    /**
-     * @return Element
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $tpl = new Element('ul');

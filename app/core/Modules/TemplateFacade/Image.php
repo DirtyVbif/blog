@@ -96,11 +96,8 @@ class Image extends TemplateFacade
         $this->alt = htmlspecialchars($alt);
         return $this;
     }
-
-    /**
-     * @return Element
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element('img');

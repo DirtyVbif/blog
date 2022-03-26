@@ -2,14 +2,14 @@
 
 namespace Blog\Modules\TemplateFacade;
 
-use Blog\Modules\Template\BaseTemplate;
+use Blog\Modules\Template\Element;
 
 abstract class TemplateFacade
 {
-    protected BaseTemplate $tpl;
+    protected Element $tpl;
     protected bool $renderable = true;
     
-    abstract public function tpl();
+    abstract public function tpl(): Element;
 
     public function __toString()
     {
@@ -21,8 +21,11 @@ abstract class TemplateFacade
         return $this->renderable ? $this->tpl()->render() : '';
     }
 
-    public function setAttr(string $name, ?string $value = null): self
+    public function setAttr(string $name, ?string $value = null, bool $data_attribute = false): self
     {
+        if ($data_attribute) {
+            return $this->setData($name, $value);
+        }
         $this->tpl()->setAttr($name, $value);
         return $this;
     }

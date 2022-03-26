@@ -13,11 +13,8 @@ class BodyText extends TemplateFacade
     ) {
         $this->setContent($this->raw_text);
     }
-
-    /**
-     * @return Element
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element;

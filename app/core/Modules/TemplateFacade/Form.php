@@ -12,11 +12,8 @@ class Form extends TemplateFacade
     ) {
         $this->tpl()->tag($wrapper_tag);
     }
-
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $tpl = new Element;

@@ -15,10 +15,7 @@ class BlockList extends TemplateFacade
 
     }
     
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element($this->unnamed ? 'ul' : 'ol');
@@ -45,12 +42,6 @@ class BlockList extends TemplateFacade
     public function set(string $name, $value): self
     {
         $this->tpl()->set($name, $value);
-        return $this;
-    }
-
-    public function setAttr(string $name, ?string $value = null): self
-    {
-        $this->tpl()->setAttr($name, $value);
         return $this;
     }
 

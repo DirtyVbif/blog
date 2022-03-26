@@ -14,10 +14,7 @@ class Title extends TemplateFacade
         $this->size($this->size);
     }
     
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $tag = "h{$this->size}";
@@ -39,12 +36,6 @@ class Title extends TemplateFacade
     public function set($content): self
     {
         $this->content = $content;
-        return $this;
-    }
-
-    public function setAttr(string $name, ?string $value = null): self
-    {
-        $this->tpl()->setAttr($name, $value);
         return $this;
     }
 

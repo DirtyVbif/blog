@@ -46,11 +46,8 @@ class Link extends TemplateFacade
         $this->label = $label;
         return $this;
     }
-
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element('a');
