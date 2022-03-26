@@ -3,12 +3,12 @@
 namespace Blog\Interface\Form;
 
 use Blog\Modules\Template\Element;
-use Blog\Modules\TemplateFacade\TemplateFacade;
+use Blog\Modules\TemplateFacade\Title;
 
 /**
  * It using BEM-model class naming with underscore `_` separator for parts `block_block-mod__element_element-mod`
  */
-class Form extends TemplateFacade implements FormInterface
+class Form implements FormInterface
 {
     /**
      * form mask for autogeneratable template id attribute
@@ -61,14 +61,27 @@ class Form extends TemplateFacade implements FormInterface
     protected array $fields = [];
 
     /**
-     * Array with defined fields that attached into section
+     * @var array<string, ?string> $fields_section Array with defined fields that attached into section
      */
     protected array $fields_section = [];
 
     /**
-     * Array with sorted fields. It's flushing every time when new field defined or changed field section
+     * @var array<string, int> $fields_order Array with defiend fields sorting order weight
      */
-    protected array $fields_stack;
+    protected array $fields_order = [];
+
+    /**
+     * @var array<0|string, array<string, int>> $fields_order_tree is an automatically generated 2D array
+     * 
+     * Array with sorted fields. It's flushing every time when new field defined or changed field section or weight.
+     * 
+     * Array string key is the name of the section where field attached.
+     * 
+     * Second level of array contains `<field_name> => <weight>` pairs as array `key => value`.
+     * 
+     * Array index `0` contains fields that aren't attached to any section.
+     */
+    protected array $fields_order_tree;
 
     /**
      * @var FormSection[] $sections array with defined form sections
@@ -88,7 +101,27 @@ class Form extends TemplateFacade implements FormInterface
     /**
      * Form interface directory absolute path
      */
-    protected string $idir;
+    protected string $self_dir;
+
+    /**
+     * Form title element
+     */
+    protected Title $title;
+
+    /**
+     * Form title content
+     */
+    protected string $title_content;
+
+    /**
+     * Form template object
+     */
+    protected Element $form_template;
+
+    /**
+     * @var array<string, bool> $prepared_element
+     */
+    protected array $prepared_elements = [];
 
     public function __construct(
         ?string $name = null
@@ -97,7 +130,12 @@ class Form extends TemplateFacade implements FormInterface
        $f = parseClassname(static::class);
        $dir = COREDIR . $f->namespace . '/src/templates/';
        ffpath($dir);
-       $this->idir = $dir;
+       $this->self_dir = $dir;
+    }
+
+    public function __toString()
+    {
+        return (string)$this->render();
     }
 
     public function setName(?string $form_name): void
@@ -115,12 +153,12 @@ class Form extends TemplateFacade implements FormInterface
     public function addClass(string|array $classlist): self
     {
         if (is_string($classlist)) {
-            $classlist = preg_split('/[^\w\-]+/', $classlist);
+            $classlist = preg_split('/\s+/', $classlist);
         }
         foreach ($classlist as $class) {
-            $class = preg_replace(['/^\s+/', '/\s+$/'], ['', ''], $class);
-            if (!in_array($class, $this->classlist)) {
-                array_push($this->classlist);
+            $class = normalizeClassname($class);
+            if ($class && !in_array($class, $this->classlist)) {
+                array_push($this->classlist, $class);
             }
         }
         return $this;
@@ -128,7 +166,11 @@ class Form extends TemplateFacade implements FormInterface
 
     public function setClassMod(?string $mod): self
     {
-        $this->default_class_mod = $mod ? bemmod($mod) : $mod;
+        if (!$mod) {
+            unset($this->default_class_mod);
+        } else {
+            $this->default_class_mod = bemmod($mod);
+        }
         return $this;
     }
 
@@ -143,11 +185,8 @@ class Form extends TemplateFacade implements FormInterface
         $this->use_custom_nested_class = $use;
         return $this;
     }
-
-    /**
-     * Get form default classlist with BEM-model modificator if it specified
-     */
-    protected function getDefaultClasslist(): array
+    
+    public function getDefaultClasslist(): array
     {
         if (!$this->use_default_class) {
             return [];
@@ -168,17 +207,22 @@ class Form extends TemplateFacade implements FormInterface
         return $return_string ? implode(' ', $classlist) : $classlist;
     }
 
-    public function getItemClasslist(string $item_name, bool $return_string = false): array|string
+    public function getItemClasslist(string $bem_element, ?string $bem_element_mod = null, bool $return_string = false): array|string
     {
         $classlist = [];
-        $bem_element = $item_name ? bemelem($item_name) : $item_name;
+        $bem_element = bemelem($bem_element);
+        $bem_mod = $bem_element_mod ? bemmod($bem_element_mod) : $bem_element_mod;
         if ($this->use_custom_nested_class) {
             $classlist = $this->getClasslist();
         } else if ($this->use_default_class) {
             $classlist = $this->getDefaultClasslist();
         }
         foreach ($classlist as $i => $class) {
-            $classlist[$i] .= $bem_element;
+            $class = $class . $bem_element;
+            $classlist[$i] = $class;
+            if ($bem_mod) {
+                $classlist[] = $class . $bem_mod;
+            }
         }
         return $return_string ? implode(' ', $classlist) : $classlist;
     }
@@ -223,53 +267,80 @@ class Form extends TemplateFacade implements FormInterface
         return $this->action;
     }
 
-    public function setField(string $name, ?string $section = null): FormFieldInterface
+    public function setField(string $name, string $type = 'text', int $order = 0, ?string $section = null): FormFieldInterface
     {
-        $this->fields[$name] = new FormField($name);
+        $field = new FormField($name, $this, $type);
+        $name = $field->name();
+        $this->fields[$name] = $field;
         $this->setFieldSection($name, $section);
+        $this->setFieldOrder($name, $order);
         return $this->fields[$name];
     }
 
     public function setFieldSection(string $name, ?string $section = null): void
     {
         $this->fields_section[$name] = $section;
-        unset($this->fields_stack);
+        unset($this->fields_order_tree);
     }
 
-    public function getFieldOrder(): array
+    public function setFieldOrder(string $name, int $order): void
     {
-        if (!isset($this->fields_stack)) {
-            $stack = [0 => []];
+        $this->fields_order[$name] = $order;
+    }
+
+    public function getFieldsOrder(): array
+    {
+        if (!isset($this->fields_order_tree)) {
+            $order_tree = [0 => []];
             foreach ($this->fields_section as $fname => $section) {
                 if (!$section) {
                     $section = 0;
                 }
-                array_push($stack[$section], $fname);
+                $order_tree[$section][$fname] = $this->fields_order[$fname] ?? 0;
             }
-            $this->fields_stack = $stack;
+            foreach ($order_tree as $i => $stack) {
+                asort($stack, SORT_NUMERIC);
+            }
+            $this->fields_order_tree = $order_tree;
         }
-        return $this->fields_stack;
+        return $this->fields_order_tree;
+    }
+
+    public function f(string $name): ?FormFieldInterface
+    {
+        return $this->field($name);
     }
 
     public function field(string $name): ?FormFieldInterface
     {
-        return $this->field[$name] ?? null;
+        return $this->fields[$name] ?? null;
+    }
+
+    public function fields(): array
+    {
+        return $this->fields;
     }
 
     public function setSection(string $name, int $order = 0): FormSectionInterface
     {
-        $this->sections[$name] = new FormSection($name);
+        $section = new FormSection($name);
+        // TODO: complete section name parsing
+        // $name = $section->name();
+        $this->sections[$name] = $section;
         $this->setSectionOrder($name, $order);
         return $this->sections[$name];
     }
 
     public function setSectionOrder(string $name, int $order = 0): void
     {
+        if (!isset($this->sections[$name])) {
+            return;
+        }
         $this->sections_order[$name] = $order;
         unset($this->sections_stack);
     }
 
-    public function getSectionOrder(): array
+    public function getSectionsOrder(): array
     {
         if (!isset($this->sections_stack)) {
             $stack = [];
@@ -290,16 +361,140 @@ class Form extends TemplateFacade implements FormInterface
         return $this->sections[$name] ?? null;
     }
 
-    /**
-     * @return Element
-     */
-    public function tpl()
+    public function s(string $name): ?FormSectionInterface
     {
-        if (!isset($this->tpl)) {
-            $this->tpl = new Element('form');
-            app()->twig_add_namespace($this->idir, 'form-interface');
-            $this->tpl->setName('@form-interface/form');
+        return $this->section($name);
+    }
+
+    public function sections(): array
+    {
+        return $this->sections;
+    }
+
+    public function title(): ?Title
+    {
+        if (!isset($this->title)) {
+            $this->title = new Title(2);
         }
-        return $this->tpl;
+        return $this->title;
+    }
+
+    public function setTitle(?string $content): void
+    {
+        if (empty($content)) {
+            unset($this->title_content);
+        } else {
+            $this->title_content = $content;
+        }
+    }
+    
+    public function template(): Element
+    {
+        if (!isset($this->form_template)) {
+            app()->twig_add_namespace($this->self_dir, 'form-interface');
+            $this->form_template = new Element('form');
+            $this->form_template->setName('@form-interface/form');
+        }
+        return $this->form_template;
+    }
+
+    public function render(): Element
+    {
+        $this->prepareForm();
+        $this->prepareHiddenFields();
+        $this->prepareFormTitle();
+        $this->prepareFormBody();
+        return $this->template();
+    }
+
+    protected function elementPrepared(string $name): bool
+    {
+        if (!empty($this->prepared_elements[$name] ?? null)) {
+            return true;
+        }
+        $this->prepared_elements[$name] = true;
+        return false;
+    }
+
+    protected function prepareForm(): void
+    {
+        if ($this->elementPrepared('form')) {
+            return;
+        }
+        $this->template()->setAttr('action', $this->action());
+        $this->template()->setAttr('method', $this->method());
+        $this->template()->addClass($this->getClasslist());
+        $this->template()->setId($this->id());
+    }
+
+    protected function prepareHiddenFields(): void
+    {
+        if ($this->elementPrepared('hidden-fields')) {
+            return;
+        }
+        /**
+         * @var FormFIeldInterface $field
+         */
+        foreach ($this->fields() as $name => $field) {
+            if (!$field->isHidden()) {
+                continue;
+            }
+            $this->template()->content()->add($field);
+            unset(
+                $this->fields[$name],
+                $this->fields_order[$name],
+                $this->fields_section[$name]
+            );
+        }
+    }
+
+    protected function prepareFormTitle(): void
+    {
+        if (
+            $this->elementPrepared('title')
+            || empty($this->title_content ?? null)
+        ) {
+            return;
+        }
+        $this->title()->set($this->title_content);
+        $this->title()->addClass(
+            $this->getItemClasslist('title')
+        );
+        $this->template()->content()->add(
+            $this->title()
+        );
+    }
+
+    protected function prepareFormBody(): void
+    {
+        if ($this->elementPrepared('body')) {
+            return;
+        }
+        $fields_tree = $this->getFieldsOrder();
+
+        /** @var string[] $sections */
+        foreach ($this->getSectionsOrder() as $sections) {
+            foreach ($sections as $s) {
+                /* TODO: complete FormSectionInterface
+                $fields = $fields_tree[$s] ?? [];
+                $this->s($s)?->prepare();
+                foreach ($fields as $f) {
+                    $this->s($s)?->template()->content()->add(
+                        $this->f($f)->render()
+                    );
+                }
+                $this->template()->content()->add(
+                    $this->s($s)->render()
+                );
+                */
+            }
+        }
+
+        /** @var string $f */
+        foreach ($fields_tree[0] as $f) {
+            $this->template()->content()->add(
+                $this->f($f)->render()
+            );
+        }
     }
 }
