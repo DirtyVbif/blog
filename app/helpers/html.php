@@ -54,6 +54,27 @@ function classlistToString(array|string $classlist, string|array $prefix = '', s
     return $classlist;
 }
 
+/**
+ * Normalizes html single classname string.
+ * 
+ * All whitespaces will be replaced with single undescores `_` symbol.
+ * All other non-word and non-numeric symbols will be replaced single with `-` symbol
+ */
+function normalizeClassname(string $classname): string
+{
+    $classname = preg_replace(
+        [
+            '/^[^a-z]*/i',
+            '/[^a-z0-9]*$/i',
+            '/\s+/'
+        ],
+        ['', '', '_'],
+        $classname
+    );
+    $classname = preg_replace('/\W+/', '-', $classname);
+    return strtolower($classname);
+}
+
 function img(string $src): \Blog\Modules\TemplateFacade\Image
 {
     $img = new \Blog\Modules\TemplateFacade\Image($src);

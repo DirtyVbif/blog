@@ -173,9 +173,9 @@ function ffpath(string &...$args): void
 }
 
 /**
- * Convert input string `example input string` into PascalCase `ExampleInputString`
+ * Converts provided string `Some Example String` into PascalCase `ExampleInputString`
  * 
- * All non-word and non-number symbols will be trimmed.
+ * All non-word and non-numeric symbols will be trimmed.
  */
 function pascalCase(string $string): string
 {
@@ -188,9 +188,9 @@ function pascalCase(string $string): string
 }
 
 /**
- * Convert input string `example input string` into camelCase `exampleInputString`
+ * Converts provided string `Some Example String` into camelCase `exampleInputString`
  * 
- * All non-word and non-number symbols will be trimmed.
+ * All non-word and non-numeric symbols will be trimmed.
  */
 function camelCase(string $string): string
 {
@@ -199,18 +199,36 @@ function camelCase(string $string): string
 }
 
 /**
- * Convert input string `example input string` into kebab-case `example-input-string`
+ * Converts provided string `Some Example String` into kebab-case `example-input-string`
  * 
- * All non-word and non-number symbols will be trimmed.
+ * All non-word and non-numeric symbols will be trimmed.
  */
 function kebabCase(string $string, bool $transliterate = false, string $langcode = 'ru'): string
 {
     $string = strtolower(
         ($transliterate ? transliterate($string, $langcode) : $string)
     );
-    $regex = '/[\W_]+/';
-    $output = preg_replace('/(^\-*)|(\-*$)/', '', preg_replace($regex, '-', $string));
+    $output = preg_replace(
+        '/(^\-*)|(\-*$)/',
+        '',
+        preg_replace('/[\W_]+/', '-', $string)
+    );
     return $output;
+}
+
+/**
+ * Converts provided string `Some Example String` into underscore_case `some_example_string`
+ * 
+ * All non-word and non-numeric symbols will be trimmed.
+ */
+function underscoreCase(string $string): string
+{
+    $output = preg_replace(
+        '/(^_*)|(_*$)/',
+        '',
+        preg_replace('/[\W_]+/', '_', $string)
+    );
+    return strtolower($output);
 }
 
 /**
