@@ -2,13 +2,14 @@
 
 namespace Blog\Interface\Form;
 
+use Blog\Interface\TemplateInterface;
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Title;
 
 /**
  * It using BEM-model class naming with underscore `_` separator for parts `block_block-mod__element_element-mod`
  */
-class Form implements FormInterface
+class Form implements FormInterface, TemplateInterface
 {
     /**
      * form mask for autogeneratable template id attribute
@@ -122,6 +123,16 @@ class Form implements FormInterface
      * @var array<string, bool> $prepared_element
      */
     protected array $prepared_elements = [];
+
+    /**
+     * Statement to use hidden csrf-token field
+     */
+    protected bool $use_csrf;
+
+    /**
+     * array with attributes for form
+     */
+    protected array $attributes = [];
 
     public function __construct(
         ?string $name = null
@@ -267,7 +278,7 @@ class Form implements FormInterface
         return $this->action;
     }
 
-    public function setField(string $name, string $type = 'text', int $order = 0, ?string $section = null): FormFieldInterface
+    public function setField(string $name, string $type = 'text', int $order = 0, ?string $section = null): FormField
     {
         $field = new FormField($name, $this, $type);
         $name = $field->name();
@@ -306,12 +317,12 @@ class Form implements FormInterface
         return $this->fields_order_tree;
     }
 
-    public function f(string $name): ?FormFieldInterface
+    public function f(string $name): ?FormField
     {
         return $this->field($name);
     }
 
-    public function field(string $name): ?FormFieldInterface
+    public function field(string $name): ?FormField
     {
         return $this->fields[$name] ?? null;
     }
@@ -421,6 +432,9 @@ class Form implements FormInterface
         if ($this->elementPrepared('form')) {
             return;
         }
+        foreach ($this->attributes as $name => $value) {
+            $this->template()->setAttr($name, $value);
+        }
         $this->template()->setAttr('action', $this->action());
         $this->template()->setAttr('method', $this->method());
         $this->template()->addClass($this->getClasslist());
@@ -432,8 +446,13 @@ class Form implements FormInterface
         if ($this->elementPrepared('hidden-fields')) {
             return;
         }
+        if ($this->use_csrf ?? false) {
+            $this->setField('csrf', 'hidden')->setValue(
+                csrf(false)->get()
+            );
+        }
         /**
-         * @var FormFIeldInterface $field
+         * @var FormField $field
          */
         foreach ($this->fields() as $name => $field) {
             if (!$field->isHidden()) {
@@ -480,21 +499,37 @@ class Form implements FormInterface
                 $this->s($s)?->prepare();
                 foreach ($fields as $f) {
                     $this->s($s)?->template()->content()->add(
-                        $this->f($f)->render()
+                        $this->f($f)?->render()
                     );
                 }
                 $this->template()->content()->add(
-                    $this->s($s)->render()
+                    $this->s($s)?->render()
                 );
                 */
             }
         }
 
         /** @var string $f */
-        foreach ($fields_tree[0] as $f) {
+        foreach ($fields_tree[0] as $f => $order) {
             $this->template()->content()->add(
-                $this->f($f)->render()
+                $this->f($f)?->render()
             );
         }
+    }
+
+    public function useCsrf(bool $use = true): void
+    {
+        $this->use_csrf = $use;
+    }
+    
+    public function setAttribute(string $name, ?string $value = null, bool $data_attribute = false): self
+    {
+        if ($data_attribute) {
+            // remove manualy provided data-prefix
+            $name = preg_replace('/^\W*data\W+/', '', $name);
+        }
+        $name = kebabCase($data_attribute ? "data {$name}" : $name);
+        $this->attributes[$name] = $value;
+        return $this;
     }
 }

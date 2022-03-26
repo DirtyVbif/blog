@@ -115,9 +115,9 @@ interface FormInterface
      * @param int $order [optional] field sorting order weight. @see @method setFieldOrder()
      * @param ?string $section [optional] name of section where to attach field. @see @method setFieldSection()
      * 
-     * @return FormFieldInterface defined form field
+     * @return FormField defined form field
      */
-    public function setField(string $name, string $type = 'text', int $order = 0, ?string $section = null): FormFieldInterface;
+    public function setField(string $name, string $type = 'text', int $order = 0, ?string $section = null): FormField;
 
     /**
      * Attach defined field into existing section
@@ -137,20 +137,20 @@ interface FormInterface
     /**
      * Get access to specified form field
      * 
-     * @return FormFieldInterface
+     * @return FormField
      * @return null if field doesn't defined
      */
-    public function field(string $name): ?FormFieldInterface;
+    public function field(string $name): ?FormField;
 
     /**
      * Alias method for @method field()
      */
-    public function f(string $name): ?FormFieldInterface;
+    public function f(string $name): ?FormField;
 
     /**
      * Get form defined fields array
      * 
-     * @return FormFieldInterface[]
+     * @return FormField[]
      */
     public function fields(): array;
 
@@ -218,4 +218,9 @@ interface FormInterface
      * Build form template correspondes with current form configuration, fields, sections, it's order and settings
      */
     public function render(): Element;
+
+    /**
+     * Set statement of using form csrf protection
+     */
+    public function useCsrf(bool $use = true): void;
 }

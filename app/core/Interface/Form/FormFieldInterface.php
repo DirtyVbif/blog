@@ -96,7 +96,7 @@ interface FormFieldInterface
     /**
      * Get field parent wrapper element template
      */
-    public function wrapper(): Element;
+    public function template(): Element;
 
     /**
      * Set label in one line with field input or not. Corresponds with field and label order.
@@ -172,6 +172,11 @@ interface FormFieldInterface
     public function addWrapperClass(string|array $classlist): self;
 
     /**
+     * Alias method for @method addWrapperClass()
+     */
+    public function clsW(string|array $classlist): self;
+
+    /**
      * Add custom classes to field label element
      * 
      * @param string|string[] $classlist
@@ -179,11 +184,9 @@ interface FormFieldInterface
     public function addLabelClass(string|array $classlist): self;
 
     /**
-     * Add BEM-model modificator to default form template class
-     * 
-     * BEM-model modificator can be provided without `_` underscore prefix. It will be added automatically.
+     * Alias method for @method addWLabelClass()
      */
-    public function setClassMod(?string $mod): self;
+    public function clsL(string|array $classlist): self;
 
     /**
      * Add custom classes to field input element
@@ -191,6 +194,18 @@ interface FormFieldInterface
      * @param string|string[] $classlist
      */
     public function addInputClass(string|array $classlist): self;
+
+    /**
+     * Alias method for @method addInputClass()
+     */
+    public function clsI(string|array $classlist): self;
+
+    /**
+     * Add BEM-model modificator to default form template class
+     * 
+     * BEM-model modificator can be provided without `_` underscore prefix. It will be added automatically.
+     */
+    public function setClassMod(?string $mod): self;
 
     /**
      * Check if field is of type

@@ -2,17 +2,18 @@
 
 namespace Blog\Interface\Form;
 
+use Blog\Interface\TemplateInterface;
 use Blog\Modules\Template\Element;
 use JetBrains\PhpStorm\ExpectedValues;
 
-class FormField implements FormFieldInterface
+class FormField implements FormFieldInterface, TemplateInterface
 {
     public const ORDER_AFTER_LABEL = 0;
     public const ORDER_BEFORE_LABEL = 1;
     public const ORDER_IN_LABEL_BEFORE = 2;
     public const ORDER_IN_LABEL_AFTER = 3;
     public const DEFAULT_BEM_MODS = [
-        'checkbox', 'textarea', 'submit', 'reset'
+        'checkbox', 'textarea', 'reset', 'submit'
     ];
 
     /**
@@ -120,9 +121,14 @@ class FormField implements FormFieldInterface
     protected bool $use_default_class = true;
 
     /**
-     * @var array<string, bool> $prepared_element
+     * @property array<string, bool> $prepared_element array with prepared to render elements
      */
     protected array $prepared_elements = [];
+
+    /**
+     * array with attributes for input field
+     */
+    protected array $attributes = [];
 
     /**
      * @param string $name must be exactly in `underscore_case`. Any other styles will be converted to that case
@@ -143,7 +149,7 @@ class FormField implements FormFieldInterface
         return (string)$this->render();
     }
 
-    public function wrapper(): Element
+    public function template(): Element
     {
         if (!isset($this->template)) {
             $this->template = new Element;
@@ -157,9 +163,9 @@ class FormField implements FormFieldInterface
         if (!$this->isHidden()) {
             $this->prepareInputLine();
             $this->prepareLabel();
-            $this->prepareWrapper();
         }
-        return $this->wrapper();
+        $this->prepareWrapper();
+        return $this->template();
     }
 
     protected function elementPrepared(string $name): bool
@@ -176,25 +182,38 @@ class FormField implements FormFieldInterface
         if ($this->elementPrepared('input')) {
             return;
         }
-        $attributes = ['name' => $this->name()];
-        if (!$this->isHidden()) {
-            $attributes['class'] = $this->form()->getItemClasslist('input', $this->getClasslistMod());
-            $attributes['id'] = $this->id();
-            if (!empty($this->classlist['input'] ?? null)) {
-                $attributes['class'] = array_merge(
-                    $attributes['class'],
-                    $this->classlist['input']
-                );
-            }
+        $attributes = [];
+        if ($this->isNameRequired()) {
+            $attributes['name'] = $this->name();
         }
+        if (!$this->isHidden()) {
+            $attributes['id'] = $this->id();
+            $classlist = $this->form()->getItemClasslist($this->getInputElementClass(), $this->getClasslistMod());
+            if (!empty($this->classlist['input'] ?? null)) {
+                $classlist = array_merge($classlist, $this->classlist['input']);
+            }
+            $this->input()->addClass($classlist);
+        }
+        $attributes = array_merge($this->attributes, $attributes);
         foreach ($attributes as $name => $value) {
             $this->input()->setAttr($name, $value);
         }
-        if ($this->required()) {
+        if ($this->isRequired()) {
             $this->input()->setAttr('required');
         }
         $this->prepareInputType();
         $this->prepareInputValue();
+    }
+
+    protected function getInputElementClass(): string
+    {
+        $element = in_array($this->type(), self::DEFAULT_BEM_MODS) ? $this->type() :'input';
+        return bemelem($element);
+    }
+
+    protected function isNameRequired(): bool
+    {
+        return !($this->is('submit') || $this->is('reset'));
     }
 
     protected function prepareInputType(): void
@@ -326,15 +345,14 @@ class FormField implements FormFieldInterface
     {
         if ($this->elementPrepared('wrapper')) {
             return;
-        }
-        if (!$this->use_wrapper) {
-            $this->wrapper()->wrapper()->hide();
+        } else if (!$this->use_wrapper || $this->isHidden()) {
+            $this->template()->wrapper()->hide();
         } else {
-            $this->wrapper()->addClass(
+            $this->template()->addClass(
                 $this->form()->getItemClasslist('field', $this->getClasslistMod())
             );
             if (!empty($this->classlist['wrapper'])) {
-                $this->wrapper()->addClass(
+                $this->template()->addClass(
                     $this->classlist['wrapper']
                 );
             }
@@ -342,11 +360,12 @@ class FormField implements FormFieldInterface
         if (
             $this->inline_label
             || $this->order === self::ORDER_BEFORE_LABEL
+            || $this->isHidden()
         ) {
             $this->prepareInputInWrapper();
         }
-        if (!$this->inline_label) {
-            $this->wrapper()->content()->add(
+        if (!$this->inline_label && !$this->isHidden()) {
+            $this->template()->content()->add(
                 $this->labelElement()
             );
             if ($this->order !== self::ORDER_BEFORE_LABEL) {
@@ -357,8 +376,16 @@ class FormField implements FormFieldInterface
 
     protected function prepareInputInWrapper(): void
     {
+        if ($this->elementPrepared('input-in-wrapper')) {
+            return;
+        } else if ($this->isHidden()) {
+            $this->template()->content()->add(
+                $this->input()
+            );
+            return;
+        }
         $this->prepareDesctiptionBefore();
-        $this->wrapper()->content()->add(
+        $this->template()->content()->add(
             $this->inputLine()
         );
         $this->prepareDesctiptionAfter();
@@ -374,10 +401,10 @@ class FormField implements FormFieldInterface
         }
         $desc = new Element('p');
         $desc->addClass(
-            $this->form()->getItemClasslist('field-desc', $this->getClasslistMod())
+            $this->form()->getItemClasslist('description', $this->getClasslistMod())
         );
         $desc->setContent($this->description_before);
-        $this->wrapper()->content()->add($desc);
+        $this->template()->content()->add($desc);
     }
 
     protected function prepareDesctiptionAfter(): void
@@ -390,10 +417,10 @@ class FormField implements FormFieldInterface
         }
         $desc = new Element('p');
         $desc->addClass(
-            $this->form()->getItemClasslist('field-anno', $this->getClasslistMod())
+            $this->form()->getItemClasslist('annotation', $this->getClasslistMod())
         );
         $desc->setContent($this->description_after);
-        $this->wrapper()->content()->add($desc);
+        $this->template()->content()->add($desc);
     }
 
     public function form(): Form
@@ -578,13 +605,14 @@ class FormField implements FormFieldInterface
     }
 
     /**
-     * @param string $i indicator of classlist pool. For description @see @param $classlist
+     * @param string $i indicator of classlist pool. For description @see @property $classlist
      */
     protected function addClass(string|array $classlist, string $i): void
     {
         if (is_string($classlist)) {
             $classlist = preg_split('/[\s\,]+/', $classlist);
         }
+        $this->classlist[$i] ??= [];
         foreach ($classlist as $class) {
             $class = normalizeClassname($class);
             if ($class && !in_array($class, $this->classlist[$i])) {
@@ -603,17 +631,32 @@ class FormField implements FormFieldInterface
         }
         return $this->class_mod ?? null;
     }
+    
+    public function clsW(string|array $classlist): self
+    {
+        return $this->addWrapperClass($classlist);
+    }
 
     public function addWrapperClass(string|array $classlist): self
     {
         $this->addClass($classlist, 'wrapper');
         return $this;
     }
+    
+    public function clsL(string|array $classlist): self
+    {
+        return $this->addWrapperClass($classlist);
+    }
 
     public function addLabelClass(string|array $classlist): self
     {
         $this->addClass($classlist, 'label');
         return $this;
+    }
+    
+    public function clsI(string|array $classlist): self
+    {
+        return $this->addInputClass($classlist);
     }
 
     public function addInputClass(string|array $classlist): self
@@ -651,5 +694,16 @@ class FormField implements FormFieldInterface
     public function isTextarea(): bool
     {
         return $this->is('textarea');
+    }
+
+    public function setAttribute(string $name, ?string $value = null, bool $data_attribute = false): self
+    {
+        if ($data_attribute) {
+            // remove manualy provided data-prefix
+            $name = preg_replace('/^\W*data\W+/', '', $name);
+        }
+        $name = kebabCase($data_attribute ? "data {$name}" : $name);
+        $this->attributes[$name] = $value;
+        return $this;
     }
 }
