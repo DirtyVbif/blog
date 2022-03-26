@@ -32,14 +32,24 @@ function pre(): void
             unset($arguments[$i]);
         }
     }
-    print "<pre style=\"color:#272727;font-weight:200;font-size:14px;padding:1px 10px;background:#e7e7e7;margin:0;white-space:pre-wrap;\"><code>";
+    print "<pre style=\"color:#272727;font-weight:200;font-size:14px;padding:1px 15px;background:#e7e7e7;margin:0;white-space:pre-wrap;\"><code>";
     print "<hr><i>debug from: " . debugFileCalled() . "</i><br>";
     foreach ($arguments as $data) {
         $data = is_string($data) ? htmlspecialchars($data) : $data;
         ob_start();
         $verbouse ? var_dump($data) : print_r($data);
         $output = ob_get_clean();
-        print '<span>' . ($html ? htmlspecialchars($output) : $output) . '</span>';
+        if (!$verbouse) {
+            $output = preg_replace(
+                [
+                    '/(\()(\s+)(\))/m',
+                    '/(object|array)(\s*\()/im',
+                    '/\)[\r\n]+/m',
+                    '/^(\s*)(\s{4}\))(\s*)$/m'
+                ], ['()', '$1 (', ")\n", '$1)$3'], $output
+            );
+        }
+        print '<div>' . ($html ? htmlspecialchars($output) : $output) . '</div>';
     }
     print "<hr></code></pre>";
     if ($quit) {
