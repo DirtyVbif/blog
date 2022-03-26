@@ -2,6 +2,8 @@
 
 namespace Blog\Modules\PageBuilder\Components;
 
+use Blog\Interface\Form\Form as FormInterface;
+use Blog\Interface\Form\FormFactory;
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Title;
@@ -121,10 +123,16 @@ trait PageBuilderElements
         $label = new Title(2);
         $label->set(t('contacts'));
         $label->addClass('section__header section_contacts__header');
+        $form = FormFactory::get('feedback');
+        $frules = new Element;
+        $frules->setName('blocks/comment-rules')
+            ->addClass('form-wrapper__rules');
+        $fblock = new Element;
+        $fblock->addClass('form-wrapper form-wrapper_feedback');
+        $fblock->content()->add($form)->add($frules);
         $block->set('label', $label);
-        $form = new Form('feedback');
-        $form->tpl()->useGlobals(true);
-        $block->set('form', $form);
+        $block->set('form', $fblock);
+        pre($form);
         return $block;
     }
 
