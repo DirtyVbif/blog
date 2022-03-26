@@ -9,11 +9,8 @@ class Messenger extends \Blog\Modules\TemplateFacade\TemplateFacade
 {
     public const SESSIONID = 'status-messages';
     public const SRCPATH = 'app/core/Modules/Messenger/src/';
-
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             app()->twig_add_namespace(self::SRCPATH, 'messenger');

@@ -134,11 +134,8 @@ abstract class EntityPrototype extends TemplateFacade
         $this->data = $data;
         return;
     }
-
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element;

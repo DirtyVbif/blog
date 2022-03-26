@@ -24,11 +24,8 @@ class Logger extends \Blog\Modules\TemplateFacade\TemplateFacade
         $sql->useFunction('created', 'UNIX_TIMESTAMP', 'created');
         return $sql->all();
     }
-
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             app()->twig_add_namespace(Messenger::SRCPATH, 'messenger');

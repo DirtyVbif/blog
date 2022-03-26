@@ -31,7 +31,7 @@ trait TemplateWrapperMethods
         return $this;
     }
 
-    public function addClass(string $class): self
+    public function addClass(string|array $class): self
     {
         $this->wrapper()->addClass($class);
         return $this;

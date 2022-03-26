@@ -337,11 +337,8 @@ class Article extends EntityPrototype implements SitemapInterface
     {
         return (bool)$this->get('alias');
     }
-
-    /**
-     * @return Element $tpl;
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element('article');
