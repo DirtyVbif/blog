@@ -11,12 +11,12 @@ class TemplateAttributes extends BaseTemplateElement
     {
         $attributes = $this->attributes;
         if (!empty($this->classlist)) {
-            $attributes['class'] = $this->classlist();
+            $attributes['class'] = $this->classlist(true);
         }
         foreach ($attributes as $name => $value) {
             $attributes[$name] = empty($value) ? $name : "{$name}=\"{$value}\"";
         }
-        return $this->markup(implode(' ', $attributes));
+        return $this->markup(' ' . implode(' ', $attributes));
     }
 
     public function set(string $name, ?string $value = null): self
