@@ -2,8 +2,6 @@
 
 namespace Blog\Modules\Template;
 
-use Twig\Markup;
-
 class TemplateContent extends BaseTemplateElement
 {
     protected array $content = [];
@@ -28,5 +26,11 @@ class TemplateContent extends BaseTemplateElement
     public function get(): array
     {
         return $this->content;
+    }
+
+    public function unset(): self
+    {
+        $this->content = [];
+        return $this;
     }
 }

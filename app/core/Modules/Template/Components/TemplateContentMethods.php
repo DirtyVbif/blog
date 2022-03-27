@@ -21,4 +21,16 @@ trait TemplateContentMethods
         $this->content()->set($content);
         return $this;
     }
+
+    public function addContent($content): self
+    {
+        $this->content()->add($content);
+        return $this;
+    }
+
+    public function unsetContent(): self
+    {
+        $this->content()->unset();
+        return $this;
+    }
 }
