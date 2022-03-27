@@ -52,6 +52,8 @@
 'Your e-mail:': 'Ваш e-mail:'
 'Message:': 'Сообщение:'
 'Send': 'Отправить'
+'Login:': 'Логин:'
+'Password:': 'Пароль:'
 
 'Field `@field_name` is required.': 'Поле `@field_name` обязательно для заполнения.'
 'Field `@field_name` length must be lesser than @n symbols.': 'Содержимое поля `@field_name` должно быть не более @n символов.'

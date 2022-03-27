@@ -12,8 +12,9 @@ class FormField implements FormFieldInterface, TemplateInterface
     public const ORDER_BEFORE_LABEL = 1;
     public const ORDER_AFTER_IN_LABEL = 2;
     public const ORDER_BEFORE_IN_LABEL = 3;
-    public const DEFAULT_BEM_MODS = [
-        'checkbox', 'textarea', 'reset', 'submit'
+    public const DEFAULT_BEM_MODS = [];
+    public const DEFAULT_BEM_ELEMENTS = [
+        'reset', 'submit', 'checkbox', 'textarea'
     ];
 
     /**
@@ -531,6 +532,35 @@ class FormField implements FormFieldInterface, TemplateInterface
     // ==================================================================================
 
 
+
+    // ==================================================================================
+    // ----------------------------------- HELPERS --------------------------------------
+    // ----------------------------------------------------------------------------------
+
+    protected function getClasslistMod(): ?string
+    {
+        if (
+            !isset($this->class_mod)
+            && in_array($this->type(), self::DEFAULT_BEM_MODS)
+        ) {
+            $this->class_mod = bemmod($this->type());
+        }
+        return $this->class_mod ?? null;
+    }
+
+    protected function getTypeClassMod(): ?string
+    {
+        if (in_array($this->type(), self::DEFAULT_BEM_ELEMENTS)) {
+            return bemmod($this->type());
+        }
+        return null;
+    }
+
+    // ----------------------------------------------------------------------------------
+    // ----------------------------------- HELPERS --------------------------------------
+    // ==================================================================================
+
+
     
     // ==================================================================================
     // -------------------------------- RENDER LOGIC ------------------------------------
@@ -568,7 +598,7 @@ class FormField implements FormFieldInterface, TemplateInterface
                     break;
             }
         } else {
-            $this->template()->content()->add(
+            $this->template()->addContent(
                 $this->input()
             );
         }
@@ -599,7 +629,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         $line_required = false;
         // place label element in input line before in order input element
         if (!$this->isInputFirst() && !empty($this->labelContent())) {
-            $this->inputLine()->content()->add(
+            $this->inputLine()->addContent(
                 $this->label()
             );
             $line_required = true;
@@ -608,7 +638,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         $line_required = $this->renderInputLine() ? true : $line_required;
         // place label element in input line in order after input element 
         if ($this->isInputFirst() && !empty($this->labelContent())) {
-            $this->inputLine()->content()->add(
+            $this->inputLine()->addContent(
                 $this->label()
             );
             $line_required = true;
@@ -618,7 +648,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         // prepare and place description before input element in parent element if exists
         $this->prepareDesctiptionBefore();
         // place input line in parent element
-        $this->template()->content()->add($this->inputLine());
+        $this->template()->addContent($this->inputLine());
         // prepare and place description after input element in parent element if exists
         $this->prepareDesctiptionAfter();
     }
@@ -654,7 +684,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         // prepare input line element with attributes if its required
         $this->prepareInputLine($line_required);
         // place input line element in label element
-        $this->label()->content()->add(
+        $this->label()->addContent(
             $this->inputLine()
         );
         // place label content if it exists after input line element in label element
@@ -664,7 +694,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         // prepare and place description before input element in parent element if exists
         $this->prepareDesctiptionBefore();
         // place label element in parent element
-        $this->template()->content()->add($this->label());
+        $this->template()->addContent($this->label());
         // prepare and place description after input element in parent element if exists
         $this->prepareDesctiptionAfter();
     }
@@ -688,7 +718,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         if (!empty($this->label_content)) {
             $this->prepareLabel();
             $this->prepareLabelContent();
-            $this->template()->content()->add($this->label());
+            $this->template()->addContent($this->label());
         }
         // prepare and place description before element if its not empty in parent element
         $this->prepareDesctiptionBefore();
@@ -701,7 +731,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         // prepare input line element with attributes if its required
         $this->prepareInputLine($line_required);
         // place input line element in parent element
-        $this->template()->content()->add(
+        $this->template()->addContent(
             $this->inputLine()
         );
         // prepare and place description after element if its not empty in parent element
@@ -711,10 +741,18 @@ class FormField implements FormFieldInterface, TemplateInterface
     protected function renderInputLine(): bool
     {
         $line_required = $this->renderInputAffix('prefix');
-        $this->inputLine()->content()->add(
+        $this->inputLine()->addContent(
             $this->input()
         );
         $line_required = $this->renderInputAffix('suffix') ? true : $line_required;
+        if ($this->is('checkbox')) {
+            $line_required = true;
+            $switcher = new Element('span');
+            $switcher->addClass(
+                $this->form()->getItemClasslist('checkbox-switcher')
+            );
+            $this->inputLine()->addContent($switcher);
+        }
         return $line_required;
     }
 
@@ -723,7 +761,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         string $affix_name
     ): bool {
         if ($affix = $this->getInputAffix($affix_name)) {
-            $this->inputLine()->content()->add($affix);
+            $this->inputLine()->addContent($affix);
             return true;
         }
         return false;
@@ -753,6 +791,15 @@ class FormField implements FormFieldInterface, TemplateInterface
             $this->input()->setAttr('required');
             return;
         }
+        if (
+            empty($this->value())
+            && old($this->name())
+            && !$this->is('password')
+        ) {
+            $this->setValue(
+                old($this->name())
+            );
+        }
         $attributes = ['id' => $this->id()];
         if ($this->isInputHasName()) {
             $attributes['name'] = $this->name();
@@ -777,14 +824,12 @@ class FormField implements FormFieldInterface, TemplateInterface
         }
         $classlist = $this->classlist['input'] ?? [];
         if ($this->use_default_class) {
-            $bem_element = in_array($this->type(), self::DEFAULT_BEM_MODS) ? $this->type() : 'input';
+            $bem_element = in_array($this->type(), self::DEFAULT_BEM_ELEMENTS) ? $this->type() : 'input';
             $bem_element = bemelem($bem_element);
             $default_classlist = $this->form()->getItemClasslist($bem_element, $this->getClasslistMod());
             $classlist = array_merge($classlist, $default_classlist);
         }
-        if (!empty($classlist)) {
-            $this->input()->addClass($classlist);
-        }
+        $this->input()->addClass($classlist);
     }
 
     protected function prepareWrapper(): void
@@ -795,7 +840,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         }
         $classlist = $this->classlist['wrapper'] ?? [];
         if ($this->use_default_class) {
-            $default_classlist = $this->form()->getItemClasslist('field', $this->getClasslistMod());
+            $default_classlist = $this->form()->getItemClasslist('field', $this->getTypeClassMod());
             $classlist = array_merge($classlist, $default_classlist);
         }
         if (!empty($classlist)) {
@@ -815,7 +860,7 @@ class FormField implements FormFieldInterface, TemplateInterface
         $this->label()->setAttr('for', $this->id());
         $classlist = $this->classlist['label'] ?? [];
         if ($this->use_default_class) {
-            $default_classlist = $this->form()->getItemClasslist('label', $this->getClasslistMod());
+            $default_classlist = $this->form()->getItemClasslist('label', $this->getTypeClassMod());
             $classlist = array_merge($classlist, $default_classlist);
         }
         if (!empty($classlist)) {
@@ -825,10 +870,14 @@ class FormField implements FormFieldInterface, TemplateInterface
 
     protected function prepareLabelContent(): void
     {
-        if (empty($this->label_content ?? null)) {
+        $content = $this->label_content ?? null;
+        if (empty($content)) {
             return;
+        } else if ($this->isInputInLabel()) {
+            $content = new Element('span');
+            $content->setContent($this->label_content);
         }
-        $this->label()->content()->add($this->label_content);
+        $this->label()->addContent($content);
     }
 
     protected function prepareInputLine(bool $line_required): void
@@ -840,6 +889,9 @@ class FormField implements FormFieldInterface, TemplateInterface
         $this->inputLine()->addClass(
             $this->form()->getItemClasslist('line', $this->getClasslistMod())
         );
+        if ($this->isInputInLabel()) {
+            $this->inputLine()->wrapper()->set('span');
+        }
     }
 
     protected function prepareDesctiptionBefore(): void
@@ -852,7 +904,7 @@ class FormField implements FormFieldInterface, TemplateInterface
             $this->form()->getItemClasslist('description', $this->getClasslistMod())
         );
         $desc->setContent($this->description_before);
-        $this->template()->content()->add($desc);
+        $this->template()->addContent($desc);
     }
 
     protected function prepareDesctiptionAfter(): void
@@ -865,18 +917,7 @@ class FormField implements FormFieldInterface, TemplateInterface
             $this->form()->getItemClasslist('annotation', $this->getClasslistMod())
         );
         $desc->setContent($this->description_after);
-        $this->template()->content()->add($desc);
-    }
-
-    protected function getClasslistMod(): ?string
-    {
-        if (
-            !isset($this->class_mod)
-            && in_array($this->type(), self::DEFAULT_BEM_MODS)
-        ) {
-            $this->class_mod = bemmod($this->type());
-        }
-        return $this->class_mod ?? null;
+        $this->template()->addContent($desc);
     }
     
     // ----------------------------------------------------------------------------------

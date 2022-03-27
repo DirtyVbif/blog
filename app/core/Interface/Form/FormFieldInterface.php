@@ -78,8 +78,8 @@ interface FormFieldInterface
      * @param int $order available values:
      * * @var `FormField::ORDER_AFTER_LABEL (0)` - default order, label above (before) input field;
      * * @var `FormField::ORDER_BEFORE_LABEL (1)` - label under (after) input field;
-     * * @var `FormField::ORDER_IN_LABEL_AFTER (2)` - input field inside label after label content;
-     * * @var `FormField::ORDER_IN_LABEL_BEFORE (3)` - input field inside label before label content;
+     * * @var `FormField::ORDER_AFTER_IN_LABEL (2)` - input field inside label after label content;
+     * * @var `FormField::ORDER_BEFORE_IN_LABEL (3)` - input field inside label before label content;
      */
     public function setOrder(int $order): self;
 

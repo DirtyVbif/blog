@@ -87,6 +87,7 @@
         border-radius: 4px;
         border: 1px solid $grey_light;
         font: inherit;
+        font-size: 0.9em;
 
         &:focus {
             border-color: $link_hover;
@@ -103,6 +104,7 @@
 
     &__textarea {
         width: 100%;
+        font-size: 0.8em;
         resize: vertical;
     }
 
@@ -218,10 +220,6 @@
                 width: 110px;
             }
         }
-
-        &__input {            
-            width: 100%;
-        }
     }
     
     &_skill,
@@ -239,12 +237,8 @@
             align-items: center;
         }
 
-        &__input {
-            width: 100%;
-        }
-
         &__textarea {
-            font-size: 14px;
+            font-size: 0.7em;
         }
     }
     // MODIFICATORS <---------------------------------------------------
