@@ -18,7 +18,6 @@ class FormFactory
         $form = new Form('feedback');
         $form->setMethod('post');
         $form->useCsrf();
-        $form->setClassMod('feedback');
         $form->setField('type', 'hidden')
             ->setValue('feedback');
         $form->setField('name')
@@ -36,8 +35,40 @@ class FormFactory
             ->setAttribute('rows', 6)
             ->required()
             ->setLabel(t('Message:'));
-        $form->setField('submit', 'submit')
+        $form->setSubmit()
             ->setValue(t('Send'))
+            ->clsI('btn btn_transparent');
+        return $form;
+    }
+
+    public static function getLogin(): Form
+    {
+        $form = new Form('login');
+        $form->setMethod('post');
+        $form->setAction('/user');
+        $form->useCsrf();
+        $form->setField('type', 'hidden')
+            ->setValue('login');
+        $form->setSection('body');
+        $form->setSection('footer');
+        $form->setField('mail', 'email', section: 'body')
+            ->setLabel(t('Login:'))
+            ->setAttribute('maxlength', 256)
+            ->inlineLabel(true)
+            ->required();
+        $form->setField('password', 'password', section: 'body')
+            ->setLabel(t('Password:'))
+            ->setAttribute('minlength', 8)
+            ->setAttribute('maxlength', 64)
+            ->inlineLabel(true)
+            ->required();
+        $form->setField('remember_me', 'checkbox', section: 'footer')
+            ->setLabel(t('Remember me'))
+            ->setAttribute('checked')
+            ->setValue(1)
+            ->setOrder(FormField::ORDER_BEFORE_IN_LABEL);
+        $form->setSubmit(section: 'footer')
+            ->setValue(t('Sign in'))
             ->clsI('btn btn_transparent');
         return $form;
     }
