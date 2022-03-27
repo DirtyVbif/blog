@@ -3,6 +3,7 @@
 namespace Blog\Controller;
 
 use Blog\Client\User;
+use Blog\Interface\Form\FormFactory;
 use Blog\Request\LoginRequest;
 use Exception;
 
@@ -63,7 +64,7 @@ class UserController extends BaseController
     {
         app()->page()->addClass('page_login');
         app()->page()->addContent(
-            app()->builder()->getLoginForm()
+            FormFactory::get('login')
         );
         $this->getTitle()->set(t('Admin authorization'));
         return;

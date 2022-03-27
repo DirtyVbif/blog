@@ -2,10 +2,8 @@
 
 namespace Blog\Modules\PageBuilder\Components;
 
-use Blog\Interface\Form\Form as FormInterface;
 use Blog\Interface\Form\FormFactory;
 use Blog\Modules\Template\Element;
-use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Title;
 
 trait PageBuilderElements
@@ -180,13 +178,6 @@ trait PageBuilderElements
         $chunk->addClass('cookie-agreement hidden');
         $chunk->setId('cookie-agreement');
         return $chunk;
-    }
-
-    public function getLoginForm(): Element
-    {
-        $form = new Element;
-        $form->setName('forms/login');
-        return $form;
     }
 
     public function getUserSessions(): Element
