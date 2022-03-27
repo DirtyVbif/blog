@@ -132,7 +132,6 @@ trait PageBuilderElements
         $fblock->content()->add($form)->add($frules);
         $block->set('label', $label);
         $block->set('form', $fblock);
-        pre($form);
         return $block;
     }
 

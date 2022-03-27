@@ -24,7 +24,7 @@ interface FormFieldInterface
     /**
      * Get field label template element
      */
-    public function labelElement(): Element;
+    public function label(): Element;
 
     /**
      * Set field label content
@@ -34,7 +34,7 @@ interface FormFieldInterface
     /**
      * Get field label content if it was defined
      */
-    public function label(): Element|string|null;
+    public function labelContent(): Element|string|null;
 
     /**
      * Uset field label
@@ -78,8 +78,8 @@ interface FormFieldInterface
      * @param int $order available values:
      * * @var `FormField::ORDER_AFTER_LABEL (0)` - default order, label above (before) input field;
      * * @var `FormField::ORDER_BEFORE_LABEL (1)` - label under (after) input field;
-     * * @var `FormField::ORDER_IN_LABEL_BEFORE (2)` - input field inside label before label content;
-     * * @var `FormField::ORDER_IN_LABEL_AFTER (3)` - input field inside label after label content;
+     * * @var `FormField::ORDER_IN_LABEL_AFTER (2)` - input field inside label after label content;
+     * * @var `FormField::ORDER_IN_LABEL_BEFORE (3)` - input field inside label before label content;
      */
     public function setOrder(int $order): self;
 
