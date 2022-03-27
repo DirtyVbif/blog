@@ -77,6 +77,7 @@ interface FormInterface
      * Set form custom template id attribute value
      */
     public function setId(string $form_id): void;
+
     /**
      * Get current form template id attribute value string based on form name or null if form name wasn't specified
      */
@@ -120,6 +121,18 @@ interface FormInterface
     public function setField(string $name, string $type = 'text', int $order = 0, ?string $section = null): FormField;
 
     /**
+     * Set form submit field
+     * 
+     * It is an alias for @method setField() with arguments `(name: 'submit', type: 'submit', order: @param int $order, section: @param ?string $section)`
+     * 
+     * To get access to that field use @method f() or field() with argument `(name: 'submit')`
+     * 
+     * @param int $order @see @method setField()
+     * @param ?string $section @see @method setField()
+     */
+    public function setSubmit(int $order = 0, ?string $section = null): FormField;
+
+    /**
      * Attach defined field into existing section
      */
     public function setFieldSection(string $name, ?string $section = null): void;
@@ -130,9 +143,16 @@ interface FormInterface
     public function setFieldOrder(string $name, int $order): void;
 
     /**
-     * Generate array tree with fields inside of sections
+     * Generate array tree with fields inside of sections and fields order
      */
-    public function getFieldsOrder(): array;
+    public function getFieldsTree(): array;
+
+    /**
+     * Get fields that corresponds to the provided section name
+     * 
+     * @return FormField[]
+     */
+    public function getSectionFields(string $section_name): array;
 
     /**
      * Get access to specified form field
@@ -143,7 +163,7 @@ interface FormInterface
     public function field(string $name): ?FormField;
 
     /**
-     * Alias method for @method field()
+     * Alias for @method field()
      */
     public function f(string $name): ?FormField;
 
@@ -159,9 +179,9 @@ interface FormInterface
      * 
      * Section position can be manipulated with @param int $order
      * 
-     * @return FormSectionInterface defined form section
+     * @return FormSection defined form section
      */
-    public function setSection(string $name, int $order = 0): FormSectionInterface;
+    public function setSection(string $name, int $order = 0): FormSection;
 
     /**
      * Set sorting order for defined section by section name
@@ -176,20 +196,20 @@ interface FormInterface
     /**
      * Get access to specified form section
      * 
-     * @return FormSectionInterface
+     * @return FormSection
      * @return null if section doesn't defined
      */
-    public function section(string $name): ?FormSectionInterface;
+    public function section(string $name): ?FormSection;
 
     /**
-     * Alias method for @method section()
+     * Alias for @method section()
      */
-    public function s(string $name): ?FormSectionInterface;
+    public function s(string $name): ?FormSection;
 
     /**
      * Get form defined sections array
      * 
-     * @return FormSectionInterface[]
+     * @return FormSection[]
      */
     public function sections(): array;
 
@@ -206,8 +226,20 @@ interface FormInterface
      * 
      * @param string $content set new form title content
      * @param null $content to unset defined form title
+     * 
+     * @param int $size @see @method setTitleSize()
      */
-    public function setTitle(?string $content): void;
+    public function setTitle(?string $content, int $size = 2): void;
+
+    /**
+     * @param int $size @see Blog\Modules\TemplateFacade\Title::size()
+     */
+    public function setTitleSize(int $size): void;
+
+    /**
+     * Get current form title size
+     */
+    public function getTitleSize(): int;
 
     /**
      * Get form template element

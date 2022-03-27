@@ -72,15 +72,15 @@ class Form implements FormInterface, TemplateInterface
     protected array $fields_order = [];
 
     /**
-     * @var array<0|string, array<string, int>> $fields_order_tree is an automatically generated 2D array
+     * @var array<int|string, array<string, int>> $fields_order_tree is an automatically generated 2D array
      * 
      * Array with sorted fields. It's flushing every time when new field defined or changed field section or weight.
      * 
-     * Array string key is the name of the section where field attached.
+     * Each array key matchs to the name of defined section `<section_name> => <fields_pool>`
+     * 
+     * But array index `0` contains fields that aren't attached to any section.
      * 
      * Second level of array contains `<field_name> => <weight>` pairs as array `key => value`.
-     * 
-     * Array index `0` contains fields that aren't attached to any section.
      */
     protected array $fields_order_tree;
 
@@ -108,6 +108,11 @@ class Form implements FormInterface, TemplateInterface
      * Form title element
      */
     protected Title $title;
+
+    /**
+     * Form title size that correspondes with `<h1>` - `<h6>` HTML tag
+     */
+    protected int $title_size = 2;
 
     /**
      * Form title content
@@ -148,6 +153,16 @@ class Form implements FormInterface, TemplateInterface
     {
         return (string)$this->render();
     }
+    
+    public function template(): Element
+    {
+        if (!isset($this->form_template)) {
+            app()->twig_add_namespace($this->self_dir, 'form-interface');
+            $this->form_template = new Element('form');
+            $this->form_template->setName('@form-interface/form');
+        }
+        return $this->form_template;
+    }
 
     public function setName(?string $form_name): void
     {
@@ -180,7 +195,7 @@ class Form implements FormInterface, TemplateInterface
         if (!$mod) {
             unset($this->default_class_mod);
         } else {
-            $this->default_class_mod = bemmod($mod);
+            $this->default_class_mod = $mod;
         }
         return $this;
     }
@@ -204,7 +219,7 @@ class Form implements FormInterface, TemplateInterface
         }
         $classlist = [$this->default_class];
         if ($mod = $this->default_class_mod ?? $this->name()) {
-            array_push($classlist, $this->default_class . $mod);
+            array_push($classlist, $this->default_class . bemmod($mod));
         }
         return $classlist;
     }
@@ -288,6 +303,11 @@ class Form implements FormInterface, TemplateInterface
         return $this->fields[$name];
     }
 
+    public function setSubmit(int $order = 0, ?string $section = null): FormField
+    {
+        return $this->setField('submit', 'submit', $order, $section);
+    }
+
     public function setFieldSection(string $name, ?string $section = null): void
     {
         $this->fields_section[$name] = $section;
@@ -299,12 +319,12 @@ class Form implements FormInterface, TemplateInterface
         $this->fields_order[$name] = $order;
     }
 
-    public function getFieldsOrder(): array
+    public function getFieldsTree(): array
     {
         if (!isset($this->fields_order_tree)) {
             $order_tree = [0 => []];
             foreach ($this->fields_section as $fname => $section) {
-                if (!$section) {
+                if (!$section || !$this->s($section)) {
                     $section = 0;
                 }
                 $order_tree[$section][$fname] = $this->fields_order[$fname] ?? 0;
@@ -315,6 +335,12 @@ class Form implements FormInterface, TemplateInterface
             $this->fields_order_tree = $order_tree;
         }
         return $this->fields_order_tree;
+    }
+
+    public function getSectionFields(string $section_name): array
+    {
+        $tree = $this->getFieldsTree();
+        return $tree[$section_name] ?? [];
     }
 
     public function f(string $name): ?FormField
@@ -332,11 +358,10 @@ class Form implements FormInterface, TemplateInterface
         return $this->fields;
     }
 
-    public function setSection(string $name, int $order = 0): FormSectionInterface
+    public function setSection(string $name, int $order = 0): FormSection
     {
-        $section = new FormSection($name);
-        // TODO: complete section name parsing
-        // $name = $section->name();
+        $section = new FormSection($name, $this);
+        $name = $section->name();
         $this->sections[$name] = $section;
         $this->setSectionOrder($name, $order);
         return $this->sections[$name];
@@ -367,12 +392,12 @@ class Form implements FormInterface, TemplateInterface
         return $this->sections_stack;
     }
 
-    public function section(string $name): ?FormSectionInterface
+    public function section(string $name): ?FormSection
     {
         return $this->sections[$name] ?? null;
     }
 
-    public function s(string $name): ?FormSectionInterface
+    public function s(string $name): ?FormSection
     {
         return $this->section($name);
     }
@@ -385,12 +410,12 @@ class Form implements FormInterface, TemplateInterface
     public function title(): ?Title
     {
         if (!isset($this->title)) {
-            $this->title = new Title(2);
+            $this->title = new Title($this->title_size);
         }
         return $this->title;
     }
 
-    public function setTitle(?string $content): void
+    public function setTitle(?string $content, int $size = 2): void
     {
         if (empty($content)) {
             unset($this->title_content);
@@ -398,19 +423,42 @@ class Form implements FormInterface, TemplateInterface
             $this->title_content = $content;
         }
     }
-    
-    public function template(): Element
+
+    public function setTitleSize(int $size): void
     {
-        if (!isset($this->form_template)) {
-            app()->twig_add_namespace($this->self_dir, 'form-interface');
-            $this->form_template = new Element('form');
-            $this->form_template->setName('@form-interface/form');
-        }
-        return $this->form_template;
+        $this->title_size = $size;
     }
+
+    public function getTitleSize(): int
+    {
+        return $this->title_size;
+    }
+
+    public function useCsrf(bool $use = true): void
+    {
+        $this->use_csrf = $use;
+    }
+    
+    public function setAttribute(string $name, ?string $value = null, bool $data_attribute = false): self
+    {
+        if ($data_attribute) {
+            // remove manualy provided data-prefix
+            $name = preg_replace('/^\W*data\W+/', '', $name);
+        }
+        $name = kebabCase($data_attribute ? "data {$name}" : $name);
+        $this->attributes[$name] = $value;
+        return $this;
+    }
+    
+
+
+    // ==================================================================================
+    // -------------------------------- RENDER LOGIC ------------------------------------
+    // ----------------------------------------------------------------------------------
 
     public function render(): Element
     {
+        // TODO: complete changes affecting on rendered form element
         $this->prepareForm();
         $this->prepareHiddenFields();
         $this->prepareFormTitle();
@@ -418,20 +466,8 @@ class Form implements FormInterface, TemplateInterface
         return $this->template();
     }
 
-    protected function elementPrepared(string $name): bool
-    {
-        if (!empty($this->prepared_elements[$name] ?? null)) {
-            return true;
-        }
-        $this->prepared_elements[$name] = true;
-        return false;
-    }
-
     protected function prepareForm(): void
     {
-        if ($this->elementPrepared('form')) {
-            return;
-        }
         foreach ($this->attributes as $name => $value) {
             $this->template()->setAttr($name, $value);
         }
@@ -443,9 +479,6 @@ class Form implements FormInterface, TemplateInterface
 
     protected function prepareHiddenFields(): void
     {
-        if ($this->elementPrepared('hidden-fields')) {
-            return;
-        }
         if ($this->use_csrf ?? false) {
             $this->setField('csrf', 'hidden')->setValue(
                 csrf(false)->get()
@@ -469,15 +502,13 @@ class Form implements FormInterface, TemplateInterface
 
     protected function prepareFormTitle(): void
     {
-        if (
-            $this->elementPrepared('title')
-            || empty($this->title_content ?? null)
-        ) {
+        if (empty($this->title_content ?? null)) {
             return;
         }
+        $this->title()->size($this->title_size);
         $this->title()->set($this->title_content);
         $this->title()->addClass(
-            $this->getItemClasslist('title')
+            $this->getItemClasslist('header')
         );
         $this->template()->content()->add(
             $this->title()
@@ -486,50 +517,29 @@ class Form implements FormInterface, TemplateInterface
 
     protected function prepareFormBody(): void
     {
-        if ($this->elementPrepared('body')) {
-            return;
-        }
-        $fields_tree = $this->getFieldsOrder();
+        $fields_tree = $this->getFieldsTree();
 
         /** @var string[] $sections */
         foreach ($this->getSectionsOrder() as $sections) {
             foreach ($sections as $s) {
-                /* TODO: complete FormSectionInterface
-                $fields = $fields_tree[$s] ?? [];
-                $this->s($s)?->prepare();
-                foreach ($fields as $f) {
-                    $this->s($s)?->template()->content()->add(
-                        $this->f($f)?->render()
-                    );
-                }
                 $this->template()->content()->add(
                     $this->s($s)?->render()
                 );
-                */
             }
         }
 
-        /** @var string $f */
+        /**
+         * @var string $f field name
+         * @var int $order field order
+         * */
         foreach ($fields_tree[0] as $f => $order) {
             $this->template()->content()->add(
                 $this->f($f)?->render()
             );
         }
     }
-
-    public function useCsrf(bool $use = true): void
-    {
-        $this->use_csrf = $use;
-    }
     
-    public function setAttribute(string $name, ?string $value = null, bool $data_attribute = false): self
-    {
-        if ($data_attribute) {
-            // remove manualy provided data-prefix
-            $name = preg_replace('/^\W*data\W+/', '', $name);
-        }
-        $name = kebabCase($data_attribute ? "data {$name}" : $name);
-        $this->attributes[$name] = $value;
-        return $this;
-    }
+    // ----------------------------------------------------------------------------------
+    // -------------------------------- RENDER LOGIC ------------------------------------
+    // ==================================================================================
 }
