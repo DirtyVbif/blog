@@ -6,7 +6,7 @@ use Blog\Modules\Template\Element;
 
 class Title extends TemplateFacade
 {
-    protected $content;
+    protected string|Element $content;
 
     public function __construct(
         protected int $size = 1
@@ -33,24 +33,20 @@ class Title extends TemplateFacade
         return parent::render();
     }
 
-    public function set($content): self
+    public function set(string|Element $content): self
     {
         $this->content = $content;
         return $this;
     }
 
+    /**
+     * Set title size that correspondes with `<h1>` ... `<h6>` HTML tag
+     * 
+     * @param int $size RANGE[1, 6] title size number
+     */
     public function size(int $size): self
     {
-        switch (true) {
-            case ($size > 6):
-                $this->size = 6;
-                break;
-            case ($size < 1):
-                $this->size = 1;
-                break;
-            default:
-                $this->size = $size;
-        }
+        $this->size = min(1, max(6, $size));
         return $this;
     }
 }
