@@ -199,14 +199,24 @@ class FormField implements FormFieldInterface, TemplateInterface
     public function required(bool $required = true): self
     {
         $this->required = $required;
-        $this->refreshRender();
+        if ($this->isRendered()) {
+            if ($this->required && !$required) {
+                $this->input()->wrapper()->unsetAttribute('required');
+            } else if ($required) {
+                $this->input()->setAttr('required');
+            }
+        }
         return $this;
     }
 
     public function setLabel(string|Element $content): self
     {
         $this->label_content = $content;
-        $this->refreshRender();
+        if ($this->isRendered() && !$this->isInputInLabel()) {
+            $this->label()->setContent($content);
+        } else if ($this->isRendered()) {
+            $this->refreshRender();
+        }
         return $this;
     }
 
@@ -236,12 +246,27 @@ class FormField implements FormFieldInterface, TemplateInterface
 
     public function setValue(?string $value): self
     {
-        if (!$value) {
+        if (empty($value)) {
             unset($this->value);
         } else {
             $this->value = $value;
         }
-        $this->refreshRender();
+        if (!$this->isRendered()) {
+            return $this;
+        }
+        if (empty($value)) {
+            if ($this->isTextarea()) {
+                $this->input()->unsetContent();
+            } else {
+                $this->input()->wrapper()->unsetAttribute('value');
+            }
+        } else {
+            if ($this->isTextarea()) {
+                $this->input()->setContent($value);
+            } else {
+                $this->input()->setAttr('value', $value);
+            }
+        }
         return $this;
     }
 
@@ -252,18 +277,17 @@ class FormField implements FormFieldInterface, TemplateInterface
 
     public function setPlaceholder(?string $content): self
     {
-        if (!$content) {
-            unset($this->placeholder);
+        if (empty($content)) {
+            unset($this->attributes['placeholder']);
         } else {
-            $this->placeholder = $content;
+            $this->attributes['placeholder'] = $content;
         }
-        $this->refreshRender();
+        if ($this->isRendered() && empty($content)) {
+            $this->input()->wrapper()->unsetAttribute('placeholder');
+        } else if ($this->isRendered()) {
+            $this->input()->setAttr('placeholder', $content);
+        }
         return $this;
-    }
-
-    protected function placeholder(): ?string
-    {
-        return $this->placeholder ?? null;
     }
 
     public function setOrder(
@@ -286,19 +310,22 @@ class FormField implements FormFieldInterface, TemplateInterface
 
     public function useWrapper(bool $use): self
     {
+        $this->use_wrapper = $use;
         if ($this->isRendered() && $use) {
             $this->template()->wrapper()->show();
         } else if ($this->isRendered()) {
             $this->template()->wrapper()->hide();
         }
-        $this->use_wrapper = $use;
         return $this;
     }
 
     public function inlineLabel(bool $inline_statement): self
     {
+        $old_statement = $this->inline_label;
         $this->inline_label = $inline_statement;
-        $this->refreshRender();
+        if ($old_statement !== $inline_statement) {
+            $this->refreshRender();
+        }
         return $this;
     }
 
@@ -355,19 +382,37 @@ class FormField implements FormFieldInterface, TemplateInterface
     /**
      * @param string $i indicator of classlist pool. For description @see @property $classlist
      */
-    protected function addClass(string|array $classlist, string $i): void
-    {
+    protected function addClass(
+        string|array $classlist,
+        #[ExpectedValues('wrapper', 'label', 'input')]
+        string $i
+    ): void {
         if (is_string($classlist)) {
             $classlist = preg_split('/[\s\,]+/', $classlist);
         }
         $this->classlist[$i] ??= [];
+        $new_classlist = [];
         foreach ($classlist as $class) {
             $class = normalizeClassname($class);
             if ($class && !in_array($class, $this->classlist[$i])) {
                 array_push($this->classlist[$i], $class);
+                $new_classlist[] = $class;
             }
         }
-        $this->refreshRender();
+        if (!$this->isRendered() || ($this->isRendered() && empty($new_classlist))) {
+            return;
+        }
+        switch ($i) {
+            case 'wrapper':
+                $this->template()->addClass($new_classlist);
+                break;
+            case 'label':
+                $this->label()->addClass($new_classlist);
+                break;
+            case 'input':
+                $this->input()->addClass($new_classlist);
+                break;
+        }
     }
 
     public function clsW(string|array $classlist): self
@@ -410,7 +455,9 @@ class FormField implements FormFieldInterface, TemplateInterface
         } else {
             $this->class_mod = bemmod($mod);
         }
-        $this->refreshRender();
+        if ($this->use_default_class && $this->isRendered()) {
+            $this->refreshRender();
+        }
         return $this;
     }
 
@@ -429,7 +476,9 @@ class FormField implements FormFieldInterface, TemplateInterface
         }
         $name = kebabCase($data_attribute ? "data {$name}" : $name);
         $this->attributes[$name] = $value;
-        $this->refreshRender();
+        if ($this->isRendered()) {
+            $this->input()->setAttr($name, $value);
+        }
         return $this;
     }
 
@@ -489,7 +538,6 @@ class FormField implements FormFieldInterface, TemplateInterface
 
     protected function refreshRender(): void
     {
-        // TODO: improve content change on rendered field element
         if (!$this->statement_render) {
             return;
         }
@@ -727,16 +775,16 @@ class FormField implements FormFieldInterface, TemplateInterface
         foreach ($attributes as $name => $value) {
             $this->input()->setAttr($name, $value);
         }
-        $bem_element = in_array($this->type(), self::DEFAULT_BEM_MODS) ? $this->type() : 'input';
-        $bem_element = bemelem($bem_element);
-        $classlist = $this->form()->getItemClasslist(
-            $bem_element,
-            $this->getClasslistMod()
-        );
-        if (!empty($this->classlist['input'] ?? null)) {
-            $classlist = array_merge($classlist, $this->classlist['input']);
+        $classlist = $this->classlist['input'] ?? [];
+        if ($this->use_default_class) {
+            $bem_element = in_array($this->type(), self::DEFAULT_BEM_MODS) ? $this->type() : 'input';
+            $bem_element = bemelem($bem_element);
+            $default_classlist = $this->form()->getItemClasslist($bem_element, $this->getClasslistMod());
+            $classlist = array_merge($classlist, $default_classlist);
         }
-        $this->input()->addClass($classlist);
+        if (!empty($classlist)) {
+            $this->input()->addClass($classlist);
+        }
     }
 
     protected function prepareWrapper(): void
@@ -745,11 +793,14 @@ class FormField implements FormFieldInterface, TemplateInterface
             $this->template()->wrapper()->hide();
             return;
         }
-        $classlist = $this->form()->getItemClasslist('field', $this->getClasslistMod());
-        if (!empty($this->classlist['wrapper'])) {
-            $classlist = array_merge($classlist, $this->classlist['wrapper']);
+        $classlist = $this->classlist['wrapper'] ?? [];
+        if ($this->use_default_class) {
+            $default_classlist = $this->form()->getItemClasslist('field', $this->getClasslistMod());
+            $classlist = array_merge($classlist, $default_classlist);
         }
-        $this->template()->addClass($classlist);
+        if (!empty($classlist)) {
+            $this->template()->addClass($classlist);
+        }
     }
 
     protected function prepareLabel(): void
@@ -762,11 +813,14 @@ class FormField implements FormFieldInterface, TemplateInterface
             return;
         }
         $this->label()->setAttr('for', $this->id());
-        $classlist = $this->form()->getItemClasslist('label', $this->getClasslistMod());
-        if (!empty($this->classlist['label'])) {
-            $classlist = array_merge($classlist, $this->classlist['label']);
+        $classlist = $this->classlist['label'] ?? [];
+        if ($this->use_default_class) {
+            $default_classlist = $this->form()->getItemClasslist('label', $this->getClasslistMod());
+            $classlist = array_merge($classlist, $default_classlist);
         }
-        $this->label()->addClass($classlist);
+        if (!empty($classlist)) {
+            $this->label()->addClass($classlist);
+        }
     }
 
     protected function prepareLabelContent(): void
@@ -784,10 +838,7 @@ class FormField implements FormFieldInterface, TemplateInterface
             return;
         }
         $this->inputLine()->addClass(
-            $this->form()->getItemClasslist(
-                'item',
-                $this->getClasslistMod()
-            )
+            $this->form()->getItemClasslist('line', $this->getClasslistMod())
         );
     }
 

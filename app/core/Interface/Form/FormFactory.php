@@ -24,11 +24,13 @@ class FormFactory
         $form->setField('name')
             ->setAttribute('maxlength', 60)
             ->required()
-            ->setLabel(t('Your name:'));
+            ->setLabel(t('Your name:'))
+            ->inlineLabel(true);
         $form->setField('email', 'email')
             ->setAttribute('maxlength', 256)
             ->required()
             ->setLabel(t('Your e-mail:'))
+            ->inlineLabel(true)
             ->appendDescription('Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.');
         $form->setField('subject', 'textarea')
             ->setAttribute('rows', 6)
