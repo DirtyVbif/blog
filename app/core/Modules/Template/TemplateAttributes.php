@@ -47,7 +47,9 @@ class TemplateAttributes extends BaseTemplateElement
      */
     public function addClass(string|array $classlist): self
     {
-        if (is_string($classlist)) {
+        if (empty($classlist)) {
+            return $this;
+        } else if (is_string($classlist)) {
             $classlist = preg_split('/\s+/', $classlist);
         }
         foreach ($classlist as $class) {

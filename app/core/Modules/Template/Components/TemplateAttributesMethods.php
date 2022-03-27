@@ -45,13 +45,7 @@ trait TemplateAttributesMethods
      */
     public function addClass(string|array $classes): self
     {
-        if (is_array($classes)) {
-            foreach ($classes as $class) {
-                $this->addClass($class);
-            }
-        } else {
-            $this->attributes()->addClass($classes);
-        }
+        $this->attributes()->addClass($classes);
         return $this;
     }
 
