@@ -60,4 +60,10 @@ trait TemplateAttributesMethods
         $this->attributes()->setId($id);
         return $this;
     }
+
+    public function unsetAttribute(string $name): self
+    {
+        $this->attributes()->unset($name);
+        return $this;
+    }
 }

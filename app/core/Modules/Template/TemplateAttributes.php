@@ -9,20 +9,19 @@ class TemplateAttributes extends BaseTemplateElement
 
     public function render()
     {
-        $stack = [];
-        foreach ($this->attributes as $name => $value) {
-            $stack[] = is_null($value) ? $name : "{$name}=\"{$value}\"";
+        $attributes = $this->attributes;
+        if (!empty($this->classlist)) {
+            $attributes['class'] = $this->classlist();
         }
-        $classlist = $this->renderClasses();
-        if (empty($stack) && !$classlist) {
-            return '';
+        foreach ($attributes as $name => $value) {
+            $attributes[$name] = empty($value) ? $name : "{$name}=\"{$value}\"";
         }
-        $output = $classlist . ' ' . implode(' ', $stack);
-        return $this->markup($output);
+        return $this->markup(implode(' ', $attributes));
     }
 
     public function set(string $name, ?string $value = null): self
     {
+        $name = normalizeClassname($name);
         if ($name === 'class' && $value) {
             return $this->addClass($value);
         } else if ($name === 'id' && $value) {
@@ -37,39 +36,38 @@ class TemplateAttributes extends BaseTemplateElement
         return $this->attributes[$name] ?? null;
     }
 
-    /**
-     * @param string[]|string $classes
-     */
-    public function addClass(string|array $classes): self
+    public function unset(string $name): self
     {
-        if (is_array($classes)) {
-            foreach ($classes as $class) {
-                $this->addClass($class);
-            }
-            return $this;
-        }
-        $classes = preg_split('/\s+/', $classes);
-        foreach ($classes as $i => $class) {
-            if (!$class) {
-                unset($classes[$i]);
-            }
-            $classes[$i] = preg_replace('/\W+/', '-', strtolower($class));
-        }
-        $this->classlist = array_merge($this->classlist, $classes);
+        unset($this->attributes[$name]);
         return $this;
     }
 
-    public function classList(bool $as_string = false): array|string
+    /**
+     * @param string[]|string $classlist
+     */
+    public function addClass(string|array $classlist): self
     {
-        return $as_string ? implode(' ', $this->classlist) : $this->classlist;
+        if (is_string($classlist)) {
+            $classlist = preg_split('/\s+/', $classlist);
+        }
+        foreach ($classlist as $class) {
+            if (is_array($class)) {
+                $this->addClass($class);
+                continue;
+            }
+            $class = normalizeClassname($class);
+            if (empty($class)) {
+                continue;
+            } else if (!in_array($class, $this->classlist)) {
+                $this->classlist[] = $class;
+            }
+        }
+        return $this;
     }
 
-    public function renderClasses(): string
+    public function classlist(bool $return_string = false): array|string
     {
-        if (empty($this->classlist)) {
-            return '';
-        }
-        return ' class="' . $this->classList(true) . '"';
+        return $return_string ? implode(' ', $this->classlist) : $this->classlist;
     }
 
     public function setId(string $id): self
