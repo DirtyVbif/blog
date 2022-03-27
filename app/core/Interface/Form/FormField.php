@@ -236,6 +236,9 @@ class FormField implements FormFieldInterface, TemplateInterface
     public function setType(?string $type): self
     {
         $this->type = $type;
+        if ($this->is('password')) {
+            $this->required();
+        }
         $this->refreshRender();
         return $this;
     }
@@ -788,7 +791,6 @@ class FormField implements FormFieldInterface, TemplateInterface
             $this->input()->setAttr('type', $this->type());
             $this->input()->setAttr('name', $this->name());
             $this->input()->setAttr('value', $this->value());
-            $this->input()->setAttr('required');
             return;
         }
         if (
