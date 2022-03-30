@@ -4,6 +4,8 @@ namespace Blog\Modules\Entity;
 
 use Blog\Client\User;
 use Blog\Database\SQLSelect;
+use Blog\Interface\Form\Form;
+use Blog\Interface\Form\FormField;
 use Blog\Mediators\AjaxResponse;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
@@ -292,6 +294,92 @@ class Article extends EntityPrototype implements SitemapInterface
         ])->useFunction('c.created', 'UNIX_TIMESTAMP', 'c_created');
         $sql->order('c.created', 'DESC');
         return $sql;
+    }
+
+    public static function getForm(?self $data = null): Form
+    {
+        $form = new Form('entity');
+        $form->setAction('/admin/article');
+        $form->setMethod('post');
+        $form->set('type', 'create');
+        $form->setSection('top');
+        $form->setField('title', section: 'top')
+            ->required()
+            ->setLabel(t('Title') . ':&nbsp;')
+            ->inlineLabel(true)
+            ->setDefaultClassMod('line')
+            ->setAttribute('maxlength', 256);
+        $form->setField('alias', section: 'top')
+            ->required()
+            ->setPrefix('/blog/')
+            ->setLabel(t('Alias') . ':&nbsp;')
+            ->inlineLabel(true)
+            ->setPlaceholder('You can specify alias manualy or it will be generated automatically')
+            ->setDefaultClassMod('alias')
+            ->setAttribute('maxlength', 256);
+        $form->setSection('preview')
+            ->setTitle(t('Preview image'))
+            ->setDefaultClassMod('field');
+        $form->setField('preview_src', section: 'preview')
+            ->required()
+            ->setLabel(t('src:'))
+            ->inlineLabel(true)
+            ->useWrapper(false)
+            ->setDefaultClassMod('src')
+            ->setAttribute('maxlength', 256);
+        $form->setField('preview_alt', section: 'preview')
+            ->required()
+            ->setLabel(t('alt:'))
+            ->inlineLabel(true)
+            ->useWrapper(false)
+            ->setDefaultClassMod('src')
+            ->setAttribute('maxlength', 256);
+        $form->setSection('body');
+        $form->setField('summary', 'textarea', section: 'body')
+            ->required()
+            ->setLabel(t('Article summary:'))
+            ->setAttribute('rows', 3)
+            ->setAttribute('maxlength', 512);
+        $form->setField('body', 'textarea', section: 'body')
+            ->required()
+            ->setLabel(t('Body:'))
+            ->setAttribute('rows', 8);
+        $form->setField('author', section: 'body')
+            ->required()
+            ->setLabel(t('Author') . ':&nbsp;')
+            ->inlineLabel(true)
+            ->setValue(self::DEFAULT_AUTHOR)
+            ->setDefaultClassMod('line')
+            ->setAttribute('maxlength', 50);
+        $form->setSection('footer');
+        $form->setField('status', 'checkbox', section: 'footer')
+            ->setLabel(t('Publish'))
+            ->setOrder(FormField::ORDER_BEFORE_IN_LABEL)
+            ->setValue(1);
+        $form->setSubmit(section: 'footer')
+            ->setValue(t('Save'))
+            ->addClass('btn btn_transparent');
+        if ($data?->exists()) {
+            self::setFormData($form, $data);
+        }
+        return $form;
+    }
+
+    protected static function setFormData(Form $form, self $data): void
+    {
+        
+        $form->setAction('/admin/article/' . $data->id());
+        $form->set('type', 'edit');
+        $form->f('title')->setValue($data->get('title'));
+        $form->f('alias')->setValue($data->get('alias'));
+        $form->f('preview_src')->setValue($data->get('preview_src'));
+        $form->f('preview_alt')->setValue($data->get('preview_alt'));
+        $form->f('summary')->setValue($data->get('summary'));
+        $form->f('body')->setValue($data->get('body'));
+        $form->f('author')->setValue($data->get('author'));
+        if ($data->status()) {
+            $form->f('status')->setAttribute('checked');
+        }
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Blog\Modules\View;
 
 use Blog\Client\User;
+use Blog\Interface\Form\FormFactory;
 use Blog\Modules\Entity\Article;
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Form;
@@ -61,11 +62,9 @@ class Blog extends BaseView
         app()->page()->addContent($article);
         app()->page()->content()->addClass('container_article');
         // load comments form for article
-        $comment_form = new Form('comment', 'section');
-        $comment_form->tpl()->set('entity_id', $article->id());
-        $comment_form->tpl()->set('parent_id', 0);
-        $comment_form->tpl()->useGlobals(true);
-        app()->page()->addContent($comment_form);
+        app()->page()->addContent(
+            app()->builder()->getCommentFormSection($article->id())
+        );
         // load article comments
         $comments = new Element('section');
         $comments->setName('blocks/article--comments');

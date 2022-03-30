@@ -3,6 +3,8 @@
 namespace Blog\Modules\Entity;
 
 use Blog\Client\User;
+use Blog\Interface\Form\Form;
+use Blog\Interface\Form\FormField;
 use Blog\Request\RequestPrototype;
 use JetBrains\PhpStorm\ExpectedValues;
 use Twig\Markup;
@@ -93,6 +95,69 @@ class Skill extends EntityPrototype
         ]);
         $sql->where([self::ENTITY_PK => $id]);
         return (bool)$sql->update();
+    }
+
+    public static function getForm(?self $data = null): Form
+    {
+        $form = new Form('entity');
+        $form->setAction('/admin/skill');
+        $form->setMethod('post');
+        $form->set('type', 'create');
+        $form->setSection('top');
+        $form->setField('title', section: 'top')
+            ->required()
+            ->setLabel(t('Title') . ':&nbsp;')
+            ->inlineLabel(true)
+            ->setDefaultClassMod('line')
+            ->setAttribute('maxlength', 256);
+        $form->setSection('icon')
+            ->setTitle(t('Icon image'))
+            ->setDefaultClassMod('field');
+        $form->setField('icon_src', section: 'icon')
+            ->required()
+            ->setLabel('src:')
+            ->inlineLabel(true)
+            ->useWrapper(false)
+            ->setDefaultClassMod('src')
+            ->setAttribute('maxlength', 256);
+        $form->setField('icon_alt', section: 'icon')
+            ->required()
+            ->setLabel('alt:')
+            ->inlineLabel(true)
+            ->useWrapper(false)
+            ->setDefaultClassMod('src')
+            ->setAttribute('maxlength', 256);
+        $form->setSection('body');
+        $form->setField('body', 'textarea', section: 'body')
+            ->required()
+            ->setLabel(t('Body'). ':')
+            ->setAttribute('rows', 8);
+        $form->setSection('footer');
+        $form->setField('status', 'checkbox', section: 'footer')
+            ->setLabel(t('Publish'))
+            ->setOrder(FormField::ORDER_BEFORE_IN_LABEL)
+            ->setValue(1);
+        $form->setSubmit(section: 'footer')
+            ->setValue(t('Save'))
+            ->addClass('btn btn_transparent');
+        if ($data?->exists()) {
+            self::setFormData($form, $data);
+        }
+        return $form;
+    }
+
+    protected static function setFormData(Form $form, self $data): void
+    {
+        
+        $form->setAction('/admin/skill/' . $data->id());
+        $form->set('type', 'edit');
+        $form->f('title')->setValue($data->get('title'));
+        $form->f('icon_src')->setValue($data->get('icon_src'));
+        $form->f('icon_alt')->setValue($data->get('icon_alt'));
+        $form->f('body')->setValue($data->get('body'));
+        if ($data->status()) {
+            $form->f('status')->setAttribute('checked');
+        }
     }
 
     public function __construct(

@@ -6,6 +6,7 @@ use Blog\Database\SQLSelect;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Client\User;
+use Blog\Interface\Form\Form;
 use Blog\Request\RequestPrototype;
 use JetBrains\PhpStorm\ExpectedValues;
 
@@ -160,6 +161,40 @@ class Comment extends EntityPrototype implements SitemapInterface
         return !$rollback;
     }
 
+    public static function getForm(int $entity_id, ?self $data = null, int $parent_id = 0): Form
+    {
+        // TODO: rebuild comment posting to /admin/entity/<entity_id> route
+        $form = new Form('comment');
+        $form->setMethod('post');
+        $form->setAction('/blog');
+        $form->useCsrf();
+        $form->setField('type', 'hidden')
+            ->setValue('comment-add');
+        $form->setField('parent_id', 'hidden')
+            ->setValue($parent_id);
+        $form->setField('entity_id', 'hidden')
+            ->setValue($entity_id);
+        $form->setField('name')
+            ->required()
+            ->setLabel(t('Your name') . ':')
+            ->inlineLabel(true)
+            ->setAttribute('maxlength', 60);
+        $form->setField('email', 'email')
+            ->required()
+            ->setLabel(t('Your e-mail') . ':')
+            ->inlineLabel(true)
+            ->appendDescription('Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.')
+            ->setAttribute('maxlength', 256);
+        $form->setField('subject', 'textarea')
+            ->required()
+            ->setLabel(t('Comment') . ':')
+            ->setAttribute('rows', 6);
+        $form->setSubmit()
+            ->setValue(t('Send'))
+            ->addClass('btn btn_transparent');
+        return $form;
+    }
+
     public function __construct(
         int|array $data = 0,
         #[ExpectedValues(self::VIEW_MODE_FULL, self::VIEW_MODE_ARTICLE)]
@@ -180,7 +215,7 @@ class Comment extends EntityPrototype implements SitemapInterface
     /**
      * @return Element $tpl
      */
-    public function tpl()
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element;

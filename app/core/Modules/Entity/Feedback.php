@@ -2,6 +2,7 @@
 
 namespace Blog\Modules\Entity;
 
+use Blog\Interface\Form\Form;
 use Blog\Modules\DateFormat\DateFormat;
 use Blog\Modules\Template\Element;
 use Blog\Request\RequestPrototype;
@@ -84,6 +85,34 @@ class Feedback extends EntityPrototype
         return !$rollback;
     }
 
+    public static function getForm(): Form
+    {
+        $form = new Form('feedback');
+        $form->setMethod('post');
+        $form->useCsrf();
+        $form->setField('type', 'hidden')
+            ->setValue('feedback');
+        $form->setField('name')
+            ->required()
+            ->setLabel(t('Your name') . ':')
+            ->inlineLabel(true)
+            ->setAttribute('maxlength', 60);
+        $form->setField('email', 'email')
+            ->required()
+            ->setLabel(t('Your e-mail') . ':')
+            ->inlineLabel(true)
+            ->appendDescription('Он не будет отображаться где-либо на сайте. Это только для обратной связи с Вами.')
+            ->setAttribute('maxlength', 256);
+        $form->setField('subject', 'textarea')
+            ->required()
+            ->setLabel(t('Message') . ':')
+            ->setAttribute('rows', 6);
+        $form->setSubmit()
+            ->setValue(t('Send'))
+            ->addClass('btn btn_transparent');
+        return $form;
+    }
+
     /**
      * @param int|array $data is an id of article that must be loaded or already loaded article data.
      * If integer id provided as `int $data` then article will be automatically loaded from storage.
@@ -101,11 +130,8 @@ class Feedback extends EntityPrototype
         }
         $this->setViewMode($view_mode);
     }
-
-    /**
-     * @return Element $tpl
-     */
-    public function tpl()
+    
+    public function tpl(): Element
     {
         if (!isset($this->tpl)) {
             $this->tpl = new Element;
