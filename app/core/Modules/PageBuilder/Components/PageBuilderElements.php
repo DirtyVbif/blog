@@ -123,13 +123,30 @@ trait PageBuilderElements
         $label->addClass('section__header section_contacts__header');
         $form = FormFactory::get('feedback');
         $frules = new Element;
-        $frules->setName('blocks/comment-rules')
+        $frules->setName('content/rules--feedback')
             ->addClass('form-wrapper__rules');
         $fblock = new Element;
         $fblock->addClass('form-wrapper form-wrapper_feedback');
         $fblock->content()->add($form)->add($frules);
         $block->set('label', $label);
         $block->set('form', $fblock);
+        return $block;
+    }
+
+    public function getCommentFormSection(int $entity_id, int $parent_id = 0): Element
+    {
+        $block = new Element('section');
+        $block->addClass('section section_comment-form form-wrapper');
+        $label = new Title(2);
+        $label->set(t('Leave your comment'));
+        $label->addClass('section__header section_comment-form__header');
+        $block->addContent($label);
+        $form = FormFactory::getComment($entity_id, $parent_id);
+        $block->addContent($form);
+        $rules = new Element;
+        $rules->setName('content/rules--comment')
+            ->addClass('form-wrapper__rules');
+        $block->addContent($rules);
         return $block;
     }
 

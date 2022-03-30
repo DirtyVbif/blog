@@ -2,6 +2,7 @@
 
 namespace Blog\Controller\Components;
 
+use Blog\Interface\Form\FormFactory;
 use Blog\Modules\Entity\EntityFactory;
 use Blog\Modules\Entity\Skill;
 use Blog\Modules\TemplateFacade\Form;
@@ -21,10 +22,9 @@ trait AdminControllerSkillRequest
     protected function getRequestSkillCreate(): bool
     {
         $this->getTitle()->set('Создание нового материала типа &laquo;навык&raquo;');
-        $form = $this->getRequestSkillForm();
-        $form->tpl()->set('type', 'create');
-        $form->tpl()->set('action', '/admin/skill');
-        app()->page()->addContent($form);
+        app()->page()->addContent(
+            FormFactory::getSkill()
+        );
         return true;
     }
 
@@ -58,16 +58,9 @@ trait AdminControllerSkillRequest
         app()->controller()->getTitle()->set(
             "Редактирование материала типа &laquo;навык&raquo; - #{$skill->id()} " . $skill->get('title')
         );
-        $form = $this->getRequestSkillForm();
-        $form->tpl()->set('title', $skill->get('title'));
-        $form->tpl()->set('icon_src', $skill->get('icon_src'));
-        $form->tpl()->set('icon_alt', $skill->get('icon_alt'));
-        $form->tpl()->set('body', $skill->get('body'));
-        $form->tpl()->set('status', $skill->get('status'));
-        $form->tpl()->set('id', $skill->id());
-        $form->tpl()->set('action', $skill->url());
-        $form->tpl()->set('type', 'edit');
-        app()->page()->addContent($form);
+        app()->page()->addContent(
+            FormFactory::getSkill($skill)
+        );
         return true;
     }
 }
