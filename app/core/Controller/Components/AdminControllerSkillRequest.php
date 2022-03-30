@@ -5,19 +5,9 @@ namespace Blog\Controller\Components;
 use Blog\Interface\Form\FormFactory;
 use Blog\Modules\Entity\EntityFactory;
 use Blog\Modules\Entity\Skill;
-use Blog\Modules\TemplateFacade\Form;
 
 trait AdminControllerSkillRequest
 {
-    protected function getRequestSkillForm(): Form
-    {
-        $form = new Form('skill');
-        /** @var \BlogLibrary\HtmlTagsAutofill\HtmlTagsAutofill $html_tags_autofill */
-        $html_tags_autofill = app()->library('html-tags-autofill');
-        $html_tags_autofill->use();
-        $form->tpl()->set('html_tags_autofill', $html_tags_autofill->getTemplate('form-skill--body'));
-        return $form;
-    }
 
     protected function getRequestSkillCreate(): bool
     {

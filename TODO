@@ -60,3 +60,6 @@
 [ ] Create migration interface for entities;
 [ ] Create admin content page for entities;
 [ ] Create sorting interface for entities;
+[ ] Add fields for entities;
+    - rebuild edit form generating based on entities fields;
+    - rebuild requirest validating based on entities fields;

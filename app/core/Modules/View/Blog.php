@@ -3,10 +3,8 @@
 namespace Blog\Modules\View;
 
 use Blog\Client\User;
-use Blog\Interface\Form\FormFactory;
 use Blog\Modules\Entity\Article;
 use Blog\Modules\Template\Element;
-use Blog\Modules\TemplateFacade\Form;
 use Blog\Modules\TemplateFacade\Pager;
 use Blog\Modules\View\BaseView;
 
