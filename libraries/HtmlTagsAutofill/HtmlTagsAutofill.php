@@ -28,6 +28,16 @@ class HtmlTagsAutofill extends \Blog\Modules\Library\AbstractLibrary
     protected bool $twig_namespace_defined = false;
     protected array $tags;
 
+    /**
+     * Get HTML tags autofill template and include library to use it's sources on response building
+     */
+    public static function get(string $target_id): Element
+    {
+        $library = new static;
+        $library->use();
+        return $library->getTemplate($target_id);
+    }
+
     public function __construct()
     {
         $tags_list = f('tags-list', $this->getSelfSrcDir(), 'json')
