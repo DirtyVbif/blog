@@ -6,19 +6,17 @@ use Blog\Modules\Template\Element;
 
 class Title extends TemplateFacade
 {
+    protected int $size;
     protected string|Element $content;
 
-    public function __construct(
-        protected int $size = 1
-    ) {
-        $this->size($this->size);
+    public function __construct(int $size = 1) {
+        $this->size($size);
     }
     
     public function tpl(): Element
     {
         if (!isset($this->tpl)) {
-            $tag = "h{$this->size}";
-            $this->tpl = new Element($tag);
+            $this->tpl = new Element($this->tag());
         }
         return $this->tpl;
     }
@@ -46,7 +44,13 @@ class Title extends TemplateFacade
      */
     public function size(int $size): self
     {
-        $this->size = min(1, max(6, $size));
+        $this->size = max(1, min(6, $size));
+        $this->tpl()->wrapper()->set($this->tag());
         return $this;
+    }
+
+    protected function tag(): string
+    {
+        return "h{$this->size}";
     }
 }

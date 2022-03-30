@@ -41,4 +41,15 @@ abstract class TemplateFacade
         $this->tpl()->addClass($classes);
         return $this;
     }
+
+    public function setRenderable(bool $renderable = true): self
+    {
+        $this->renderable = $renderable;
+        return $this;
+    }
+
+    public function renderable(): bool
+    {
+        return $this->renderable;
+    }
 }
