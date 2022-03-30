@@ -1,0 +1,55 @@
+#svg-icon-lamp {
+    width: 100%;
+    width: 100%;
+    cursor: pointer;
+
+    & .base,
+    & .path {
+        transition: $transition;
+        fill: $grey_light;
+    }
+
+    & .line,
+    & .fill {
+        transition: $transition;
+        fill: transparent;
+    }
+
+    & .line {
+        stroke-width: 5;
+        stroke: transparent;
+    }
+
+    &:hover {
+        & .path,
+        & .fill {
+            fill: $grey_light;
+        }
+
+        & .line {
+            stroke: #e6b411;
+        }
+    }
+
+    &.active,
+    .active & {
+        & .path,
+        & .fill {
+            fill: #e6b411;
+        }
+
+        & .line {
+            stroke: #e6b411;
+        }
+
+        &:hover {
+            & .path,
+            & .fill {
+                fill: $grey_light;
+            }
+            & .line {
+                stroke: transparent;
+            }
+        }
+    }
+}
