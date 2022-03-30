@@ -2,39 +2,18 @@
 
 namespace Blog\Interface\Form;
 
-use Blog\Interface\TemplateInterface;
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Title;
 
 /**
  * It using BEM-model class naming with underscore `_` separator for parts `block_block-mod__element_element-mod`
  */
-class Form implements FormInterface, TemplateInterface
+class Form extends AbstractFormElement implements FormInterface
 {
-    /**
-     * form mask for autogeneratable template id attribute
-     */
-    protected string $form_id_mask = 'form-%s';
-
     /**
      * contains default form template class attribute
      */
     protected string $default_class = 'form';
-
-    /**
-     * BEM modificator for default form template class attribute
-     */
-    protected string $default_class_mod;
-
-    /**
-     * Indicates form to use default template class attribute
-     */
-    protected bool $use_default_class = true;
-
-    /**
-     * @var string[] contains form custom template classes attribute
-     */
-    protected array $classlist = [];
 
     /**
      * Use or not use custom classes from `@var string[] $classlist` for generating classes for nested items
@@ -120,11 +99,6 @@ class Form implements FormInterface, TemplateInterface
     protected string $title_content;
 
     /**
-     * Form template object
-     */
-    protected Element $form_template;
-
-    /**
      * @var array<string, bool> $prepared_element
      */
     protected array $prepared_elements = [];
@@ -133,11 +107,6 @@ class Form implements FormInterface, TemplateInterface
      * Statement to use hidden csrf-token field
      */
     protected bool $use_csrf;
-
-    /**
-     * array with attributes for form
-     */
-    protected array $attributes = [];
 
     public function __construct(
         ?string $name = null
@@ -149,25 +118,26 @@ class Form implements FormInterface, TemplateInterface
        $this->self_dir = $dir;
     }
 
-    public function __toString()
+    protected function target(): Element
     {
-        return (string)$this->render();
+        return $this->template();
     }
-    
-    public function template(): Element
+
+    public function title(): ?Title
     {
-        if (!isset($this->form_template)) {
-            app()->twig_add_namespace($this->self_dir, 'form-interface');
-            $this->form_template = new Element('form');
-            $this->form_template->setName('@form-interface/form');
+        if (!isset($this->title)) {
+            $this->title = new Title($this->title_size);
         }
-        return $this->form_template;
+        return $this->title;
     }
 
     public function setName(?string $form_name): void
     {
         if ($form_name) {
             $this->name = $form_name;
+        }
+        if ($this->isRendered()) {
+            $this->refreshRender();
         }
     }
 
@@ -178,37 +148,19 @@ class Form implements FormInterface, TemplateInterface
 
     public function addClass(string|array $classlist): self
     {
-        if (is_string($classlist)) {
-            $classlist = preg_split('/\s+/', $classlist);
-        }
-        foreach ($classlist as $class) {
-            $class = normalizeClassname($class);
-            if ($class && !in_array($class, $this->classlist)) {
-                array_push($this->classlist, $class);
-            }
+        parent::addClass($classlist);
+        if ($this->isRendered() && !empty($this->new_classes)) {
+            $this->template()->addClass($this->new_classes);
         }
         return $this;
     }
 
-    public function setClassMod(?string $mod): self
-    {
-        if (!$mod) {
-            unset($this->default_class_mod);
-        } else {
-            $this->default_class_mod = $mod;
-        }
-        return $this;
-    }
-
-    public function useDefaultClass(bool $use): self
-    {
-        $this->use_default_class = $use;
-        return $this;
-    }
-
-    public function useClasslistForNestedItems(bool $use): self
+    public function useCustomClassForChildren(bool $use): self
     {
         $this->use_custom_nested_class = $use;
+        if ($this->isRendered()) {
+            $this->refreshRender();
+        }
         return $this;
     }
     
@@ -218,7 +170,7 @@ class Form implements FormInterface, TemplateInterface
             return [];
         }
         $classlist = [$this->default_class];
-        if ($mod = $this->default_class_mod ?? $this->name()) {
+        if ($mod = $this->getClassMod() ?? $this->name() ?? null) {
             array_push($classlist, $this->default_class . bemmod($mod));
         }
         return $classlist;
@@ -233,7 +185,7 @@ class Form implements FormInterface, TemplateInterface
         return $return_string ? implode(' ', $classlist) : $classlist;
     }
 
-    public function getItemClasslist(string $bem_element, ?string $bem_element_mod = null, bool $return_string = false): array|string
+    public function getChildClass(string $bem_element, ?string $bem_element_mod = null, bool $return_string = false): array|string
     {
         $classlist = [];
         $bem_element = bemelem($bem_element);
@@ -253,14 +205,12 @@ class Form implements FormInterface, TemplateInterface
         return $return_string ? implode(' ', $classlist) : $classlist;
     }
 
-    public function setFormIdMask(string $mask_string): void
+    public function setId(string $id): void
     {
-        $this->form_id_mask = $mask_string;
-    }
-
-    public function setId(string $form_id): void
-    {
-        $this->id = $form_id;    
+        $this->id = kebabCase($id);
+        if ($this->isRendered()) {
+            $this->refreshRender();
+        }
     }
 
     public function id(): ?string
@@ -268,14 +218,17 @@ class Form implements FormInterface, TemplateInterface
         if ($id = $this->id ?? null) {
             return $id;
         } else if ($name = $this->name()) {
-            return sprintf($this->form_id_mask, kebabCase($name));
+            return  'form-' . kebabCase($name);
         }
-        return null;
+        return 'form';
     }
 
     public function setMethod(string $method): void
     {
         $this->method = strtoupper($method);
+        if ($this->isRendered()) {
+            $this->template()->setAttr('method', $method);
+        }
     }
 
     public function method(): string
@@ -286,6 +239,9 @@ class Form implements FormInterface, TemplateInterface
     public function setAction(string $path): void
     {
         $this->action = $path;
+        if ($this->isRendered()) {
+            $this->template()->setAttr('action', $path);
+        }
     }
 
     public function action(): string
@@ -300,6 +256,9 @@ class Form implements FormInterface, TemplateInterface
         $this->fields[$name] = $field;
         $this->setFieldSection($name, $section);
         $this->setFieldOrder($name, $order);
+        if ($this->isRendered()) {
+            $this->refreshRender();
+        }
         return $this->fields[$name];
     }
 
@@ -308,15 +267,29 @@ class Form implements FormInterface, TemplateInterface
         return $this->setField('submit', 'submit', $order, $section);
     }
 
+    public function set(string $name, string $value): FormField
+    {
+        $name = $this->setField($name, 'hidden')
+            ->setValue($value)
+            ->name();
+        return $this->f($name);
+    }
+
     public function setFieldSection(string $name, ?string $section = null): void
     {
         $this->fields_section[$name] = $section;
         unset($this->fields_order_tree);
+        if ($this->isRendered()) {
+            $this->refreshRender();
+        }
     }
 
     public function setFieldOrder(string $name, int $order): void
     {
         $this->fields_order[$name] = $order;
+        if ($this->isRendered()) {
+            $this->refreshRender();
+        }
     }
 
     public function getFieldsTree(): array
@@ -364,6 +337,9 @@ class Form implements FormInterface, TemplateInterface
         $name = $section->name();
         $this->sections[$name] = $section;
         $this->setSectionOrder($name, $order);
+        if ($this->isRendered()) {
+            $this->refreshRender();
+        }
         return $this->sections[$name];
     }
 
@@ -374,6 +350,9 @@ class Form implements FormInterface, TemplateInterface
         }
         $this->sections_order[$name] = $order;
         unset($this->sections_stack);
+        if ($this->isRendered()) {
+            $this->refreshRender();
+        }
     }
 
     public function getSectionsOrder(): array
@@ -407,14 +386,6 @@ class Form implements FormInterface, TemplateInterface
         return $this->sections;
     }
 
-    public function title(): ?Title
-    {
-        if (!isset($this->title)) {
-            $this->title = new Title($this->title_size);
-        }
-        return $this->title;
-    }
-
     public function setTitle(?string $content, int $size = 2): void
     {
         if (empty($content)) {
@@ -422,11 +393,18 @@ class Form implements FormInterface, TemplateInterface
         } else {
             $this->title_content = $content;
         }
+        if ($this->isRendered()) {
+            $this->title()->set($content ?? '');
+            $this->title()->setRenderable(empty($content) ? false : true);
+        }
     }
 
     public function setTitleSize(int $size): void
     {
         $this->title_size = $size;
+        if ($this->isRendered()) {
+            $this->title()->size($size);
+        }
     }
 
     public function getTitleSize(): int
@@ -437,18 +415,35 @@ class Form implements FormInterface, TemplateInterface
     public function useCsrf(bool $use = true): void
     {
         $this->use_csrf = $use;
-    }
-    
-    public function setAttribute(string $name, ?string $value = null, bool $data_attribute = false): self
-    {
-        if ($data_attribute) {
-            // remove manualy provided data-prefix
-            $name = preg_replace('/^\W*data\W+/', '', $name);
+        if ($this->isRendered()) {
+            $this->refreshRender();
         }
-        $name = kebabCase($data_attribute ? "data {$name}" : $name);
-        $this->attributes[$name] = $value;
-        return $this;
     }
+
+    public function contains(string $field_type): bool
+    {
+        foreach ($this->fields() as $field) {
+            if ($field->type() === $field_type) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    // ==================================================================================
+    // --------------------------------- STATEMENTS -------------------------------------
+    // ----------------------------------------------------------------------------------
+
+    protected function isPageTemplateAffected(): bool
+    {
+        return $this->statement_template_affect ?? false;
+    }
+
+    // ----------------------------------------------------------------------------------
+    // --------------------------------- STATEMENTS -------------------------------------
+    // ==================================================================================
     
 
 
@@ -456,18 +451,39 @@ class Form implements FormInterface, TemplateInterface
     // -------------------------------- RENDER LOGIC ------------------------------------
     // ----------------------------------------------------------------------------------
 
+    public function refreshRender(): void
+    {
+        if (!$this->isRendered()) {
+            return;
+        }
+        $this->form_template = new Element('form');
+        $this->form_template->setName('@form-interface/form');
+        $this->title = new Title($this->title_size);
+        foreach ($this->sections() as $s) {
+            $s->refreshRender();
+        }
+        foreach ($this->fields() as $f) {
+            $f->refreshRender();
+        }
+        $this->statement_rended = false;
+    }
+
     public function render(): Element
     {
-        // TODO: complete changes affecting on rendered form element
-        $this->prepareForm();
-        $this->prepareHiddenFields();
-        $this->prepareFormTitle();
-        $this->prepareFormBody();
+        if (!$this->isRendered()) {
+            $this->prepareForm();
+            $this->prepareHiddenFields();
+            $this->prepareFormTitle();
+            $this->prepareFormBody();
+            $this->statement_rended = true;
+        }
+        $this->affectPageTemplate();
         return $this->template();
     }
 
     protected function prepareForm(): void
     {
+        $this->template()->wrapper()->set('form');
         foreach ($this->attributes as $name => $value) {
             $this->template()->setAttr($name, $value);
         }
@@ -508,7 +524,7 @@ class Form implements FormInterface, TemplateInterface
         $this->title()->size($this->title_size);
         $this->title()->set($this->title_content);
         $this->title()->addClass(
-            $this->getItemClasslist('header')
+            $this->getChildClass('header')
         );
         $this->template()->content()->add(
             $this->title()
@@ -523,7 +539,7 @@ class Form implements FormInterface, TemplateInterface
         foreach ($this->getSectionsOrder() as $sections) {
             foreach ($sections as $s) {
                 $this->template()->content()->add(
-                    $this->s($s)?->render()
+                    $this->s($s)
                 );
             }
         }
@@ -534,9 +550,22 @@ class Form implements FormInterface, TemplateInterface
          * */
         foreach ($fields_tree[0] as $f => $order) {
             $this->template()->content()->add(
-                $this->f($f)?->render()
+                $this->f($f)
             );
         }
+    }
+
+    protected function affectPageTemplate(): void
+    {
+        // TODO: add Mediator::class for source files to make it public
+        if ($this->isPageTemplateAffected()) {
+            return;
+        }
+        page()->useCss('css/form.min');
+        if ($this->contains('password')) {
+            page()->useJs('js/pw-switch.min');
+        }
+        $this->statement_template_affect = true;
     }
     
     // ----------------------------------------------------------------------------------

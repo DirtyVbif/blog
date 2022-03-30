@@ -2,11 +2,10 @@
 
 namespace Blog\Interface\Form;
 
-use Blog\Interface\TemplateInterface;
 use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Title;
 
-class FormSection implements FormSectionInterface, TemplateInterface
+class FormSection extends AbstractFormElement implements FormSectionInterface
 {
     /**
      * Section name in `kebab-case-style`
@@ -49,6 +48,11 @@ class FormSection implements FormSectionInterface, TemplateInterface
     protected array $attributes = [];
 
     /**
+     * Current template render statement
+     */
+    protected bool $statement_render;
+
+    /**
      * @param string $name must be exactly in `kebab-case-style`. Any other styles will be converted to that case
      * @param Form $form parent form object
      */
@@ -57,6 +61,11 @@ class FormSection implements FormSectionInterface, TemplateInterface
         protected Form $form
     ) {
         $this->name = kebabCase($name);
+    }
+
+    protected function target(): Element
+    {
+        return $this->template();
     }
 
     public function name(): string
@@ -69,18 +78,10 @@ class FormSection implements FormSectionInterface, TemplateInterface
         return $this->form;
     }
 
-    public function template(): Element
-    {
-        if (!isset($this->template)) {
-            $this->template = new Element;
-        }
-        return $this->template;
-    }
-
     public function title(): Title
     {
         if (!isset($this->title)) {
-            $this->title = new Title();
+            $this->title = new Title;
         }
         return $this->title;
     }
@@ -89,8 +90,13 @@ class FormSection implements FormSectionInterface, TemplateInterface
     {
         if (empty($content)) {
             unset($this->title_content);
+            $this->title()->setRenderable(false);
         } else {
             $this->title_content = $content;
+            if ($this->isRendered()) {
+                $this->title()->set($content);
+                $this->title()->setRenderable(true);
+            }
         }
         return $this;
     }
@@ -103,49 +109,27 @@ class FormSection implements FormSectionInterface, TemplateInterface
     public function setTitleSize(int $size): self
     {
         $this->title_size = $size;
+        if ($this->isRendered()) {
+            $this->title()->size($size);
+        }
         return $this;
     }
 
     public function addClass(string|array $classlist): self
     {
-        if (is_string($classlist)) {
-            $classlist = preg_split('/\s+/', $classlist);
+        parent::addClass($classlist);
+        if ($this->isRendered() && !empty($this->new_classlist)) {
+            $this->template()->addClass($this->new_classlist);
         }
-        foreach ($classlist as $class) {
-            $class = normalizeClassname($class);
-            if (!in_array($class, $this->classlist)) {
-                array_push($this->classlist, $class);
-            }
-        }
-        return $this;
-    }
-
-    public function setClassMod(string $mod): self
-    {
-        $this->classlist_mod = $mod;
-        return $this;
-    }
-
-    public function useDefaultClass(bool $use): self
-    {
-        $this->use_default_class = $use;
-        return $this;
-    }
-
-    public function setAttribute(string $name, ?string $value = null, bool $data_attribute = false): self
-    {
-        if ($data_attribute) {
-            // remove manualy provided data-prefix
-            $name = preg_replace('/^\W*data\W+/', '', $name);
-        }
-        $name = kebabCase($data_attribute ? "data {$name}" : $name);
-        $this->attributes[$name] = $value;
         return $this;
     }
 
     public function setTag(string $tag): self
     {
         $this->tag = $tag;
+        if ($this->isRendered()) {
+            $this->template()->wrapper()->set($tag);
+        }
         return $this;
     }
 
@@ -156,14 +140,9 @@ class FormSection implements FormSectionInterface, TemplateInterface
     /**
      * Get title size based on parent form title size
      */
-    protected function tSize(): int
+    protected function getTitleSize(): int
     {
         return $this->title_size ?? $this->form()->getTitleSize() + 1;
-    }
-
-    protected function getClasslistMod(): ?string
-    {
-        return $this->classlist_mod ?? $this->name();
     }
 
     // ----------------------------------------------------------------------------------
@@ -190,13 +169,23 @@ class FormSection implements FormSectionInterface, TemplateInterface
     // ==================================================================================
     // -------------------------------- RENDER LOGIC ------------------------------------
     // ----------------------------------------------------------------------------------
+    
+    public function refreshRender(): void
+    {
+        if (!$this->isRendered()) {
+            return;
+        }
+        $this->template = new Element;
+        $this->title = new Title;
+        $this->statement_render = false;
+    }
 
     public function render(): Element
     {
-        // TODO: complete changes affeting on rendered section element
         $this->prepareWrapper();
         $this->renderTitle();
         $this->renderFields();
+        $this->statement_render = true;
         return $this->template();
     }
 
@@ -207,7 +196,7 @@ class FormSection implements FormSectionInterface, TemplateInterface
         }
         $classlist = $this->classlist;
         if ($this->use_default_class) {
-            $default_classlist = $this->form()->getItemClasslist($this->name(), $this->getClasslistMod());
+            $default_classlist = $this->form()->getChildClass($this->name(), $this->getClassMod());
             $classlist = array_merge($default_classlist, $classlist);
         }
         $this->template()->addClass($classlist);
@@ -219,9 +208,10 @@ class FormSection implements FormSectionInterface, TemplateInterface
             return false;
         }
         if ($this->use_default_class) {
-            $classlist = $this->form()->getItemClasslist('title', $this->getClasslistMod());
+            $classlist = $this->form()->getChildClass('title', $this->getClassMod());
             $this->title()->addClass($classlist);
         }
+        $this->title()->size($this->getTitleSize());
         $this->title()->set($this->title_content);
         $this->template()->addContent($this->title());
         return true;
