@@ -37,6 +37,13 @@
     margin: 0 auto;
 
     // ELEMENTS ------------------------------------------------------->
+    &__title {
+        &_field {
+            font-size: 1em;
+            font-weight: 400;
+            margin: 0;
+        }
+    }
     &__field {
         padding-top: 10px;
         padding-bottom: 10px;
@@ -76,12 +83,17 @@
     }
 
     &__prefix {
-        min-width: 45px;
-        margin-right: 5px;
+        flex-shrink: 0;
+        min-width: 50px;
+        &_alias {
+            font-family: monospace;
+        }
     }
 
+    &__password,
     &__textarea,
     &__input {
+        width: 100%;
         padding: 5px 12px;
         outline: none;
         border-radius: 4px;
@@ -98,12 +110,7 @@
         }
     }
 
-    &__input {
-        width: 100%;
-    }
-
     &__textarea {
-        width: 100%;
         font-size: 0.8em;
         resize: vertical;
     }
@@ -132,7 +139,7 @@
         left: -9999px;
     }
 
-    &__checkbox-switcher {
+    &__cb-switch {
         position: relative;
         width: 42px;
         height: 24px;
@@ -158,11 +165,11 @@
         }
     }
 
-    &__label_checkbox:hover &__checkbox-switcher {
-        background-color: $grey_light;
+    &__label_checkbox:hover &__cb-switch {
+        background-color: $grey_bright;
     }
 
-    &__checkbox:checked ~ &__checkbox-switcher {
+    &__checkbox:checked ~ &__cb-switch {
         background-color: $blue_light;
 
         &::after {
@@ -170,8 +177,17 @@
         }
     }
 
-    &__label_checkbox:hover &__checkbox:checked ~ &__checkbox-switcher {
+    &__label_checkbox:hover &__checkbox:checked ~ &__cb-switch {
         background-color: $blue_bright;
+    }
+
+    &__pw-switch {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        width: 28px;
+        height: 28px;
+        transform: translateY(-50%);
     }
 
     // ELEMENTS <-------------------------------------------------------
@@ -204,6 +220,7 @@
         }
     }
 
+    &_comment,
     &_login,
     &_feedback {
         &__line {
@@ -222,12 +239,17 @@
         }
     }
     
-    &_skill,
-    &_article {
-        
+    &_entity {
         &__label {
-            &:not(&_checkbox) {
-                width: 100%;
+            width: 100%;
+            &_alias,
+            &_line,
+            &_checkbox {
+                width: auto;
+            }
+            &_src {
+                width: 45px;
+                margin-right: 5px;
             }
         }
 
