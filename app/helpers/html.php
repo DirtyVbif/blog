@@ -128,6 +128,46 @@ function usesvg(string $href, array $options = [])
 }
 
 /**
+ * Path to svg file
+ * 
+ * @param string $path it must be relative path if file is in public directory or absolute otherwise
+ * @param array $options [optional]
+ * * array key `'markup' => bool` `[default(TRUE)]` to use `Twig\Markup::class` for output.
+ * * array key `'relative' => bool` `[default(TRUE)]` path statement: `TRUE` - relative; `FALSE` - absolute.
+ * * array key `'absolute' => bool` `[default(FALSE)]` path statement: `TRUE` - absolue; `FALSE` - relative
+ * @param bool $relative_path must be set as `TRUE` for relative pathes or `FALSE` for absolute pathes
+ */
+function getsvg(string $path, array $options = []): string|\Twig\Markup
+{
+    $relative = true;
+    if (
+        isset($options['relative']) && !$options['relative']
+        || ($options['absolute'] ?? false)
+    ) {
+        $relative = false;
+    }
+    if ($relative) {
+        ffstr($path);
+    } else {
+        ffpath($path);
+    }
+    if (!file_exists($path)) {
+        return null;
+    }
+    $output = file_get_contents($path);
+    // cleanup all white spaces and new lines
+    $output = preg_replace(['/\s+\</m', '/\>\s+/'], ['<', '>'], $output);
+    // cleanup all comments
+    $output = preg_replace('/\s*\<\!\-\-.*(?=\-\-\>)\-\-\>\s*/m', '', $output);
+    // get only `<svg>...</svg>` content
+    $output = preg_replace('/(.*)(\<svg.*)(?=\<\/svg\>)(\<\/svg\>)(.*)/im', '$2$3$4', $output);
+    if ($options['markup'] ?? true) {
+        $output = new \Twig\Markup($output, CHARSET);
+    }
+    return $output;
+}
+
+/**
  * Converts string to BEM-model modificator `_mod-name`
  */
 function bemmod(string $mod): string
