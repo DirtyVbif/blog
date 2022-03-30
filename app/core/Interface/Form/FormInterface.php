@@ -2,33 +2,15 @@
 
 namespace Blog\Interface\Form;
 
-use Blog\Modules\Template\Element;
 use Blog\Modules\TemplateFacade\Title;
 use JetBrains\PhpStorm\ExpectedValues;
 
 interface FormInterface
 {
     /**
-     * Add new class or classes to form template classlist
-     */
-    public function addClass(string|array $classlist): self;
-
-    /**
-     * Add BEM-model modificator to default form template class
-     * 
-     * BEM-model modificator can be provided without `_` underscore prefix. It will be added automatically.
-     */
-    public function setClassMod(?string $mod): self;
-
-    /**
-     * Set form statement to use or not to use default form template class
-     */
-    public function useDefaultClass(bool $use): self;
-
-    /**
      * Set new status for using custom classlist in generating classes for nested form items
      */
-    public function useClasslistForNestedItems(bool $use): self;
+    public function useCustomClassForChildren(bool $use): self;
 
     /**
      * Get form default classlist with BEM-model modificator if it specified
@@ -54,7 +36,7 @@ interface FormInterface
      * @return array classlist if `@param bool $return_string` is `FALSE`
      * @return string classlist if `@param bool $return_string` is `TRUE`
      */
-    public function getItemClasslist(string $bem_element, ?string $bem_element_mod = null, bool $return_string = false): array|string;
+    public function getChildClass(string $bem_element, ?string $bem_element_mod = null, bool $return_string = false): array|string;
 
     /**
      * Set form name that will be used in automatically generated form and form elements ids and names
@@ -67,16 +49,9 @@ interface FormInterface
     public function name(): ?string;
 
     /**
-     * Set new form mask for autogenerateble template id attribute based on form name
-     * 
-     * Mask string must be compatable with `sprintf()` function. By default form uses `form-%s` mask.
-     */
-    public function setFormIdMask(string $mask_string): void;
-
-    /**
      * Set form custom template id attribute value
      */
-    public function setId(string $form_id): void;
+    public function setId(string $id): void;
 
     /**
      * Get current form template id attribute value string based on form name or null if form name wasn't specified
@@ -131,6 +106,19 @@ interface FormInterface
      * @param ?string $section @see @method setField()
      */
     public function setSubmit(int $order = 0, ?string $section = null): FormField;
+
+    /**
+     * Set form hidden field with field value
+     * 
+     * Is is an alias for @method setField() with arguments `(name: $name, type: 'hidden')`
+     * with callback of field @method FOrmField::setValue() with argument `(value: $value)`
+     * 
+     * @param string $name hidden field attribute `name` value
+     * @param string $value hidden field attribute `value` value
+     * 
+     * @return FormField created hidden field
+     */
+    public function set(string $name, string $value): FormField;
 
     /**
      * Attach defined field into existing section
@@ -242,17 +230,12 @@ interface FormInterface
     public function getTitleSize(): int;
 
     /**
-     * Get form template element
-     */
-    public function template(): Element;
-
-    /**
-     * Build form template correspondes with current form configuration, fields, sections, it's order and settings
-     */
-    public function render(): Element;
-
-    /**
      * Set statement of using form csrf protection
      */
     public function useCsrf(bool $use = true): void;
+
+    /**
+     * Check if form element contains specified field type
+     */
+    public function contains(string $field_type): bool;
 }

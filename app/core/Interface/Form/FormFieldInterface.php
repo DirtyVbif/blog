@@ -2,9 +2,11 @@
 
 namespace Blog\Interface\Form;
 
+use Blog\Interface\RenderableInterface;
+use Blog\Interface\TemplateInterface;
 use Blog\Modules\Template\Element;
 
-interface FormFieldInterface
+interface FormFieldInterface extends TemplateInterface, RenderableInterface
 {
     /**
      * Get field parent form object
@@ -94,11 +96,6 @@ interface FormFieldInterface
     public function useWrapper(bool $use): self;
 
     /**
-     * Get field parent wrapper element template
-     */
-    public function template(): Element;
-
-    /**
      * Set label in one line with field input or not. Corresponds with field and label order.
      */
     public function inlineLabel(bool $inline_statement): self;
@@ -155,57 +152,25 @@ interface FormFieldInterface
     public function isRequired(): bool;
 
     /**
-     * Build form field template correspondes with current field configuration and content
-     */
-    public function render(): Element;
-
-    /**
-     * Set statement for using or not default form classes
-     */
-    public function useDefaultClass(bool $use): self;
-
-    /**
      * Add custom classes to field parent wrapper element
      * 
      * @param string|string[] $classlist
      */
-    public function addWrapperClass(string|array $classlist): self;
-
-    /**
-     * Alias method for @method addWrapperClass()
-     */
-    public function clsW(string|array $classlist): self;
+    public function addClassWrapper(string|array $classlist): self;
 
     /**
      * Add custom classes to field label element
      * 
      * @param string|string[] $classlist
      */
-    public function addLabelClass(string|array $classlist): self;
-
-    /**
-     * Alias method for @method addWLabelClass()
-     */
-    public function clsL(string|array $classlist): self;
+    public function addClassLabel(string|array $classlist): self;
 
     /**
      * Add custom classes to field input element
      * 
      * @param string|string[] $classlist
      */
-    public function addInputClass(string|array $classlist): self;
-
-    /**
-     * Alias method for @method addInputClass()
-     */
-    public function clsI(string|array $classlist): self;
-
-    /**
-     * Add BEM-model modificator to default form template class
-     * 
-     * BEM-model modificator can be provided without `_` underscore prefix. It will be added automatically.
-     */
-    public function setClassMod(?string $mod): self;
+    public function addClassInput(string|array $classlist): self;
 
     /**
      * Check if field is of type

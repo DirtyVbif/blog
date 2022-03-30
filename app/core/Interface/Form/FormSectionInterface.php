@@ -41,21 +41,6 @@ interface FormSectionInterface
     public function setTitleSize(int $size): self;
 
     /**
-     * Add classes to section element
-     */
-    public function addClass(string|array $classlist): self;
-
-    /**
-     * Add BEM-model modificator to current classlist
-     */
-    public function setClassMod(string $mod): self;
-
-    /**
-     * Set statement for using default classlist
-     */
-    public function useDefaultClass(bool $use): self;
-
-    /**
      * Set specific HTML tag name for section element
      */
     public function setTag(string $tag): self;
