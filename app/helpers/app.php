@@ -81,3 +81,13 @@ function systemLog(string $type, string $text, array $data = []): void
     app()->logger()->log($type, $text, $data);
     return;
 }
+
+function template(string $tag = 'div', string $name = 'template'): \Blog\Modules\Template\Template
+{
+    return new \Blog\Modules\Template\Template($tag, $name);
+}
+
+function tpl(string $tag = 'div', string $name = 'template'): \Blog\Modules\Template\Template
+{
+    return template($tag, $name);
+}

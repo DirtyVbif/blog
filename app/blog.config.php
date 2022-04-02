@@ -42,7 +42,8 @@ $__config['twig'] = [
         'Blog\Modules\Template\BaseTemplate' => ['html'],
         'Blog\Modules\Template\BaseTemplateElement' => ['html'],
         'Blog\Modules\TemplateFacade\TemplateFacade' => ['html'],
-        'Blog\Interface\TemplateInterface' => ['html']
+        'Blog\Interface\TemplateInterface' => ['html'],
+        'Blog\Modules\Template\RenderableElement' => ['html']
     ],
     'config' => [
         // 'cache' => PUBDIR . 'cache/twig',

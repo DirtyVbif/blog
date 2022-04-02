@@ -63,3 +63,4 @@
 [ ] Add fields for entities;
     - rebuild edit form generating based on entities fields;
     - rebuild requirest validating based on entities fields;
+[ ] Add Request::facade;

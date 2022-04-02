@@ -7,7 +7,7 @@ use Blog\Modules\Template\Element;
 interface RenderableInterface
 {
     /**
-     * Rebuild template for new render in case ob changes for rendered template
+     * Rebuild template for new render in case on changes for rendered template
      */
     public function refreshRender(): void;
 
