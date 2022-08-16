@@ -1,0 +1,71 @@
+Life Flasks                         > LifeFlask                                             >> Flasks
+Mana Flasks                         > ManaFlask                                             >> Flasks
+Hybrid Flasks                       > HybridFlask                                           >> Flasks
+Currency                            > Currency                                              >> Other
+Amulets                             > Amulet                                                >> Jewellery
+Rings                               > Ring                                                  >> Jewellery
+Claws                               > Claw                                                  >> One Handed Weapon
+Daggers                             > Dagger                                                >> One Handed Weapon
+Wands                               > Wand                                                  >> One Handed Weapon
+One Hand Swords                     > One Hand Sword                                        >> One Handed Weapon
+Thrusting One Hand Swords           > Thrusting One Hand Sword                              >> One Handed Weapon
+One Hand Axes                       > One Hand Axe                                          >> One Handed Weapon
+One Hand Maces                      > One Hand Mace                                         >> One Handed Weapon
+Bows                                > Bow                                                   >> Two Handed Weapon
+Staves                              > Staff                                                 >> Two Handed Weapon
+Two Hand Swords                     > Two Hand Sword                                        >> Two Handed Weapon
+Two Hand Axes                       > Two Hand Axe                                          >> Two Handed Weapon
+Two Hand Maces                      > Two Hand Mace                                         >> Two Handed Weapon
+Active Skill Gems                   > Active Skill Gem                                      >> Gems
+Support Skill Gems                  > Support Skill Gem                                     >> Gems
+Quivers                             > Quiver                                                >> Off-hand
+Belts                               > Belt                                                  >> Jewellery
+Gloves                              > Gloves                                                >> Armor
+Boots                               > Boots                                                 >> Armor
+Body Armours                        > Body Armour                                           >> Armor
+Helmets                             > Helmet                                                >> Armor
+Shields                             > Shield                                                >> Off-hand
+Stackable Currency                  > StackableCurrency
+Quest Items                         > QuestItem
+Sceptres                            > Sceptre                                               >> One Handed Weapon
+Utility Flasks                      > UtilityFlask                                          >> Flasks
+Critical Utility Flasks             > UtilityFlaskCritical
+Maps                                > Map                                                   >> Other
+Unarmed                             > Unarmed
+Fishing Rods                        > FishingRod
+Map Fragments                       > MapFragment                                           >> Other
+Hideout Doodads                     > HideoutDoodad
+Microtransactions                   > Microtransaction                                      >> Microtransactions
+Jewel                               > Jewel                                                 >> Other
+Divination Card                     > DivinationCard                                        >> Other
+Labyrinth Item                      > LabyrinthItem
+Labyrinth Trinket                   > LabyrinthTrinket
+Labyrinth Map Item                  > LabyrinthMapItem
+Misc Map Items                      > MiscMapItem                                           >> Other
+Leaguestones                        > Leaguestone                                           >> Other
+Pantheon Soul                       > PantheonSoul
+Piece                               > UniqueFragment                                        >> Other
+Abyss Jewel                         > AbyssJewel                                            >> Other
+Incursion Item                      > IncursionItem
+Delve Socketable Currency           > DelveSocketableCurrency
+Incubator                           > Incubator
+Shard                               > UniqueShard
+Shard Heart                         > UniqueShardBase
+Rune Daggers                        > Rune Dagger                                           >> One Handed Weapon
+Warstaves                           > Warstaff                                              >> Two Handed Weapon
+Delve Stackable Socketable Currency > DelveStackableSocketableCurrency
+Atlas Region Upgrade Item           > AtlasRegionUpgradeItem
+Metamorph Sample                    > MetamorphosisDNA
+                                    > HarvestObject
+Harvest Seed                        > HarvestSeed
+                                    > HarvestInfrastructure
+Seed Enhancer                       > HarvestPlantBooster
+Contract                            > HeistContract
+Heist Gear                          > HeistEquipmentWeapon
+Heist Tool                          > HeistEquipmentTool
+Heist Cloak                         > HeistEquipmentUtility
+Heist Brooch                        > HeistEquipmentReward
+Blueprint                           > HeistBlueprint
+Trinkets                            > Trinket                                               >> Jewellery
+Heist Target                        > HeistObjective
+Expedition Logbook                  > ExpeditionLogbook

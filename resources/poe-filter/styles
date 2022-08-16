@@ -1,0 +1,11 @@
+('SetBorderColor'), <Red> <Green> <Blue> [Alpha]
+('SetTextColor'), <Red> <Green> <Blue> [Alpha]
+('SetBackgroundColor'), <Red> <Green> <Blue> [Alpha]
+('SetFontSize'), <FontSize>
+('PlayAlertSound'), <Id> [Volume]
+('PlayAlertSoundPositional'), <Id> [Volume]
+('DisableDropSound'),
+('EnableDropSound'),
+('CustomAlertSound'), <FileName | FileFullPath>
+('MinimapIcon'), <Size> <Color> <Shape>
+('PlayEffect'), <Color> [Temp]

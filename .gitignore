@@ -13,6 +13,7 @@ public/cache/
 # Development files
 commands
 .vscode/
+.idea/
 assets/img/
 
 # local configuration and automaticly generated files

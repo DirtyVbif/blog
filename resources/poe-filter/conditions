@@ -1,0 +1,36 @@
+('AreaLevel'), [Operator] <Value>
+('ItemLevel'), [Operator] <Level>
+('DropLevel'), [Operator] <Level>
+('Quality'), [Operator] <Quality>
+('Rarity'), [Operator] <Rarity>
+('Class'), <Class>
+('BaseType'), <Type>
+('Prophecy'), <Type>
+('LinkedSockets'), [Operator] <Links>
+('SocketGroup'), [Operator] <GroupSyntax>
+('Sockets'), [Operator] <GroupSyntax>
+('Height'), [Operator] <Value>
+('Width'), [Operator] <Value>
+('HasExplicitMod'), <Value>
+('AnyEnchantment'), <Boolean>
+('HasEnchantment'), <Value>
+('EnchantmentPassiveNode'), <Value>
+('EnchantmentPassiveNum'), [Operator] <Value>
+('StackSize'), [Operator] <Value>
+('GemLevel'), [Operator] <Value>
+('GemQualityType'), <Value>
+('AlternateQuality'), <Boolean>
+('Replica'), <Boolean>
+('Identified'), <Boolean>
+('Corrupted'), <Boolean>
+('CorruptedMods'), [Operator] <Value>
+('Mirrored'), <Boolean>
+('ElderItem'), <Boolean>
+('ShaperItem'), <Boolean>
+('HasInfluence'), <Type>
+('FracturedItem'), <Boolean>
+('SynthesisedItem'), <Boolean>
+('ElderMap'), <Boolean>
+('ShapedMap'), <Boolean>
+('BlightedMap'), <Boolean>
+('MapTier'), [Operator] <Value>
