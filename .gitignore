@@ -12,6 +12,7 @@ public/cache/
 
 # Development files
 commands
+.idea/
 .vscode/
 assets/img/
 
